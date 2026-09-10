@@ -33,6 +33,7 @@ export default function AdminCreatorsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [payingSampleId, setPayingSampleId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -45,6 +46,57 @@ export default function AdminCreatorsPage() {
     setCopiedAccountId(id);
     setTimeout(() => setCopiedAccountId(null), 2000);
     toast.success(`Copied account number: ${text}`);
+  };
+
+  const handleMarkSamplePaid = async (creatorId: string, creatorName?: string) => {
+    if (
+      !confirm(
+        `Confirm that the $1.00 audition sample reward has been disbursed to ${creatorName || 'this creator'}?\n\nThis will mark the audition sample as PAID and remove $1.00 from their available balance.`
+      )
+    ) {
+      return;
+    }
+
+    setPayingSampleId(creatorId);
+    try {
+      const res = await fetch('/api/admin/creators/sample-payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to mark sample payout.');
+
+      toast.success(
+        `$1.00 audition reward marked as paid out for ${creatorName || 'creator'}. Available balance updated!`,
+        'Bonus Paid Out'
+      );
+
+      // Instantly update creator state in table
+      setCreators((prev) =>
+        prev.map((c) => {
+          if (c.id === creatorId) {
+            const updatedStats = data.stats || {
+              ...c.stats,
+              sampleUnpaidEarnings: 0,
+              samplePaidEarnings: (c.stats?.samplePaidEarnings || 0) + 1.0,
+              availablePayoutBalance: Math.max(0, (c.stats?.availablePayoutBalance || 0) - 1.0),
+              totalPaid: (c.stats?.totalPaid || 0) + 1.0,
+              sampleBonusPaid: true,
+            };
+            return {
+              ...c,
+              stats: updatedStats,
+            };
+          }
+          return c;
+        })
+      );
+    } catch (err: any) {
+      toast.error(err.message || 'Error processing sample payout.');
+    } finally {
+      setPayingSampleId(null);
+    }
   };
 
   // Quick Direct Notify Modal
@@ -324,10 +376,30 @@ export default function AdminCreatorsPage() {
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="space-y-1.5">
                           {sampleStatus === 'APPROVED' ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF2F4] text-[#7B1E4B] border-0">
-                              <CheckCircle2 className="w-3 h-3 mr-1 text-[#7B1E4B]" />
-                              Audition Approved
-                            </span>
+                            <div className="space-y-1">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF2F4] text-[#7B1E4B] border-0">
+                                <CheckCircle2 className="w-3 h-3 mr-1 text-[#7B1E4B]" />
+                                Audition Approved
+                              </span>
+                              <div>
+                                {c.stats?.sampleBonusPaid ? (
+                                  <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
+                                    ✓ $1 Bonus Paid Out
+                                  </span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={payingSampleId === c.id}
+                                    onClick={() => handleMarkSamplePaid(c.id, c.display_name)}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold shadow-sm transition-all disabled:opacity-50"
+                                    title="Click once the $1 audition bonus has been sent to creator's local bank"
+                                  >
+                                    <DollarSign className="w-3 h-3" />
+                                    {payingSampleId === c.id ? 'Marking Paid...' : 'Mark $1 Paid Out'}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                           ) : sampleStatus === 'PENDING_REVIEW' ? (
                             <div className="space-y-1">
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF0F5] text-[#7B1E4B] border-0">

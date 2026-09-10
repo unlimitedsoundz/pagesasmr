@@ -50,6 +50,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'A rejection reason is required.' }, { status: 400 });
       }
       updatedProfile = db.rejectCreatorSample(creatorId, user, notes, false);
+    } else if (action === 'MARK_PAID') {
+      const result = db.markSamplePayoutPaid(creatorId, user, notes);
+      return NextResponse.json({ message: 'Audition bonus marked as paid out', ...result });
     } else {
       return NextResponse.json({ error: 'Invalid review action.' }, { status: 400 });
     }

@@ -579,8 +579,8 @@ export default function SubmissionsPage() {
             </div>
           ) : (
             <>
-              {/* Table column headers */}
-              <div className="px-6 grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500 border-t border-neutral-100 dark:border-neutral-800 py-2.5">
+              {/* Table column headers (Desktop only) */}
+              <div className="hidden md:grid px-6 grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500 border-t border-neutral-100 dark:border-neutral-800 py-2.5">
                 <span>Recording</span>
                 <span>Submitted</span>
                 <span>Status</span>
@@ -588,7 +588,7 @@ export default function SubmissionsPage() {
                 <span />
               </div>
 
-              {/* Table rows */}
+              {/* Table rows / Mobile cards */}
               <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
                 {filtered.map((sub) => {
                   const minutes = Math.floor(sub.duration_seconds / 60);
@@ -597,109 +597,179 @@ export default function SubmissionsPage() {
                     .toString()
                     .padStart(2, '0')}`;
                   const earnings = sub.is_sample
-                    ? '$0.00'
+                    ? (sub.payout_status === 'PAID' ? '$1.00' : '$1.00 (Pending)')
                     : `$${(sub.agreed_rate_usd || 50).toFixed(2)}`;
                   const earningsNote = sub.is_sample
-                    ? 'Non-billable audition'
+                    ? (sub.payout_status === 'PAID' ? 'Audition bonus paid' : 'Audition bonus unpaid')
                     : sub.payout_status || 'UNPAID';
 
                   return (
-                    <div
-                      key={sub.id}
-                      className="px-6 py-4 grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 items-center hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors"
-                    >
-                      {/* Recording col */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        <button
-                          type="button"
-                          onClick={() => openDetails(sub)}
-                          className="shrink-0 focus:outline-none"
-                        >
-                          <VideoThumbnail
-                            videoId={sub.id}
-                            videoUrl={sub.file_url}
-                            durationSeconds={sub.duration_seconds}
-                            className="w-14 h-14 rounded-lg"
-                            altTitle={sub.title}
-                            isSample={sub.is_sample}
-                          />
-                        </button>
-                        <div className="min-w-0 space-y-0.5">
-                          <div className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-medium">
-                            {formatCategoryShort(sub.category)}
-                          </div>
+                    <div key={sub.id}>
+                      {/* Mobile View Card (< md) */}
+                      <div className="md:hidden p-4 space-y-3 hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
+                        <div className="flex items-start gap-3 min-w-0">
                           <button
                             type="button"
                             onClick={() => openDetails(sub)}
-                            className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1 text-left hover:text-[#8E2848] dark:hover:text-pink-400 transition-colors"
+                            className="shrink-0 focus:outline-none"
                           >
-                            {sub.title}
+                            <VideoThumbnail
+                              videoId={sub.id}
+                              videoUrl={sub.file_url}
+                              durationSeconds={sub.duration_seconds}
+                              className="w-16 h-16 rounded-xl object-cover"
+                              altTitle={sub.title}
+                              isSample={sub.is_sample}
+                            />
                           </button>
-                          <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
-                            {sub.is_sample && (
-                              <span className="font-medium text-neutral-500">
-                                Audition sample
+
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-semibold truncate">
+                                {formatCategoryShort(sub.category)}
                               </span>
-                            )}
-                            <span>&middot; {durationLabel}</span>
+                              <StatusPill status={sub.status} />
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => openDetails(sub)}
+                              className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white line-clamp-2 text-left hover:text-[#8E2848] dark:hover:text-pink-400 transition-colors break-words"
+                            >
+                              {sub.title}
+                            </button>
+
+                            <div className="text-[11px] text-neutral-400">
+                              {sub.is_sample ? 'Audition sample · ' : ''}{durationLabel}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Submitted col */}
-                      <div className="text-xs text-neutral-600 dark:text-neutral-400 space-y-0.5">
-                        {sub.created_at ? (
-                          <>
-                            <div className="font-medium">
-                              {new Date(sub.created_at).toLocaleDateString(
-                                'en-US',
-                                {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                }
-                              )}
+                        <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800 text-xs gap-2">
+                          <div className="space-y-0.5 min-w-0">
+                            <div className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
+                              {sub.created_at
+                                ? new Date(sub.created_at).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                  })
+                                : '—'}
                             </div>
-                            <div className="text-[11px] text-neutral-400">
-                              {new Date(sub.created_at).toLocaleTimeString(
-                                'en-US',
-                                {
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                  hour12: true,
-                                }
-                              )}
+                            <div className="font-semibold text-neutral-900 dark:text-white text-xs">
+                              {earnings}{' '}
+                              <span className="text-[10px] font-normal text-neutral-500 dark:text-neutral-400">
+                                ({earningsNote})
+                              </span>
                             </div>
-                          </>
-                        ) : (
-                          <span>â€”</span>
-                        )}
-                      </div>
+                          </div>
 
-                      {/* Status col */}
-                      <div>
-                        <StatusPill status={sub.status} />
-                      </div>
-
-                      {/* Earnings col */}
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-semibold text-neutral-900 dark:text-white">
-                          {earnings}
-                        </div>
-                        <div className="text-[11px] text-neutral-400 dark:text-neutral-500">
-                          {earningsNote}
+                          <button
+                            type="button"
+                            onClick={() => openDetails(sub)}
+                            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold text-xs hover:bg-[#8E2848] hover:text-white transition-colors"
+                          >
+                            Details
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
                         </div>
                       </div>
 
-                      {/* Action col */}
-                      <button
-                        type="button"
-                        onClick={() => openDetails(sub)}
-                        className="flex items-center gap-1 text-xs font-semibold text-[#8E2848] dark:text-pink-400 hover:underline whitespace-nowrap"
-                      >
-                        Details
-                        <ArrowRight className="w-3 h-3" />
-                      </button>
+                      {/* Desktop View Row (>= md) */}
+                      <div className="hidden md:grid px-6 py-4 grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 items-center hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
+                        {/* Recording col */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => openDetails(sub)}
+                            className="shrink-0 focus:outline-none"
+                          >
+                            <VideoThumbnail
+                              videoId={sub.id}
+                              videoUrl={sub.file_url}
+                              durationSeconds={sub.duration_seconds}
+                              className="w-14 h-14 rounded-lg"
+                              altTitle={sub.title}
+                              isSample={sub.is_sample}
+                            />
+                          </button>
+                          <div className="min-w-0 space-y-0.5">
+                            <div className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-medium truncate">
+                              {formatCategoryShort(sub.category)}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => openDetails(sub)}
+                              className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1 text-left hover:text-[#8E2848] dark:hover:text-pink-400 transition-colors"
+                            >
+                              {sub.title}
+                            </button>
+                            <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
+                              {sub.is_sample && (
+                                <span className="font-medium text-neutral-500">
+                                  Audition sample
+                                </span>
+                              )}
+                              <span>&middot; {durationLabel}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Submitted col */}
+                        <div className="text-xs text-neutral-600 dark:text-neutral-400 space-y-0.5">
+                          {sub.created_at ? (
+                            <>
+                              <div className="font-medium">
+                                {new Date(sub.created_at).toLocaleDateString(
+                                  'en-US',
+                                  {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                  }
+                                )}
+                              </div>
+                              <div className="text-[11px] text-neutral-400">
+                                {new Date(sub.created_at).toLocaleTimeString(
+                                  'en-US',
+                                  {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                  }
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <span>—</span>
+                          )}
+                        </div>
+
+                        {/* Status col */}
+                        <div>
+                          <StatusPill status={sub.status} />
+                        </div>
+
+                        {/* Earnings col */}
+                        <div className="space-y-0.5">
+                          <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                            {earnings}
+                          </div>
+                          <div className="text-[11px] text-neutral-400 dark:text-neutral-500">
+                            {earningsNote}
+                          </div>
+                        </div>
+
+                        {/* Action col */}
+                        <button
+                          type="button"
+                          onClick={() => openDetails(sub)}
+                          className="flex items-center gap-1 text-xs font-semibold text-[#8E2848] dark:text-pink-400 hover:underline whitespace-nowrap"
+                        >
+                          Details
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -884,17 +954,30 @@ export default function SubmissionsPage() {
 
       {/* â”€â”€ Detail / Revision Drawer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {selectedSub && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-[#fff9fb] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-5 border border-[#f2e3e8] text-neutral-900 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-[#fff9fb] rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-8 space-y-4 sm:space-y-5 border border-[#f2e3e8] text-neutral-900 shadow-2xl">
             {/* Drawer Header */}
-            <div className="border-b border-neutral-200 pb-4 flex items-start justify-between gap-4">
-              <div className="space-y-1 min-w-0 flex-1">
+            <div className="border-b border-neutral-200 pb-4 space-y-3">
+              {/* Top Row: Status pill and Close Button */}
+              <div className="flex items-center justify-between gap-3">
                 <StatusPill status={selectedSub.status} />
-                <h3 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 break-words mt-1">
-                  {selectedSub.title}
-                </h3>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSub(null)}
+                  className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded-full hover:bg-neutral-200/60 transition-colors shrink-0"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+
+              {/* Title (Full width, no collision) */}
+              <h3 className="font-serif text-lg sm:text-2xl font-normal text-neutral-900 break-words leading-snug">
+                {selectedSub.title}
+              </h3>
+
+              {/* Action Buttons Row */}
+              <div className="flex items-center gap-2 flex-wrap pt-1">
                 <button
                   type="button"
                   onClick={() => handleDownload(selectedSub, true)}
@@ -916,7 +999,7 @@ export default function SubmissionsPage() {
                   <span>
                     {downloadingCompressId === selectedSub.id
                       ? 'Compressing...'
-                      : 'MP4'}
+                      : 'Download MP4'}
                   </span>
                 </button>
                 <button
@@ -937,61 +1020,54 @@ export default function SubmissionsPage() {
                   <span>
                     {downloadingId === selectedSub.id
                       ? 'Downloading...'
-                      : 'Original'}
+                      : 'Original Video'}
                   </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedSub(null)}
-                  className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded-full hover:bg-neutral-100 transition-colors"
-                  aria-label="Close"
-                >
-                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
             {/* Meta grid */}
-            <div className="bg-[#f8e2ec] p-4 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-              <div>
-                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider">
+            <div className="bg-[#f8e2ec] p-3.5 sm:p-4 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center text-xs">
+              <div className="min-w-0">
+                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider block truncate">
                   Agreed Rate
                 </span>
-                <div className="font-serif text-base font-normal text-neutral-900 mt-0.5">
+                <div className="font-serif text-sm sm:text-base font-normal text-neutral-900 mt-0.5">
                   {selectedSub.is_sample ? (
-                    <span className="text-xs text-[#8E2848] font-semibold">
-                      Audition Gate
-                    </span>
+                    <div>
+                      <span className="font-bold text-sm text-neutral-900">$1.00</span>
+                      <div className="text-[10px] text-[#8E2848] font-semibold">Audition Bonus</div>
+                    </div>
                   ) : (
-                    `$${selectedSub.agreed_rate_usd.toFixed(2)}`
+                    `$${(selectedSub.agreed_rate_usd || 50).toFixed(2)}`
                   )}
                 </div>
               </div>
-              <div>
-                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider">
+              <div className="min-w-0">
+                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider block truncate">
                   Duration
                 </span>
-                <div className="font-serif text-base font-normal text-neutral-900 mt-0.5">
+                <div className="font-serif text-sm sm:text-base font-normal text-neutral-900 mt-0.5">
                   {Math.round(selectedSub.duration_seconds)}s
                 </div>
               </div>
-              <div>
-                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider">
+              <div className="min-w-0">
+                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider block truncate">
                   Payout State
                 </span>
-                <div className="font-semibold text-neutral-900 uppercase mt-0.5 text-[11px]">
-                  {selectedSub.is_sample ? (
-                    <span className="text-neutral-600">Gate ($0)</span>
+                <div className="font-semibold uppercase mt-0.5 text-[11px] truncate">
+                  {selectedSub.payout_status === 'PAID' ? (
+                    <span className="text-emerald-700 font-bold">PAID OUT</span>
                   ) : (
-                    selectedSub.payout_status
+                    <span className="text-amber-800 font-bold">{selectedSub.payout_status || 'UNPAID'}</span>
                   )}
                 </div>
               </div>
-              <div>
-                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider">
+              <div className="min-w-0">
+                <span className="text-neutral-600 text-[10px] uppercase font-bold tracking-wider block truncate">
                   Version
                 </span>
-                <div className="font-serif text-base font-normal text-neutral-900 mt-0.5">
+                <div className="font-serif text-sm sm:text-base font-normal text-neutral-900 mt-0.5">
                   v{selectedSub.version_number}
                 </div>
               </div>

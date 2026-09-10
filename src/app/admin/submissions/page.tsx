@@ -60,7 +60,39 @@ export default function AdminSubmissionsPage() {
   // Download States
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [downloadingCompressId, setDownloadingCompressId] = useState<string | null>(null);
+  const [payingSampleId, setPayingSampleId] = useState<string | null>(null);
   const [compressProgress, setCompressProgress] = useState<{ id: string; percent: number; stage: string } | null>(null);
+
+  const handleMarkSamplePaid = async (creatorId: string, creatorName?: string) => {
+    if (
+      !confirm(
+        `Mark $1.00 audition sample reward as paid out for ${creatorName || 'this creator'}?\n\nThis will deduct $1.00 from their available balance and mark the audition bonus as PAID.`
+      )
+    ) {
+      return;
+    }
+    setPayingSampleId(creatorId);
+    try {
+      const res = await fetch('/api/admin/creators/sample-payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to mark sample payout');
+      toast.success(
+        `Audition $1.00 bonus marked as paid out for ${creatorName || 'creator'}! Available balance updated.`
+      );
+      if (reviewingSub) {
+        setReviewingSub({ ...reviewingSub, payout_status: 'PAID' });
+      }
+      loadSubmissions();
+    } catch (err: any) {
+      toast.error(err.message || 'Error processing sample payout');
+    } finally {
+      setPayingSampleId(null);
+    }
+  };
 
   const handleDownload = async (sub: Submission, compress: boolean = true) => {
     if (downloadingId || downloadingCompressId) return;
@@ -937,7 +969,7 @@ export default function AdminSubmissionsPage() {
 
             {reviewingSub.is_sample && (
               <div className="p-3.5 rounded-xl bg-[#f8e2ec] border-0 text-xs font-medium text-black">
-                <strong className="font-bold">Quality Audition Rule:</strong> Approving this sample unlocks the creator's portal to record and upload their <strong>8 full paid videos ($50.00 each)</strong> toward their $400 milestone payout. Note: audition samples are unpaid ($0 USD).
+                <strong className="font-bold">Quality Audition Rule:</strong> Approving this sample unlocks the creator's portal to record and upload their <strong>8 full paid videos ($50.00 each)</strong> toward their $400 milestone payout. Note: audition samples earn an immediate <strong>$1.00 reward</strong> disbursed to their local bank.
               </div>
             )}
 
@@ -1029,11 +1061,48 @@ export default function AdminSubmissionsPage() {
               </div>
             )}
 
-            {/* Review Decision Buttons */}
-            <div className="space-y-4 border-t border-neutral-200 pt-4">
-              <div className="text-xs font-bold uppercase tracking-wider text-black">
-                Review Decision
+            {reviewingSub.status === 'APPROVED' ? (
+              <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-300 text-black space-y-3">
+                <div className="flex items-center gap-2 font-bold text-sm text-black">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Status: Approved & Resolved</span>
+                </div>
+                <p className="text-xs text-neutral-600">
+                  {reviewingSub.is_sample
+                    ? 'This 30s audition sample was approved and unlocked full production access. A $1.00 bonus was credited to their account.'
+                    : `This submission was approved ($${reviewingSub.agreed_rate_usd.toFixed(2)} USD credited). It is resolved and removed from the active queue.`}
+                </p>
+                {reviewingSub.is_sample && (
+                  <div className="pt-2 border-t border-neutral-200 flex items-center justify-between">
+                    {reviewingSub.payout_status === 'PAID' ? (
+                      <span className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                        ✓ $1.00 Audition Bonus Paid Out
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={payingSampleId === reviewingSub.creator_id}
+                        onClick={() => handleMarkSamplePaid(reviewingSub.creator_id, reviewingSub.creator_name)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all disabled:opacity-50"
+                        title="Click to mark this $1.00 audition bonus as paid out to creator's local bank"
+                      >
+                        <DollarSign className="w-3.5 h-3.5" />
+                        {payingSampleId === reviewingSub.creator_id ? 'Marking Paid...' : 'Mark $1.00 Paid Out'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
+            ) : reviewingSub.payout_status === 'PAID' ? (
+              <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-300 text-xs text-black">
+                <strong>Protected Status:</strong> This video has already been paid out to the creator. Content review decisions are permanent and cannot be modified or reversed.
+              </div>
+            ) : (
+              /* Review Decision Buttons */
+              <div className="space-y-4 border-t border-neutral-200 pt-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-black">
+                  Review Decision
+                </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <button
@@ -1116,8 +1185,9 @@ export default function AdminSubmissionsPage() {
                 </div>
               )}
             </div>
-          </div>
+          )}
         </div>
+      </div>
       )}
     </div>
   );

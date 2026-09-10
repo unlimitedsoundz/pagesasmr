@@ -273,9 +273,8 @@ class PagesDatabaseService {
             file_name: ss.file_name,
             file_size_bytes: Number(ss.file_size_bytes),
             status: (ss.status || 'SUBMITTED').toString().toUpperCase() as SubmissionStatus,
-            is_sample: isSample,
-            agreed_rate_usd: Number(ss.agreed_rate_usd ?? (isSample ? 0 : RATE_PER_VIDEO_USD)),
-            payout_status: ss.payout_status as PayoutItemStatus,
+            agreed_rate_usd: isSample ? (ss.status === 'APPROVED' ? Number(ss.agreed_rate_usd || 1.0) : 0) : Number(ss.agreed_rate_usd ?? RATE_PER_VIDEO_USD),
+            payout_status: (ss.payout_status as PayoutItemStatus) || 'UNPAID',
             payout_id: ss.payout_id || undefined,
             notes: ss.notes || undefined,
             rejection_reason: ss.rejection_reason || undefined,
@@ -1364,11 +1363,12 @@ class PagesDatabaseService {
 
     const sampleApprovedEarnings = approvedSamples.reduce((sum, s) => sum + (s.agreed_rate_usd || 1.0), 0);
     const sampleUnpaidEarnings = approvedSamples.filter((s) => s.payout_status === 'UNPAID').reduce((sum, s) => sum + (s.agreed_rate_usd || 1.0), 0);
+    const samplePaidEarnings = approvedSamples.filter((s) => s.payout_status === 'PAID').reduce((sum, s) => sum + (s.agreed_rate_usd || 1.0), 0);
 
     const approvedEarnings = approvedSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0) + sampleApprovedEarnings;
     const availablePayoutBalance = eligibleForPayout.reduce((sum, s) => sum + s.agreed_rate_usd, 0) + sampleUnpaidEarnings;
     const reservedBalance = reservedSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
-    const totalPaid = paidSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
+    const totalPaid = paidSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0) + samplePaidEarnings;
     const pendingReviewValue = pendingReviewSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
 
     const minRequired = MIN_PAYOUT_VIDEOS;
@@ -1395,6 +1395,8 @@ class PagesDatabaseService {
       available_balance: availablePayoutBalance,
       sampleApprovedEarnings,
       sampleUnpaidEarnings,
+      samplePaidEarnings,
+      sampleBonusPaid: samplePaidEarnings > 0 || (sampleApprovedEarnings > 0 && sampleUnpaidEarnings === 0),
       auditionBonusEarned: sampleApprovedEarnings > 0,
       reservedBalance,
       reservedAmount: reservedBalance,
@@ -2302,6 +2304,76 @@ class PagesDatabaseService {
     this.save();
     this.syncProfileToSupabase(creator);
     return creator;
+  }
+
+  markSamplePayoutPaid(creatorId: string, adminUser: Profile, paymentReference?: string) {
+    const creator = this.getProfileById(creatorId);
+    if (!creator) throw new Error('Creator not found.');
+
+    const sampleSubs = this.data.submissions.filter(
+      (s) => s.creator_id === creator.id && s.is_sample && s.status === 'APPROVED'
+    );
+
+    let paidAmount = 0;
+    for (const sub of sampleSubs) {
+      if (sub.payout_status !== 'PAID') {
+        sub.payout_status = 'PAID';
+        sub.agreed_rate_usd = 1.0;
+        sub.updated_at = new Date().toISOString();
+        paidAmount += 1.0;
+        this.syncSubmissionToSupabase(sub);
+      }
+    }
+
+    if (paidAmount === 0 && creator.sample_status === 'APPROVED') {
+      paidAmount = 1.0;
+    }
+
+    const ref = paymentReference || `SMP-${Date.now()}`;
+    const payMethod = creator.payment_method || 'Bank';
+    const accNumber = (creator.payment_details as any)?.account_number;
+    const ledgerEntry: EarningsLedgerEntry = {
+      id: `sample_payout_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      platform_id: PLATFORM_ID,
+      creator_id: creator.id,
+      amount_usd: paidAmount > 0 ? paidAmount : 1.0,
+      type: 'PAID',
+      description: `Audition Sample $${(paidAmount > 0 ? paidAmount : 1.0).toFixed(2)} Bonus Paid Out to ${payMethod}${accNumber ? ` (*${String(accNumber).slice(-4)})` : ''} (Ref: ${ref})`,
+      created_at: new Date().toISOString(),
+    };
+    if (!this.data.earnings_ledger) this.data.earnings_ledger = [];
+    this.data.earnings_ledger.unshift(ledgerEntry);
+    this.syncLedgerToSupabase(ledgerEntry);
+
+    this.createNotification({
+      user_id: creator.id,
+      title: 'Audition Sample $1.00 Bonus Paid Out! 🎉',
+      message: `Your $${(paidAmount > 0 ? paidAmount : 1.0).toFixed(2)} audition sample reward has been disbursed to your ${payMethod}! Reference: ${ref}`,
+      type: 'PAYOUT',
+      link: '/creator/payouts',
+    });
+
+    this.createAuditEvent({
+      platform_id: PLATFORM_ID,
+      actor_id: adminUser.id,
+      actor_name: adminUser.display_name,
+      action: 'PROCESS_PAYOUT',
+      target_type: 'PROFILE',
+      target_id: creator.id,
+      details: {
+        type: 'AUDITION_SAMPLE_BONUS',
+        amount_usd: paidAmount > 0 ? paidAmount : 1.0,
+        payment_reference: ref,
+      },
+    });
+
+    this.save();
+    return {
+      success: true,
+      paidAmount: paidAmount > 0 ? paidAmount : 1.0,
+      creatorId: creator.id,
+      stats: this.getCreatorStats(creator.id),
+    };
   }
 
   getPlatformStats() {
