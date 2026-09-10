@@ -296,8 +296,19 @@
       "country": "Nigeria",
       "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
-      "payment_method": null,
-      "payment_details": {},
+      "payment_method": "NIGERIA_BANK",
+      "payment_details": {
+        "bankName": "",
+        "wiseEmail": "",
+        "paypalEmail": "",
+        "mobileNumber": "",
+        "accountNumber": "",
+        "mobileNetwork": "M-Pesa",
+        "routingNumber": "",
+        "beneficiaryName": "DENCIA ADELEKE",
+        "nigerianBankName": "OPay",
+        "nigerianAccountNumber": "7040863462"
+      },
       "date_of_birth": "1999-09-23",
       "sample_status": "APPROVED",
       "sample_submission_id": "c9736603-b927-40a7-9528-07e90063da70",
@@ -522,15 +533,25 @@
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
+        "bankName": "",
         "bank_name": "",
+        "wiseEmail": "",
         "wise_email": "",
+        "paypalEmail": "",
+        "mobileNumber": "",
         "paypal_email": "",
+        "accountNumber": "",
+        "mobileNetwork": "M-Pesa",
+        "routingNumber": "",
         "account_number": "",
         "routing_number": "",
+        "beneficiaryName": "Ovwiedo victory ogheneriode",
         "beneficiary_name": "",
+        "nigerianBankName": "OPay",
         "mobile_money_phone": "",
         "nigerian_bank_name": "Access Bank",
         "mobile_money_provider": "M-Pesa (Safaricom)",
+        "nigerianAccountNumber": "9065277585",
         "nigerian_account_name": "",
         "nigerian_account_number": "",
         "mobile_money_account_name": ""
@@ -664,14 +685,14 @@
       "payment_method": null,
       "payment_details": {},
       "date_of_birth": "1998-06-12",
-      "sample_status": "PENDING_REVIEW",
+      "sample_status": "REVISION_REQUESTED",
       "password": "Deborah@1998",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T10:11:08.222+00:00",
       "agreement_signature_name": "Deborah Adeyinka",
       "created_at": "2026-09-12T10:11:08.222+00:00",
       "sample_submission_id": "d99558d8-222a-45f0-9269-93c48381b9d1",
-      "sample_review_notes": "Resend the sample again"
+      "sample_review_notes": "The angle isn’t right, you need to use long press nails. Watch the sample guideline video and remake exactly as it was made there, same camera angle, use only inbetween your 2 middle fingers to flip the pages after each lick."
     },
     {
       "id": "b9046d86-0cfd-4ba9-81d5-3278971c63b9",
@@ -729,13 +750,14 @@
       },
       "avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-a332a130-ff0d-491e-8799-6f6729754933-1789244766888.jpg",
       "date_of_birth": "2006-01-09",
-      "sample_status": "PENDING_REVIEW",
+      "sample_status": "REVISION_REQUESTED",
       "password": "@Jhaywone321",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T20:00:09.013+00:00",
       "agreement_signature_name": "Joseph",
       "created_at": "2026-09-12T20:00:09.013+00:00",
-      "sample_submission_id": "a50fa20f-1962-4127-ad26-a491f8f1ca73"
+      "sample_submission_id": "a50fa20f-1962-4127-ad26-a491f8f1ca73",
+      "sample_review_notes": "Female creators o my with long press on nails!"
     },
     {
       "id": "75c9bd8c-974e-4569-98a6-3712211baf2d",
@@ -1026,8 +1048,8 @@
         "mobile_money_account_name": ""
       },
       "date_of_birth": "2003-09-13",
-      "sample_status": "REVISION_REQUESTED",
-      "sample_submission_id": "13abfcac-5cdb-4d19-bf88-67a8455f9659",
+      "sample_status": "PENDING_REVIEW",
+      "sample_submission_id": "13bcfa53-1a8e-47d8-bbba-0c18b41c8cfd",
       "sample_review_notes": "The angle is supberb! However you need to only use your 2 middle fingers to turn the pages, do not include your thumb. Use ONLY inbetween your 2 middle fingers to clip the pages and turn. Remake!",
       "password": "Ema123.com",
       "agreement_signed": true,
@@ -1191,6 +1213,24 @@
       "agreement_signed_at": "2026-09-13T19:39:11.374+00:00",
       "agreement_signature_name": "Sandra ojike",
       "created_at": "2026-09-13T19:39:11.378+00:00"
+    },
+    {
+      "id": "4e6b5668-3d86-4f38-984e-369d375a9f9d",
+      "email": "favouredmimie@gmail.com",
+      "display_name": "Osemobor miracle",
+      "role": "CREATOR",
+      "country": "Ghana",
+      "is_adult_confirmed": true,
+      "payment_method": null,
+      "payment_details": {},
+      "date_of_birth": "2001-05-13",
+      "password": "Lovemetoo.13",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
+      "sample_status": "NOT_SUBMITTED",
+      "agreement_signed": true,
+      "agreement_signed_at": "2026-09-14T06:47:06.88+00:00",
+      "agreement_signature_name": "Osemobor miracle",
+      "created_at": "2026-09-14T06:47:06.883+00:00"
     }
   ],
   "submissions": [
@@ -1291,10 +1331,10 @@
       "is_sample": true,
       "agreed_rate_usd": 0,
       "payout_status": "UNPAID",
-      "revision_notes": "Resend the sample again",
+      "revision_notes": "The angle isn’t right, you need to use long press nails. Watch the sample guideline video and remake exactly as it was made there, same camera angle, use only inbetween your 2 middle fingers to flip the pages after each lick.",
       "version_number": 1,
       "created_at": "2026-09-13T15:10:15.922+00:00",
-      "updated_at": "2026-09-13T17:09:16.217+00:00"
+      "updated_at": "2026-09-14T00:38:41.238+00:00"
     },
     {
       "id": "cba715f4-1bea-4ecf-a244-e6c7eaa5edf4",
@@ -1328,13 +1368,14 @@
       "file_url": "/api/videos/video-1789330956733-zrw8t1.mp4/stream",
       "file_name": "WIN_20260913_19_54_43_Pro.mp4",
       "file_size_bytes": 34987631,
-      "status": "UNDER_REVIEW",
+      "status": "REVISION_REQUESTED",
       "is_sample": true,
       "agreed_rate_usd": 0,
       "payout_status": "UNPAID",
       "version_number": 1,
       "created_at": "2026-09-13T20:22:38.296+00:00",
-      "updated_at": "2026-09-13T20:22:38.296+00:00"
+      "updated_at": "2026-09-14T00:39:55.439+00:00",
+      "revision_notes": "Female creators o my with long press on nails!"
     },
     {
       "id": "d99558d8-222a-45f0-9269-93c48381b9d1",
@@ -1348,13 +1389,34 @@
       "file_url": "/api/videos/video-1789330298445-n0g345.mp4/stream",
       "file_name": "193429.mp4",
       "file_size_bytes": 77881070,
-      "status": "UNDER_REVIEW",
+      "status": "REVISION_REQUESTED",
       "is_sample": true,
       "agreed_rate_usd": 0,
       "payout_status": "UNPAID",
       "version_number": 1,
       "created_at": "2026-09-13T20:11:40.144+00:00",
-      "updated_at": "2026-09-13T20:11:40.144+00:00"
+      "updated_at": "2026-09-14T00:38:41.239+00:00",
+      "revision_notes": "The angle isn’t right, you need to use long press nails. Watch the sample guideline video and remake exactly as it was made there, same camera angle, use only inbetween your 2 middle fingers to flip the pages after each lick."
+    },
+    {
+      "id": "13bcfa53-1a8e-47d8-bbba-0c18b41c8cfd",
+      "platform_id": "pinkroom_pages",
+      "creator_id": "5bf681c0-777b-47a9-a6fd-08e2efea653d",
+      "creator_name": "Ema Onochie",
+      "creator_email": "onochieb31@gmail.com",
+      "title": "Ema Onochie - 30s Audition Sample",
+      "category": "PAGE_TURNING",
+      "duration_seconds": 31,
+      "file_url": "/api/videos/video-1789350586531-1pz1hq.mp4/stream",
+      "file_name": "212911.mp4",
+      "file_size_bytes": 75532101,
+      "status": "UNDER_REVIEW",
+      "is_sample": true,
+      "agreed_rate_usd": 0,
+      "payout_status": "UNPAID",
+      "version_number": 1,
+      "created_at": "2026-09-14T01:49:49.12+00:00",
+      "updated_at": "2026-09-14T01:49:49.12+00:00"
     }
   ],
   "submission_versions": [
@@ -1587,6 +1649,16 @@
       "file_size_bytes": 0,
       "duration_seconds": 180,
       "created_at": "2026-09-13T16:53:53.149+00:00"
+    },
+    {
+      "id": "02d0b6f8-bd82-4744-91c4-066b82fe7567",
+      "submission_id": "13bcfa53-1a8e-47d8-bbba-0c18b41c8cfd",
+      "version_number": 1,
+      "file_url": "/api/videos/video-1789350586531-1pz1hq.mp4/stream",
+      "file_name": "Revision v1.mp4",
+      "file_size_bytes": 0,
+      "duration_seconds": 31,
+      "created_at": "2026-09-14T01:49:49.12+00:00"
     }
   ],
   "earnings_ledger": [

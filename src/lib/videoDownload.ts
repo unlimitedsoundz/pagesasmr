@@ -78,8 +78,16 @@ export async function downloadNormalVideo(
         if (data.url) {
           directUrl = data.url;
         }
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        if (errJson?.code === 'STORAGE_BANDWIDTH_EXCEEDED' || errJson?.bandwidth_exceeded) {
+          throw new Error(errJson.message || 'Storage bandwidth limit reached on Storj DCS. Please add billing at storj.io to download.');
+        }
       }
-    } catch (apiErr) {
+    } catch (apiErr: any) {
+      if (apiErr?.message?.includes('bandwidth limit reached')) {
+        throw apiErr;
+      }
       console.warn('Could not query /api/videos/[id]/download, falling back to stream endpoint:', apiErr);
     }
 
@@ -91,8 +99,17 @@ export async function downloadNormalVideo(
         if (res2.ok) {
           const data2 = await res2.json();
           if (data2.url) directUrl = data2.url;
+        } else {
+          const errJson2 = await res2.json().catch(() => ({}));
+          if (errJson2?.code === 'STORAGE_BANDWIDTH_EXCEEDED' || errJson2?.bandwidth_exceeded) {
+            throw new Error(errJson2.message || 'Storage bandwidth limit reached on Storj DCS. Please add billing at storj.io to download.');
+          }
         }
-      } catch {}
+      } catch (streamErr: any) {
+        if (streamErr?.message?.includes('bandwidth limit reached')) {
+          throw streamErr;
+        }
+      }
     }
 
     // If still no direct URL, use the direct API download endpoint path

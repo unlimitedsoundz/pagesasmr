@@ -59,6 +59,7 @@ export default function AdminVideoPreview({
   const [bufferPercent, setBufferPercent] = useState<number>(0);
   const [hasError, setHasError] = useState<boolean>(false);
   const [fileMissing, setFileMissing] = useState<boolean>(false);
+  const [bandwidthExceeded, setBandwidthExceeded] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [reloadKey, setReloadKey] = useState<number>(0);
 
@@ -73,6 +74,7 @@ export default function AdminVideoPreview({
     setUrlError('');
     setHasError(false);
     setFileMissing(false);
+    setBandwidthExceeded(false);
     setIsBuffering(true);
     setBufferingTooLong(false);
 
@@ -112,6 +114,18 @@ export default function AdminVideoPreview({
             setResolvingUrl(false);
             return;
           }
+        } else if (res.status === 429) {
+          try {
+            const errData = await res.json();
+            if (!isCancelled) {
+              setBandwidthExceeded(true);
+              setErrorMessage(errData.message || 'Storage bandwidth limit reached on Storj DCS.');
+              setHasError(true);
+              setResolvingUrl(false);
+              setIsBuffering(false);
+              return;
+            }
+          } catch {}
         } else if (res.status === 404) {
           try {
             const errData = await res.json();
@@ -427,8 +441,41 @@ export default function AdminVideoPreview({
           </div>
         )}
 
+        {/* Bandwidth Exceeded State */}
+        {bandwidthExceeded && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-neutral-950 p-4 sm:p-6 text-center">
+            <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mb-3">
+              <AlertCircle className="w-5 h-5 text-amber-400" />
+            </div>
+            <h4 className="text-xs sm:text-sm font-bold text-white mb-1">Storage Bandwidth Limit Exceeded</h4>
+            <p className="text-[11px] sm:text-xs text-neutral-300 max-w-[320px] mb-3 leading-relaxed">
+              This video is stored on Storj DCS which reached its free monthly egress quota.<br />
+              <span className="text-amber-400 font-medium">Add a payment method at storj.io to unlock immediately, or re-upload.</span>
+            </p>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={handleReload}
+                style={{ backgroundColor: '#ffffff', color: '#000000' }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-neutral-200 transition-colors"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Re-check Access</span>
+              </button>
+              <a
+                href="https://storj.io"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-neutral-800 text-white text-xs font-bold hover:bg-neutral-700 border border-neutral-700 transition-colors"
+              >
+                Storj Console
+              </a>
+            </div>
+          </div>
+        )}
+
         {/* Error Fallback State */}
-        {hasError && !fileMissing && (
+        {hasError && !fileMissing && !bandwidthExceeded && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-neutral-950 p-4 sm:p-6 text-center">
             <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-amber-400 mb-2" />
             <h4 className="text-xs sm:text-sm font-bold text-white mb-1">Preview Playback Stalled</h4>

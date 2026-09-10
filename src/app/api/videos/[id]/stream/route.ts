@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { getSignedVideoUrl, extractStorageKey } from '@/lib/supabase';
+import { getSignedVideoUrl, getSignedVideoUrlResult, extractStorageKey } from '@/lib/supabase';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -158,31 +158,45 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   try {
     const isDownload = req.nextUrl.searchParams.get('download') === 'true' || req.nextUrl.searchParams.get('download') === '1';
     const downloadFilename = req.nextUrl.searchParams.get('filename') || `${targetKey}.mp4`;
-    const signedUrl = await getSignedVideoUrl(
+    const result = await getSignedVideoUrlResult(
       targetKey,
       3600,
       isDownload ? { download: downloadFilename } : undefined
     );
 
-    if (signedUrl) {
+    if (result.url) {
       if (wantsJson) {
         return NextResponse.json({
           success: true,
-          url: signedUrl,
+          url: result.url,
           direct: true,
-          source: 'supabase',
+          source: result.source || 'supabase',
           videoId: rawId,
           download: isDownload,
         });
       }
 
-      // 307 Redirect directly to high-speed signed URL
-      return NextResponse.redirect(signedUrl, {
+      // 307 Redirect directly to signed URL (no-cache so stale/expired URLs are not cached by browsers)
+      return NextResponse.redirect(result.url, {
         status: 307,
         headers: {
-          'Cache-Control': isDownload ? 'private, no-cache, no-store' : 'private, max-age=1800',
+          'Cache-Control': 'private, no-cache, no-store',
         },
       });
+    }
+
+    if (result.bandwidthExceeded) {
+      return NextResponse.json(
+        {
+          error: 'Storage bandwidth limit reached on external provider (Storj DCS).',
+          bandwidth_exceeded: true,
+          code: 'STORAGE_BANDWIDTH_EXCEEDED',
+          provider: 'storj',
+          videoId: rawId,
+          message: 'This video is stored on Storj DCS which has consumed its monthly project bandwidth quota. Please upgrade or add billing at storj.io to restore playback.',
+        },
+        { status: 429 }
+      );
     }
   } catch (err) {
     console.warn('Could not get signed video URL for streaming:', err);

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { supabaseAdmin, getSignedVideoUrl, extractStorageKey } from '@/lib/supabase';
+import { supabaseAdmin, getSignedVideoUrl, getSignedVideoUrlResult, extractStorageKey } from '@/lib/supabase';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -167,28 +167,43 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     });
   }
 
-  // 6. Check Supabase private storage
+  // 6. Check cloud storage (Supabase / S3 with circuit breaker)
   try {
-    const signedDownloadUrl = await getSignedVideoUrl(targetKey, 3600, { download: cleanFilename });
-    if (signedDownloadUrl) {
+    const result = await getSignedVideoUrlResult(targetKey, 3600, { download: cleanFilename });
+    if (result.url) {
       if (wantsJson) {
         return NextResponse.json({
           success: true,
-          url: signedDownloadUrl,
+          url: result.url,
           direct: true,
           filename: cleanFilename,
         });
       }
 
-      return NextResponse.redirect(signedDownloadUrl, {
+      return NextResponse.redirect(result.url, {
         status: 307,
         headers: {
           'Cache-Control': 'private, no-cache, no-store',
         },
       });
     }
+
+    if (result.bandwidthExceeded) {
+      return NextResponse.json(
+        {
+          error: 'Storage bandwidth limit reached on external provider (Storj DCS).',
+          bandwidth_exceeded: true,
+          code: 'STORAGE_BANDWIDTH_EXCEEDED',
+          provider: 'storj',
+          videoId: rawId,
+          filename: cleanFilename,
+          message: 'This video is stored on Storj DCS which has consumed its monthly project bandwidth quota. Please upgrade or add billing at storj.io to enable downloads.',
+        },
+        { status: 429 }
+      );
+    }
   } catch (err) {
-    console.warn('[Pages Download API] Could not generate Supabase signed download URL:', err);
+    console.warn('[Pages Download API] Could not generate signed download URL:', err);
   }
 
   return NextResponse.json(

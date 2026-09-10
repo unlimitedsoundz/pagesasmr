@@ -25,7 +25,9 @@ const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_
 const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
 const s3Endpoint = process.env.S3_ENDPOINT || (r2AccountId ? `https://${r2AccountId}.r2.cloudflarestorage.com` : undefined);
 
-const s3Client = s3Endpoint && s3AccessKeyId && s3SecretAccessKey
+const forceSupabaseOnly = process.env.FORCE_SUPABASE_STORAGE === 'true' || process.env.USE_SUPABASE_STORAGE_ONLY === 'true';
+
+const s3Client = !forceSupabaseOnly && s3Endpoint && s3AccessKeyId && s3SecretAccessKey
   ? new S3Client({
       region: process.env.S3_REGION || 'us-east-1',
       endpoint: s3Endpoint,
@@ -40,11 +42,105 @@ const s3Client = s3Endpoint && s3AccessKeyId && s3SecretAccessKey
 interface CachedSignedUrl {
   url: string;
   expiresAt: number;
+  source?: 's3' | 'supabase';
 }
 
 const signedUrlCache = new Map<string, CachedSignedUrl>();
 const negativeUrlCache = new Map<string, number>();
 const storjVerifiedKeys = new Map<string, boolean>();
+
+// S3 / Storj circuit breaker & health state
+let s3BandwidthExceeded = false;
+let lastS3BandwidthCheck = 0;
+const S3_CIRCUIT_BREAKER_COOLDOWN_MS = 300_000; // 5 minutes
+
+// Remote clock offset compensation (handles host CMOS drift vs S3/NTP)
+let serverClockOffsetMs = 0;
+let lastClockOffsetSync = 0;
+const CLOCK_SYNC_INTERVAL_MS = 600_000; // 10 minutes
+
+export async function syncServerClockOffset(): Promise<number> {
+  const now = Date.now();
+  if (lastClockOffsetSync > 0 && now - lastClockOffsetSync < CLOCK_SYNC_INTERVAL_MS) {
+    return serverClockOffsetMs;
+  }
+  try {
+    const probeUrl = s3Endpoint || supabaseUrl || 'https://www.google.com';
+    const res = await fetch(probeUrl, { method: 'HEAD', cache: 'no-store' });
+    const dateHeader = res.headers.get('date');
+    if (dateHeader) {
+      const remoteTime = new Date(dateHeader).getTime();
+      serverClockOffsetMs = remoteTime - Date.now();
+      lastClockOffsetSync = Date.now();
+      if (Math.abs(serverClockOffsetMs) > 10_000) {
+        console.log(`[Storage Clock Sync] Host clock offset detected: ${Math.round(serverClockOffsetMs / 1000)}s applied to S3 signatures.`);
+      }
+    }
+  } catch {
+    // Keep previous offset
+  }
+  return serverClockOffsetMs;
+}
+
+export function isS3BandwidthExceeded(): boolean {
+  if (!s3BandwidthExceeded) return false;
+  if (Date.now() - lastS3BandwidthCheck > S3_CIRCUIT_BREAKER_COOLDOWN_MS) {
+    // Cooldown passed, allow a probe
+    return false;
+  }
+  return true;
+}
+
+export function markS3BandwidthExceeded() {
+  s3BandwidthExceeded = true;
+  lastS3BandwidthCheck = Date.now();
+  console.warn('[Storage] S3 / Storj BandwidthLimitExceeded detected. Tripping circuit breaker for 5 minutes; routing to Supabase Storage.');
+}
+
+let lastS3Probe = 0;
+const S3_PROBE_INTERVAL_MS = 60_000;
+
+export async function checkS3Health(testKey?: string): Promise<boolean> {
+  if (!s3Client) return false;
+  const now = Date.now();
+  if (s3BandwidthExceeded) {
+    if (now - lastS3BandwidthCheck < S3_CIRCUIT_BREAKER_COOLDOWN_MS) {
+      return false;
+    }
+  } else if (lastS3Probe > 0 && now - lastS3Probe < S3_PROBE_INTERVAL_MS) {
+    return true;
+  }
+
+  try {
+    lastS3Probe = now;
+    if (testKey) {
+      // 1-byte range probe to test if Storj egress bandwidth is open
+      await s3Client.send(new GetObjectCommand({
+        Bucket: STORAGE_BUCKET,
+        Key: testKey,
+        Range: 'bytes=0-0',
+      }));
+    }
+    s3BandwidthExceeded = false;
+    return true;
+  } catch (err: any) {
+    if (
+      err?.name === 'BandwidthLimitExceeded' ||
+      err?.message?.includes('bandwidth') ||
+      err?.Code === 'BandwidthLimitExceeded' ||
+      err?.Code === 'AccessDenied'
+    ) {
+      markS3BandwidthExceeded();
+      return false;
+    }
+    return true;
+  }
+}
+
+export function resetS3CircuitBreaker() {
+  s3BandwidthExceeded = false;
+  lastS3BandwidthCheck = 0;
+}
 
 /**
  * Safely extracts the clean storage key from any raw URL, API path, or bucket path.
@@ -72,33 +168,41 @@ export function extractStorageKey(input: string): string {
   return decodeURIComponent(cleaned);
 }
 
+export interface SignedVideoResult {
+  url: string | null;
+  source?: 's3' | 'supabase' | null;
+  bandwidthExceeded?: boolean;
+  error?: string | null;
+}
+
 /**
- * Generates a short-lived signed URL for private video playback or direct file download.
- * Automatically prefers Storj / S3 ($0 egress fees) if configured, falling back to Supabase.
+ * Detailed signed URL generator that reports storage source and bandwidth status.
  */
-export async function getSignedVideoUrl(
+export async function getSignedVideoUrlResult(
   rawFilePath: string,
   expiresInSeconds = 3600,
   options?: { download?: string | boolean }
-): Promise<string | null> {
+): Promise<SignedVideoResult> {
   const filePath = extractStorageKey(rawFilePath);
-  if (!filePath) return null;
+  if (!filePath) return { url: null };
 
   const now = Date.now();
   const cacheKey = options?.download ? `${filePath}:dl:${options.download}` : filePath;
 
   const cached = signedUrlCache.get(cacheKey);
   if (cached && cached.expiresAt - now > 120_000) {
-    return cached.url;
+    return { url: cached.url, source: cached.source || 'supabase' };
   }
 
   const negExpiry = negativeUrlCache.get(filePath);
   if (negExpiry && negExpiry > now) {
-    return null;
+    return { url: null };
   }
 
-  // 1. Prefer Storj / S3 Storage ($0 Egress Fees) if object exists in Storj bucket
-  if (s3Client) {
+  const s3Blocked = isS3BandwidthExceeded();
+
+  // 1. Try S3 / Storj ($0 Egress Fees) ONLY if circuit breaker is not tripped
+  if (s3Client && !s3Blocked) {
     let isOnFileStorj = storjVerifiedKeys.get(filePath);
 
     if (isOnFileStorj === undefined) {
@@ -106,14 +210,22 @@ export async function getSignedVideoUrl(
         await s3Client.send(new HeadObjectCommand({ Bucket: STORAGE_BUCKET, Key: filePath }));
         isOnFileStorj = true;
         storjVerifiedKeys.set(filePath, true);
-      } catch {
+      } catch (headErr: any) {
+        if (headErr?.name === 'BandwidthLimitExceeded' || headErr?.message?.includes('bandwidth')) {
+          markS3BandwidthExceeded();
+        }
         isOnFileStorj = false;
         storjVerifiedKeys.set(filePath, false);
       }
     }
 
-    if (isOnFileStorj) {
-      try {
+    if (isOnFileStorj && !isS3BandwidthExceeded()) {
+      const s3Healthy = await checkS3Health(filePath);
+      if (s3Healthy && !isS3BandwidthExceeded()) {
+        try {
+          const offsetMs = await syncServerClockOffset();
+          const signingDate = new Date(Date.now() + offsetMs);
+
         const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
         const isMov = filePath.toLowerCase().endsWith('.mov');
         const isWebm = filePath.toLowerCase().endsWith('.webm');
@@ -126,18 +238,30 @@ export async function getSignedVideoUrl(
           ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
         });
 
-        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
+        const signedUrl = await getSignedUrl(s3Client, command, {
+          expiresIn: expiresInSeconds,
+          signingDate,
+        });
+
         if (signedUrl) {
-          signedUrlCache.set(cacheKey, { url: signedUrl, expiresAt: now + (expiresInSeconds - 60) * 1000 });
-          return signedUrl;
+          signedUrlCache.set(cacheKey, {
+            url: signedUrl,
+            expiresAt: now + (expiresInSeconds - 60) * 1000,
+            source: 's3',
+          });
+          return { url: signedUrl, source: 's3' };
         }
-      } catch (err) {
-        console.warn('[S3/Storj Storage] Signed URL error, falling back to Supabase:', err);
+      } catch (err: any) {
+        if (err?.name === 'BandwidthLimitExceeded' || err?.message?.includes('bandwidth')) {
+          markS3BandwidthExceeded();
+        }
+        console.warn('[S3/Storj Storage] Signed URL error, falling back to Supabase:', err?.message || err);
       }
     }
   }
+}
 
-  // 2. Fallback seamlessly to Supabase Storage
+  // 2. Primary fallback: Supabase Storage
   try {
     const { data, error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
@@ -148,18 +272,43 @@ export async function getSignedVideoUrl(
       );
 
     if (error || !data?.signedUrl) {
-      // Short negative cache (3s) so transient errors don't lock out valid files for minutes
+      // Check if this file was on Storj but blocked by bandwidth limit
+      const wasOnStorj = storjVerifiedKeys.get(filePath);
+      if (wasOnStorj || s3Blocked) {
+        return {
+          url: null,
+          bandwidthExceeded: true,
+          error: 'Video file is stored on Storj DCS which has reached its monthly project bandwidth limit. Please upgrade or add billing at storj.io.',
+        };
+      }
       negativeUrlCache.set(filePath, now + 3000);
-      return null;
+      return { url: null };
     }
 
-    signedUrlCache.set(cacheKey, { url: data.signedUrl, expiresAt: now + (expiresInSeconds - 60) * 1000 });
-    return data.signedUrl;
-  } catch (err) {
+    signedUrlCache.set(cacheKey, {
+      url: data.signedUrl,
+      expiresAt: now + (expiresInSeconds - 60) * 1000,
+      source: 'supabase',
+    });
+    return { url: data.signedUrl, source: 'supabase' };
+  } catch (err: any) {
     console.error('getSignedVideoUrl Supabase error:', err);
     negativeUrlCache.set(filePath, now + 3000);
-    return null;
+    return { url: null, error: err?.message };
   }
+}
+
+/**
+ * Generates a signed URL for private video playback or direct file download.
+ * Automatically fails over between Storj S3 and Supabase Storage.
+ */
+export async function getSignedVideoUrl(
+  rawFilePath: string,
+  expiresInSeconds = 3600,
+  options?: { download?: string | boolean }
+): Promise<string | null> {
+  const result = await getSignedVideoUrlResult(rawFilePath, expiresInSeconds, options);
+  return result.url;
 }
 
 /**
@@ -172,7 +321,8 @@ export function clearNegativeCache(filePath: string) {
 }
 
 /**
- * Uploads a video buffer to active cloud storage (Storj S3 or Supabase) with retry + verification.
+ * Uploads a video buffer to active cloud storage with durable master copy on Supabase
+ * and optional mirror on Storj S3.
  */
 const MAX_UPLOAD_RETRIES = 3;
 
@@ -181,26 +331,10 @@ export async function uploadToSupabaseStorage(
   buffer: Buffer,
   contentType: string
 ): Promise<string> {
-  // 1. Prefer Storj / S3 Storage ($0 Egress Fees)
-  if (s3Client) {
-    try {
-      await s3Client.send(new PutObjectCommand({
-        Bucket: STORAGE_BUCKET,
-        Key: filePath,
-        Body: buffer,
-        ContentType: contentType,
-      }));
-      clearNegativeCache(filePath);
-      console.log(`[Storj S3 Storage] Successfully uploaded ${filePath} ($0 egress cost)`);
-      return filePath;
-    } catch (s3Err: any) {
-      console.warn('[Storj S3 Storage] Upload failed, falling back to Supabase:', s3Err?.message || s3Err);
-    }
-  }
-
-  // 2. Fallback to Supabase Storage
+  let primaryUploadSuccess = false;
   let lastError: any;
 
+  // 1. Primary: ALWAYS save master copy to Supabase Storage first for absolute durability
   for (let attempt = 1; attempt <= MAX_UPLOAD_RETRIES; attempt++) {
     try {
       const { data, error } = await supabaseAdmin.storage
@@ -214,8 +348,10 @@ export async function uploadToSupabaseStorage(
         lastError = new Error(`Supabase upload error (attempt ${attempt}): ${error.message}`);
         console.warn(lastError.message);
       } else {
+        primaryUploadSuccess = true;
         clearNegativeCache(filePath);
-        return data!.path;
+        console.log(`[Supabase Storage] Successfully uploaded durable master copy for ${filePath}`);
+        break;
       }
     } catch (err: any) {
       lastError = err;
@@ -225,6 +361,29 @@ export async function uploadToSupabaseStorage(
     if (attempt < MAX_UPLOAD_RETRIES) {
       await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
     }
+  }
+
+  // 2. Secondary: Mirror to Storj / S3 ($0 egress fees) if configured and healthy
+  if (s3Client && !isS3BandwidthExceeded()) {
+    try {
+      await s3Client.send(new PutObjectCommand({
+        Bucket: STORAGE_BUCKET,
+        Key: filePath,
+        Body: buffer,
+        ContentType: contentType,
+      }));
+      clearNegativeCache(filePath);
+      console.log(`[Storj S3 Storage] Successfully mirrored ${filePath} to S3`);
+    } catch (s3Err: any) {
+      if (s3Err?.name === 'BandwidthLimitExceeded' || s3Err?.message?.includes('bandwidth')) {
+        markS3BandwidthExceeded();
+      }
+      console.warn('[Storj S3 Storage] Mirror upload failed (Supabase copy preserved):', s3Err?.message || s3Err);
+    }
+  }
+
+  if (primaryUploadSuccess) {
+    return filePath;
   }
 
   throw new Error(
