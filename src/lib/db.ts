@@ -1375,6 +1375,9 @@ class PagesDatabaseService {
     return {
       totalSubmissions: creatorSubmissions.length,
       approvedCount: approvedSubmissions.length,
+      approvedFullCount: approvedSubmissions.length,
+      paidCount: paidSubmissions.length,
+      reservedCount: reservedSubmissions.length,
       pendingCount: pendingReviewSubmissions.length,
       eligibleCount,
       minRequired,

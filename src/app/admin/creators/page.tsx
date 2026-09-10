@@ -375,9 +375,9 @@ export default function AdminCreatorsPage() {
 
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="font-bold text-black">
-                          {c.stats?.approvedCount || 0} full approved
+                          {c.stats?.approvedFullCount ?? c.stats?.approvedCount ?? 0} full approved
                         </div>
-                        <div className="text-[11px] text-black font-medium">
+                        <div className="text-[11px] text-neutral-600 font-medium">
                           {c.stats?.pendingCount || 0} in review • {c.stats?.totalSubmissions || 0} total
                         </div>
                       </td>
@@ -461,17 +461,55 @@ export default function AdminCreatorsPage() {
                       </td>
 
                       <td className="py-3.5 px-4 whitespace-nowrap">
-                        {c.stats?.canRequestPayout ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-[#7B1E4B] text-white border-0">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                            Ready for Payout ({c.stats.eligibleCount}/{c.stats.minRequired || 8})
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold text-[#7B1E4B] bg-[#FDF2F4] border-0">
-                            <Clock className="w-3 h-3 mr-1 text-[#7B1E4B]" />
-                            {c.stats?.eligibleCount || 0} of {c.stats?.minRequired || 8} approved
-                          </span>
-                        )}
+                        {(() => {
+                          const approvedFull = c.stats?.approvedFullCount ?? c.stats?.approvedCount ?? 0;
+                          const eligible = c.stats?.eligibleCount || 0;
+                          const minReq = c.stats?.minRequired || 8;
+                          const paidCount = c.stats?.paidCount || 0;
+                          const reservedCount = c.stats?.reservedCount || 0;
+
+                          if (eligible >= minReq) {
+                            return (
+                              <div className="space-y-1">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-[#7B1E4B] text-white border-0 shadow-xs">
+                                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                                  Ready for Payout ({eligible}/{minReq})
+                                </span>
+                                {approvedFull > eligible && (
+                                  <div className="text-[10px] text-neutral-600 font-medium">
+                                    {approvedFull} total approved
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          if (paidCount >= minReq || (approvedFull >= minReq && eligible === 0)) {
+                            return (
+                              <div className="space-y-1">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-700 text-white border-0 shadow-xs">
+                                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                                  Milestone Completed ({approvedFull}/{minReq})
+                                </span>
+                                <div className="text-[10px] text-neutral-600 font-medium">
+                                  {paidCount > 0 ? `${paidCount} videos paid` : ''} {reservedCount > 0 ? `• ${reservedCount} processing` : ''}
+                                </div>
+                              </div>
+                            );
+                          }
+                          return (
+                            <div className="space-y-1">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold text-[#7B1E4B] bg-[#FDF2F4] border-0">
+                                <Clock className="w-3 h-3 mr-1 text-[#7B1E4B]" />
+                                {approvedFull} of {minReq} approved
+                              </span>
+                              {eligible < approvedFull && eligible > 0 && (
+                                <div className="text-[10px] text-neutral-500 font-medium">
+                                  ({eligible} unpaid available)
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </td>
 
                       <td className="py-3.5 px-4 whitespace-nowrap text-right">
