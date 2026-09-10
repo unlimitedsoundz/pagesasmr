@@ -26,8 +26,11 @@ export async function GET(req: NextRequest) {
     const profiles = db.getPlatformCreators();
     const creatorsWithStats = profiles.map((p) => {
       const stats = db.getCreatorStats(p.id);
+      const { password, ...safeProfile } = p as any;
       return {
-        ...p,
+        ...safeProfile,
+        payment_method: p.payment_method || null,
+        payment_details: p.payment_details || {},
         stats,
       };
     });

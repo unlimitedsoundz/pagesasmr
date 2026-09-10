@@ -17,9 +17,14 @@ import {
   Send,
   X,
   RefreshCw,
+  CreditCard,
+  Copy,
+  Check,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
+import CreatorPayoutModal from '@/components/CreatorPayoutModal';
+import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
 import { useToast } from '@/components/ToastProvider';
 
 export default function AdminCreatorsPage() {
@@ -30,6 +35,17 @@ export default function AdminCreatorsPage() {
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Payout Details Modal & Copy
+  const [payoutModalCreator, setPayoutModalCreator] = useState<any | null>(null);
+  const [copiedAccountId, setCopiedAccountId] = useState<string | null>(null);
+
+  const handleCopyAccount = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedAccountId(id);
+    setTimeout(() => setCopiedAccountId(null), 2000);
+    toast.success(`Copied account number: ${text}`);
+  };
 
   // Quick Direct Notify Modal
   const [notifyCreator, setNotifyCreator] = useState<any | null>(null);
@@ -275,6 +291,7 @@ export default function AdminCreatorsPage() {
                   <th className="py-3.5 px-4">30s Audition Status</th>
                   <th className="py-3.5 px-4">Submissions</th>
                   <th className="py-3.5 px-4">Financials</th>
+                  <th className="py-3.5 px-4">Payout Account</th>
                   <th className="py-3.5 px-4">Milestone</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
@@ -282,6 +299,8 @@ export default function AdminCreatorsPage() {
               <tbody className="divide-y divide-neutral-100">
                 {filtered.map((c) => {
                   const sampleStatus = c.sample_status || 'NOT_SUBMITTED';
+                  const pInfo = formatCreatorPayoutInfo(c);
+
                   return (
                     <tr key={c.id} className="hover:bg-neutral-50 transition-colors">
                       <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
@@ -372,6 +391,75 @@ export default function AdminCreatorsPage() {
                         </div>
                       </td>
 
+                      {/* Payout Account Column */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        {!pInfo.isConfigured ? (
+                          <div className="space-y-1">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-500 border border-neutral-200">
+                              Not Configured
+                            </span>
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => setPayoutModalCreator(c)}
+                                className="text-[10px] text-neutral-500 hover:text-black hover:underline font-medium"
+                              >
+                                View details
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-1">
+                            <div>
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${pInfo.badgeColor}`}
+                              >
+                                {pInfo.badgeLabel}
+                              </span>
+                            </div>
+
+                            {pInfo.accountNumber ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[11px] font-bold text-black tracking-tight">
+                                  {pInfo.accountNumber}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyAccount(c.id, pInfo.accountNumber!)}
+                                  title="Copy Account Number"
+                                  className="p-1 rounded hover:bg-neutral-100 text-neutral-500 hover:text-black transition-colors"
+                                >
+                                  {copiedAccountId === c.id ? (
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </button>
+                              </div>
+                            ) : pInfo.email ? (
+                              <div className="text-[11px] font-mono text-neutral-700 truncate max-w-[140px]">
+                                {pInfo.email}
+                              </div>
+                            ) : null}
+
+                            {pInfo.accountName && (
+                              <div className="text-[10px] text-neutral-600 font-medium truncate max-w-[150px]">
+                                {pInfo.accountName}
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => setPayoutModalCreator(c)}
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-[#7B1E4B] hover:text-[#63183C] hover:underline"
+                            >
+                              <CreditCard className="w-3 h-3" />
+                              <span>Full Payout Details</span>
+                            </button>
+                          </div>
+                        )}
+                      </td>
+
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         {c.stats?.canRequestPayout ? (
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-[#7B1E4B] text-white border-0">
@@ -388,6 +476,16 @@ export default function AdminCreatorsPage() {
 
                       <td className="py-3.5 px-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setPayoutModalCreator(c)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#FDF2F4] hover:bg-[#F8E2EC] text-[#7B1E4B] text-xs font-bold transition-colors border-0 shadow-xs"
+                            title="View Creator's Complete Payout & Banking Info"
+                          >
+                            <CreditCard className="w-3 h-3" />
+                            <span>Payout</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => {
@@ -534,6 +632,13 @@ export default function AdminCreatorsPage() {
           </div>
         </div>
       )}
+
+      {/* Full Creator Payout Modal */}
+      <CreatorPayoutModal
+        creator={payoutModalCreator}
+        isOpen={Boolean(payoutModalCreator)}
+        onClose={() => setPayoutModalCreator(null)}
+      />
     </div>
   );
 }

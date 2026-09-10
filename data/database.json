@@ -1048,9 +1048,9 @@
         "mobile_money_account_name": ""
       },
       "date_of_birth": "2003-09-13",
-      "sample_status": "PENDING_REVIEW",
+      "sample_status": "REVISION_REQUESTED",
       "sample_submission_id": "13bcfa53-1a8e-47d8-bbba-0c18b41c8cfd",
-      "sample_review_notes": "The angle is supberb! However you need to only use your 2 middle fingers to turn the pages, do not include your thumb. Use ONLY inbetween your 2 middle fingers to clip the pages and turn. Remake!",
+      "sample_review_notes": "Please resend this sample!",
       "password": "Ema123.com",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T12:09:50.817+00:00",
@@ -1310,10 +1310,10 @@
       "is_sample": true,
       "agreed_rate_usd": 0,
       "payout_status": "UNPAID",
-      "revision_notes": "The angle is supberb! However you need to only use your 2 middle fingers to turn the pages, do not include your thumb. Use ONLY inbetween your 2 middle fingers to clip the pages and turn. Remake!",
+      "revision_notes": "Please resend this sample!",
       "version_number": 1,
       "created_at": "2026-09-13T12:22:20.215+00:00",
-      "updated_at": "2026-09-13T13:00:01.194+00:00"
+      "updated_at": "2026-09-14T08:24:54.179+00:00"
     },
     {
       "id": "143e8359-4991-4e43-8913-b28ce49e84f2",
@@ -1410,13 +1410,14 @@
       "file_url": "/api/videos/video-1789350586531-1pz1hq.mp4/stream",
       "file_name": "212911.mp4",
       "file_size_bytes": 75532101,
-      "status": "UNDER_REVIEW",
+      "status": "REVISION_REQUESTED",
       "is_sample": true,
       "agreed_rate_usd": 0,
       "payout_status": "UNPAID",
       "version_number": 1,
       "created_at": "2026-09-14T01:49:49.12+00:00",
-      "updated_at": "2026-09-14T01:49:49.12+00:00"
+      "updated_at": "2026-09-14T08:24:54.18+00:00",
+      "revision_notes": "Please resend this sample!"
     }
   ],
   "submission_versions": [

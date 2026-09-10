@@ -7,12 +7,16 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  Search,
   X,
   Shield,
+  CreditCard,
+  Copy,
+  Check,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
+import CreatorPayoutModal from '@/components/CreatorPayoutModal';
+import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
 import { PayoutRequest } from '@/types';
 import { useToast } from '@/components/ToastProvider';
 
@@ -22,7 +26,16 @@ export default function AdminPayoutsPage() {
   const [loading, setLoading] = useState(true);
 
   const [selectedPayout, setSelectedPayout] = useState<PayoutRequest | null>(null);
+  const [detailPayout, setDetailPayout] = useState<PayoutRequest | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [modalMode, setModalMode] = useState<'CONFIRM' | 'CANCEL' | null>(null);
+
+  const handleCopy = (key: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+    toast.success(`Copied to clipboard: ${text}`);
+  };
   const [bankRef, setBankRef] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
@@ -138,10 +151,74 @@ export default function AdminPayoutsPage() {
                       ${p.amount_usd.toFixed(2)} USD
                     </td>
                     <td className="p-4 text-black">
-                      <div className="font-bold">
-                        {p.payment_method === 'MOBILE_MONEY' ? 'Mobile Money (M-Pesa/MoMo)' : (p.payment_method === 'NIGERIA_BANK' ? 'Nigerian Bank Transfer' : p.payment_method)}
-                      </div>
-                      <div className="text-[11px] text-neutral-500 truncate max-w-xs">{p.payment_destination}</div>
+                      {(() => {
+                        const pInfo = formatCreatorPayoutInfo(p);
+                        return (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${pInfo.badgeColor}`}
+                              >
+                                {pInfo.badgeLabel}
+                              </span>
+                              <span className="font-bold text-xs text-neutral-800">
+                                {pInfo.methodLabel}
+                              </span>
+                            </div>
+
+                            {pInfo.accountNumber ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-xs font-bold text-black tracking-tight">
+                                  {pInfo.accountNumber}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(`acc_${p.id}`, pInfo.accountNumber!)}
+                                  title="Copy Account Number"
+                                  className="p-1 rounded hover:bg-neutral-100 text-neutral-500 hover:text-black transition-colors"
+                                >
+                                  {copiedKey === `acc_${p.id}` ? (
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </button>
+                              </div>
+                            ) : pInfo.email ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-xs text-neutral-700">{pInfo.email}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(`email_${p.id}`, pInfo.email!)}
+                                  title="Copy Email"
+                                  className="p-1 rounded hover:bg-neutral-100 text-neutral-500 hover:text-black transition-colors"
+                                >
+                                  {copiedKey === `email_${p.id}` ? (
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </button>
+                              </div>
+                            ) : null}
+
+                            {pInfo.accountName && (
+                              <div className="text-[11px] text-neutral-600 font-medium truncate max-w-xs">
+                                {pInfo.accountName}
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => setDetailPayout(p)}
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-[#7B1E4B] hover:text-[#63183C] hover:underline"
+                            >
+                              <CreditCard className="w-3 h-3" />
+                              <span>Full Payout Details</span>
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="p-4">
                       <StatusBadge status={p.status} size="sm" />
@@ -149,7 +226,16 @@ export default function AdminPayoutsPage() {
                     <td className="p-4 font-mono text-[11px] text-neutral-600">
                       {p.bank_payment_reference || '—'}
                     </td>
-                    <td className="p-4 text-right space-x-2">
+                    <td className="p-4 text-right space-x-2 whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => setDetailPayout(p)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-neutral-300 text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition-colors"
+                        title="View Full Payout Details"
+                      >
+                        <CreditCard className="w-3 h-3 text-[#7B1E4B]" />
+                        <span>Details</span>
+                      </button>
                       {p.status === 'REQUESTED' || p.status === 'PROCESSING' ? (
                         <>
                           <button
@@ -190,7 +276,7 @@ export default function AdminPayoutsPage() {
       {/* Confirmation / Cancellation Modal */}
       {selectedPayout && modalMode && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-[#fff9fb] max-w-md w-full rounded-2xl border border-[#f2e3e8] p-6 sm:p-8 space-y-5 shadow-2xl relative text-neutral-900">
+          <div className="bg-[#fff9fb] max-w-md w-full rounded-2xl border border-[#f2e3e8] p-6 sm:p-8 space-y-5 shadow-2xl relative text-neutral-900 max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => {
@@ -207,9 +293,58 @@ export default function AdminPayoutsPage() {
                 {modalMode === 'CONFIRM' ? 'Confirm Payment Disbursement' : 'Cancel Payout Request'}
               </h3>
               <p className="text-xs text-neutral-600 font-medium">
-                Amount: ${selectedPayout.amount_usd.toFixed(2)} USD • Destination: {selectedPayout.payment_destination}
+                Amount: <strong className="text-black">${selectedPayout.amount_usd.toFixed(2)} USD</strong> ({selectedPayout.video_count} videos)
               </p>
             </div>
+
+            {/* In Confirm mode, show full beneficiary account details directly in the modal! */}
+            {modalMode === 'CONFIRM' && (() => {
+              const pInfo = formatCreatorPayoutInfo(selectedPayout);
+              return (
+                <div className="bg-[#fcf2f5] p-3.5 rounded-xl border border-[#f5dbe4] space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#7B1E4B] uppercase text-[10px] tracking-wider">
+                      Creator Account Details
+                    </span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${pInfo.badgeColor}`}>
+                      {pInfo.badgeLabel}
+                    </span>
+                  </div>
+
+                  <div className="font-bold text-black text-sm">
+                    {selectedPayout.creator_name} ({selectedPayout.creator_email})
+                  </div>
+
+                  {pInfo.lines.map((l, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 bg-white/80 p-2 rounded border border-[#f5dbe4]">
+                      <span className="text-neutral-500 font-medium text-[11px]">{l.label}:</span>
+                      <div className="flex items-center gap-1.5 font-bold text-black select-all font-mono text-xs">
+                        <span>{l.value}</span>
+                        {l.copyable && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(`modal_${i}`, l.value)}
+                            className="p-0.5 rounded hover:bg-neutral-100 text-neutral-500 hover:text-black"
+                            title="Copy"
+                          >
+                            {copiedKey === `modal_${i}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('modal_all', pInfo.fullCopyText)}
+                    className="w-full py-2 rounded-lg bg-[#7B1E4B] hover:bg-[#63183C] text-white text-[11px] font-bold transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    {copiedKey === 'modal_all' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedKey === 'modal_all' ? 'Copied Full Banking Details!' : 'Copy Full Account Details'}</span>
+                  </button>
+                </div>
+              );
+            })()}
 
             {actionError && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
@@ -274,6 +409,13 @@ export default function AdminPayoutsPage() {
           </div>
         </div>
       )}
+
+      {/* Full Creator Payout Details Modal */}
+      <CreatorPayoutModal
+        payout={detailPayout}
+        isOpen={Boolean(detailPayout)}
+        onClose={() => setDetailPayout(null)}
+      />
     </div>
   );
 }

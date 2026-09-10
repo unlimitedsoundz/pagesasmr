@@ -17,7 +17,17 @@ export async function GET(req: NextRequest) {
     }
 
     const payouts = db.getPayoutRequests({ creatorId, status });
-    return NextResponse.json({ payouts });
+    const enrichedPayouts = payouts.map((p) => {
+      if (user.role !== 'ADMIN') return p;
+      const creator = db.getProfileById(p.creator_id);
+      return {
+        ...p,
+        creator_payment_method: creator?.payment_method,
+        creator_payment_details: creator?.payment_details,
+        creator_country: creator?.country,
+      };
+    });
+    return NextResponse.json({ payouts: enrichedPayouts });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Unauthorized' }, { status: 401 });
   }
