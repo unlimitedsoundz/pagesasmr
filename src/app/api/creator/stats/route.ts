@@ -6,6 +6,7 @@ import { db } from '@/lib/db';
 export async function GET(req: NextRequest) {
   try {
     const user = await requireUser();
+    await db.syncFromSupabase();
     const stats = db.getCreatorStats(user.id);
     const ledger = db.getEarningsLedger(user.id);
     const settings = db.getSettings();

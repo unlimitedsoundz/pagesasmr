@@ -64,13 +64,13 @@ export default function CreatorPayoutsPage() {
   const threshold = profile?.payout_min_videos || 8;
   const minPayout = threshold * rate;
 
-  const approvedCount = stats?.approved_count ?? stats?.approvedCount ?? 0;
-  const approvedUnpaidCount = stats?.approved_unpaid_count ?? stats?.approvedUnpaidCount ?? 0;
-  const availableBalance = stats?.available_balance ?? stats?.availableBalance ?? (approvedUnpaidCount * rate);
-  const reservedAmount = stats?.reserved_amount ?? stats?.reservedAmount ?? 0;
-  const totalDisbursed = stats?.total_paid ?? stats?.totalPaid ?? stats?.total_disbursed ?? 0;
+  const approvedCount = stats?.approvedCount ?? stats?.approvedFullCount ?? stats?.approved_count ?? 0;
+  const approvedUnpaidCount = stats?.eligibleCount ?? stats?.approvedUnpaidCount ?? stats?.approved_unpaid_count ?? 0;
+  const availableBalance = stats?.availablePayoutBalance ?? stats?.availableBalance ?? stats?.available_balance ?? (approvedUnpaidCount * rate);
+  const reservedAmount = stats?.reservedBalance ?? stats?.reservedAmount ?? stats?.reserved_amount ?? 0;
+  const totalDisbursed = stats?.totalPaid ?? stats?.total_paid ?? stats?.total_disbursed ?? 0;
 
-  const canRequest = approvedUnpaidCount >= threshold;
+  const canRequest = stats?.canRequestPayout ?? (approvedUnpaidCount >= threshold);
 
   const toggleFaq = (index: number) => {
     setOpenFaq((prev) => (prev === index ? null : index));

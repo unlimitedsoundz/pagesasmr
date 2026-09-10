@@ -4,6 +4,8 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { sendTelegramSubmissionNotification } from '@/lib/telegram';
 
+import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
+
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -37,6 +39,32 @@ export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const profile = db.getProfileById(user.id);
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found.' }, { status: 404 });
+    }
+
+    // 1. Mandatory Agreement Check
+    if (!profile.agreement_signed) {
+      return NextResponse.json(
+        { error: 'You must sign the Master Creator Agreement before submitting your audition sample.' },
+        { status: 403 }
+      );
+    }
+
+    // 2. Mandatory Payout Account Check
+    const payoutInfo = formatCreatorPayoutInfo(profile);
+    if (!payoutInfo.isConfigured) {
+      return NextResponse.json(
+        {
+          error:
+            'Payout account required: Please configure your local bank account or payout destination in Settings before submitting your audition sample so we can disburse your $1.00 audition bonus upon approval.',
+          requiresPayoutSetup: true,
+        },
+        { status: 400 }
+      );
     }
 
     const body = await req.json();

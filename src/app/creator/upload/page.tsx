@@ -32,6 +32,7 @@ import {
   sendBrowserPushNotification,
 } from '@/lib/notifications';
 import { compressVideoFile, formatBytes } from '@/lib/videoCompression';
+import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
 
 interface UploadQueueItem {
   id: string;
@@ -46,6 +47,7 @@ interface UploadQueueItem {
   previewUrl?: string;
   uploadedKey?: string;
   compressingMsg?: string;
+  isOfficeBonus?: boolean;
   compressionStats?: {
     originalSize: number;
     compressedSize: number;
@@ -75,6 +77,7 @@ export default function CreatorUploadPage() {
   const [sampleStatus, setSampleStatus] = useState<SampleStatus>('APPROVED');
   const [sampleReviewNotes, setSampleReviewNotes] = useState<string | null>(null);
   const [agreementSigned, setAgreementSigned] = useState<boolean | null>(null);
+  const [payoutConfigured, setPayoutConfigured] = useState<boolean | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [settings, setSettings] = useState<any>(null);
@@ -139,6 +142,8 @@ export default function CreatorUploadPage() {
       if (statsData.profile) {
         setSampleStatus(statsData.profile.sample_status || 'NOT_SUBMITTED');
         setSampleReviewNotes(statsData.profile.sample_review_notes || null);
+        const pInfo = formatCreatorPayoutInfo(statsData.profile);
+        setPayoutConfigured(pInfo.isConfigured);
       }
       if (statsData.stats) {
         setStats(statsData.stats);
@@ -167,50 +172,73 @@ export default function CreatorUploadPage() {
         if (msg.type === 'AUDITION_REVIEWED') {
           if (msg.action === 'APPROVE') {
             toast.success(
-              'Audition approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
+              'Audition approved! Quality benchmark achieved.',
               'Audition Approved'
             );
             playNotificationChime('success');
             sendBrowserPushNotification('Audition Approved!', {
-              body: 'Your 30-second audition was approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
+              body: 'Your 30-second audition was approved! Full production is unlocked.',
             });
           } else {
             toast.warning(
-              msg.notes || 'Your audition sample requires updates.',
-              msg.action === 'REVISION' ? 'Revision Requested' : 'Audition Rejected'
+              msg.notes || 'Your audition sample requires updates before full production is unlocked.',
+              msg.action === 'REVISION' ? 'Audition Revision Requested' : 'Audition Rejected'
             );
             playNotificationChime('alert');
             sendBrowserPushNotification('Audition Review Update', {
-              body: msg.notes || 'Your audition was reviewed by an administrator.',
+              body: msg.notes || 'Your audition sample was reviewed by an administrator.',
             });
           }
+          loadCreatorStatus();
+          return;
+        }
+
+        const title = msg.title || 'Video Submission';
+        if (msg.action === 'APPROVE') {
+          toast.success(
+            `"${title}" has been approved and credited toward your payout threshold!`,
+            'Submission Approved'
+          );
+          playNotificationChime('success');
+          sendBrowserPushNotification('Submission Approved!', {
+            body: `"${title}" has been approved by Admin.`,
+          });
+        } else if (msg.action === 'REJECT') {
+          toast.error(
+            `"${title}" was rejected: ${msg.feedback || 'Please review guidelines.'}`,
+            'Submission Rejected'
+          );
+          playNotificationChime('alert');
+          sendBrowserPushNotification('Submission Rejected', {
+            body: `"${title}" was rejected: ${msg.feedback || ''}`,
+          });
+        } else if (msg.action === 'REQUEST_REVISION') {
+          toast.warning(
+            `Changes requested on "${title}": ${msg.feedback || 'See notes.'}`,
+            'Revision Requested'
+          );
+          playNotificationChime('alert');
+          sendBrowserPushNotification('Revision Requested', {
+            body: `Changes requested on "${title}": ${msg.feedback || ''}`,
+          });
         }
         loadCreatorStatus();
       };
     } catch { }
 
     const realtimeChan = supabase
-      .channel('submission-updates-upload')
+      .channel('upload-submission-updates')
       .on('broadcast', { event: 'submission_reviewed' }, (payload: any) => {
-        const data = payload.payload;
-        if (!data) return;
+        const d = payload.payload;
+        if (!d) return;
 
-        if (data.type === 'AUDITION_REVIEWED') {
-          if (data.action === 'APPROVE') {
+        if (d.type === 'AUDITION_REVIEWED') {
+          if (d.action === 'APPROVE') {
             toast.success(
-              'Audition approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
-              'Audition Approved 🎉'
+              'Audition approved! Quality benchmark achieved.',
+              'Audition Approved'
             );
             playNotificationChime('success');
-            sendBrowserPushNotification('Audition Approved! 🚀', {
-              body: 'Your 30-second audition was approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
-            });
-          } else {
-            toast.warning(
-              data.notes || 'Your audition sample requires updates.',
-              data.action === 'REVISION' ? 'Revision Requested' : 'Audition Rejected'
-            );
-            playNotificationChime('alert');
           }
         }
         loadCreatorStatus();
@@ -218,13 +246,16 @@ export default function CreatorUploadPage() {
       .subscribe();
 
     const postgresChan = supabase
-      .channel('public:profiles-upload-page')
+      .channel('upload-postgres-changes')
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'profiles' },
-        () => {
-          loadCreatorStatus();
-        }
+        { event: '*', schema: 'public', table: 'submissions' },
+        () => loadCreatorStatus()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        () => loadCreatorStatus()
       )
       .subscribe();
 
@@ -232,7 +263,7 @@ export default function CreatorUploadPage() {
       if (document.visibilityState === 'visible') {
         loadCreatorStatus();
       }
-    }, 12000);
+    }, 15000);
 
     return () => {
       if (broadcastChan) broadcastChan.close();
@@ -273,6 +304,12 @@ export default function CreatorUploadPage() {
       setAuditionError('You must sign the Master Creator Agreement before submitting your audition.');
       toast.warning('Creator Agreement signature required before uploading.');
       router.push('/creator/agreement');
+      return;
+    }
+    if (payoutConfigured === false) {
+      setAuditionError('Please add your local bank account or payout destination in Settings before submitting your audition sample so we can disburse your $1.00 audition bonus upon approval.');
+      toast.warning('Payout account required before submitting audition sample.');
+      router.push('/creator/settings');
       return;
     }
     if (!auditionFile) {
@@ -508,14 +545,60 @@ export default function CreatorUploadPage() {
                   Submit Your 30-Second Audition Sample
                 </h2>
               </div>
-              <div className="text-[11px] sm:text-xs bg-[#FDF2F4] dark:bg-[#2D1622] text-[#9D174D] dark:text-[#F472B6] px-3 py-1.5 rounded-full font-bold border border-[#FBCFE8] dark:border-[#501D36] self-start sm:self-auto">
-                Target Duration: <strong>30 to 60 Seconds</strong>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="text-[11px] sm:text-xs bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 px-3 py-1.5 rounded-full font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Earn $1.00 Payout Upon Approval</span>
+                </div>
+                <div className="text-[11px] sm:text-xs bg-[#FDF2F4] dark:bg-[#2D1622] text-[#9D174D] dark:text-[#F472B6] px-3 py-1.5 rounded-full font-bold border border-[#FBCFE8] dark:border-[#501D36] self-start sm:self-auto">
+                  Target: <strong>30 to 60 Seconds</strong>
+                </div>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">
-              To ensure quality standards, all creators submit a <strong>30-second sample</strong> demonstrating natural, crisp page-turning ASMR without background noise. <strong>Setup rule:</strong> Keep camera steadily mounted at table level focusing on the book or document pages being turned. Once approved by an administrator, full {minRequired}-video production unlocks immediately.
+              To ensure quality standards, all creators submit a <strong>30-second sample</strong> demonstrating natural, crisp page-turning ASMR without background noise. <strong>Setup rule:</strong> Keep camera steadily mounted at table level focusing on the book or document pages being turned. <strong>Bonus:</strong> When your audition sample is approved, you will earn a <strong>$1.00 reward</strong> deposited directly to your bank account, and full {minRequired}-video production unlocks immediately!
             </p>
+
+            {/* Mandatory Payout Account Banner */}
+            {payoutConfigured === false && (
+              <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-xl space-y-2">
+                <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-200 text-xs">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Payout Account Required Before Submitting Audition</span>
+                </div>
+                <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed font-medium">
+                  Before you can submit your audition sample, you must link your local bank account or payout destination in Settings. This ensures your <strong>$1.00 audition bonus</strong> can be deposited to your account as soon as your audition sample is approved.
+                </p>
+                <Link
+                  href="/creator/settings"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#7B1E4B] hover:bg-[#63183C] text-white text-xs font-bold transition-colors shadow-xs"
+                >
+                  <span>Link Payout Account Now</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
+
+            {/* Master Agreement Banner */}
+            {agreementSigned === false && (
+              <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-700/60 rounded-xl space-y-2">
+                <div className="flex items-center gap-2 font-bold text-rose-900 dark:text-rose-200 text-xs">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>Master Creator Agreement Signature Required</span>
+                </div>
+                <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed font-medium">
+                  You must sign the Master Creator Agreement before submitting your audition sample.
+                </p>
+                <Link
+                  href="/creator/agreement"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#7B1E4B] hover:bg-[#63183C] text-white text-xs font-bold transition-colors shadow-xs"
+                >
+                  <span>Review & Sign Agreement</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
 
             {sampleStatus === 'PENDING_REVIEW' && (
               <div className="bg-[#130E14] text-white rounded-2xl p-5 sm:p-6 space-y-3 shadow-sm">

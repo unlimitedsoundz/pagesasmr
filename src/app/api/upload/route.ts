@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { extractVideoDuration } from '@/lib/media';
 import { db } from '@/lib/db';
 import { uploadToSupabaseStorage } from '@/lib/supabase';
+import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
 
 export async function POST(req: NextRequest) {
   try {
@@ -95,6 +96,26 @@ export async function POST(req: NextRequest) {
     if (isAdminUpload) {
       // Allow any duration for admin guideline/reference samples
     } else if (isSample) {
+      const profile = db.getProfileById(user.id);
+      if (profile && !profile.agreement_signed) {
+        return NextResponse.json(
+          { error: 'You must sign the Master Creator Agreement before uploading your audition sample.' },
+          { status: 403 }
+        );
+      }
+
+      const payoutInfo = formatCreatorPayoutInfo(profile);
+      if (!payoutInfo.isConfigured) {
+        return NextResponse.json(
+          {
+            error:
+              'Payout account required: Please configure your local bank account or payout destination in Settings before submitting your audition sample so we can disburse your $1.00 audition bonus upon approval.',
+            requiresPayoutSetup: true,
+          },
+          { status: 400 }
+        );
+      }
+
       // Creator audition sample check (min 28-30s)
       if (durationSeconds < 28) {
         return NextResponse.json(

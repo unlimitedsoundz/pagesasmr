@@ -1352,8 +1352,9 @@ class PagesDatabaseService {
       (s) => s.creator_id === creatorId && s.platform_id === PLATFORM_ID
     );
 
-    // Filter full production videos (audition samples are unpaid and do not count towards 8-video milestone)
+    // Filter full production videos (audition samples earn $1.00 bonus upon approval)
     const approvedSubmissions = creatorSubmissions.filter((s) => s.status === 'APPROVED' && !s.is_sample);
+    const approvedSamples = creatorSubmissions.filter((s) => s.status === 'APPROVED' && s.is_sample);
     const eligibleForPayout = approvedSubmissions.filter((s) => s.payout_status === 'UNPAID');
     const reservedSubmissions = approvedSubmissions.filter((s) => s.payout_status === 'RESERVED');
     const paidSubmissions = approvedSubmissions.filter((s) => s.payout_status === 'PAID');
@@ -1361,8 +1362,11 @@ class PagesDatabaseService {
       ['SUBMITTED', 'UNDER_REVIEW', 'PROCESSING'].includes(s.status) && !s.is_sample
     );
 
-    const approvedEarnings = approvedSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
-    const availablePayoutBalance = eligibleForPayout.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
+    const sampleApprovedEarnings = approvedSamples.reduce((sum, s) => sum + (s.agreed_rate_usd || 1.0), 0);
+    const sampleUnpaidEarnings = approvedSamples.filter((s) => s.payout_status === 'UNPAID').reduce((sum, s) => sum + (s.agreed_rate_usd || 1.0), 0);
+
+    const approvedEarnings = approvedSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0) + sampleApprovedEarnings;
+    const availablePayoutBalance = eligibleForPayout.reduce((sum, s) => sum + s.agreed_rate_usd, 0) + sampleUnpaidEarnings;
     const reservedBalance = reservedSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
     const totalPaid = paidSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
     const pendingReviewValue = pendingReviewSubmissions.reduce((sum, s) => sum + s.agreed_rate_usd, 0);
@@ -1380,13 +1384,23 @@ class PagesDatabaseService {
       reservedCount: reservedSubmissions.length,
       pendingCount: pendingReviewSubmissions.length,
       eligibleCount,
+      approvedUnpaidCount: eligibleCount,
+      approved_unpaid_count: eligibleCount,
       minRequired,
       remainingToUnlock,
       canRequestPayout,
       approvedEarnings,
       availablePayoutBalance,
+      availableBalance: availablePayoutBalance,
+      available_balance: availablePayoutBalance,
+      sampleApprovedEarnings,
+      sampleUnpaidEarnings,
+      auditionBonusEarned: sampleApprovedEarnings > 0,
       reservedBalance,
+      reservedAmount: reservedBalance,
+      reserved_amount: reservedBalance,
       totalPaid,
+      total_paid: totalPaid,
       pendingReviewValue,
       eligibleSubmissions: eligibleForPayout,
       sampleStatus: creator?.sample_status || 'NOT_SUBMITTED',
@@ -2101,7 +2115,7 @@ class PagesDatabaseService {
       file_name: sampleData.file_name,
       file_size_bytes: sampleData.file_size_bytes,
       status: 'UNDER_REVIEW',
-      agreed_rate_usd: 0, // Audition sample is unpaid
+      agreed_rate_usd: 1.0, // $1.00 audition bonus upon approval
       payout_status: 'UNPAID',
       is_sample: true,
       notes: sampleData.notes,
@@ -2134,7 +2148,7 @@ class PagesDatabaseService {
     this.createNotification({
       user_id: creator.id,
       title: '30-Second Audition Sample Submitted',
-      message: 'Your 30-second audition sample has been received and is currently under review by our administration team.',
+      message: 'Your 30-second audition sample has been received. Once approved, you will earn a $1.00 bonus deposited directly to your payout account!',
       type: 'REVIEW',
       link: '/creator/upload',
     });
@@ -2198,12 +2212,13 @@ class PagesDatabaseService {
     creator.sample_review_notes =
       notes || 'Audition meets quality guidelines. You may now produce and upload the 8 full paid videos ($50 each).';
 
-    // Update all sample submissions for this creator to APPROVED
+    // Update all sample submissions for this creator to APPROVED with $1.00 reward
     const sampleSubs = this.data.submissions.filter(
       (s) => s.creator_id === creator.id && s.is_sample && s.platform_id === PLATFORM_ID
     );
     for (const sub of sampleSubs) {
       sub.status = 'APPROVED';
+      sub.agreed_rate_usd = 1.0;
       sub.updated_at = new Date().toISOString();
       this.syncSubmissionToSupabase(sub);
 
