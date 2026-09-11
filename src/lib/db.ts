@@ -1042,6 +1042,18 @@ class PagesDatabaseService {
     await Promise.allSettled([
       this.syncSubmissionToSupabase(sub),
       ver ? this.syncSubmissionVersionToSupabase(ver) : Promise.resolve(),
+      sendNotificationEmail({
+        to: ADMIN_NOTIFICATION_EMAILS,
+        recipientName: 'Admin',
+        type: 'REVIEW',
+        title: sub.is_sample
+          ? `New Audition Sample Submitted: ${sub.creator_name}`
+          : `New Video Submitted: "${sub.title}"`,
+        message: sub.is_sample
+          ? `${sub.creator_name} (${sub.creator_email}) submitted a 30-second audition sample for review. Action required to approve/reject before they can upload full paid videos.`
+          : `${sub.creator_name} (${sub.creator_email}) submitted a new page-turning video "${sub.title}" (${Math.round(sub.duration_seconds)}s) for review.`,
+        link: '/admin/submissions',
+      }),
     ]);
     return sub;
   }
@@ -1121,6 +1133,14 @@ class PagesDatabaseService {
     await Promise.allSettled([
       this.syncSubmissionToSupabase(sub),
       ver ? this.syncSubmissionVersionToSupabase(ver) : Promise.resolve(),
+      sendNotificationEmail({
+        to: ADMIN_NOTIFICATION_EMAILS,
+        recipientName: 'Admin',
+        type: 'REVIEW',
+        title: `Revision Submitted: "${sub.title}" (v${sub.version_number})`,
+        message: `${sub.creator_name || 'Creator'} submitted a revised version (v${sub.version_number}) of "${sub.title}" for review.`,
+        link: '/admin/submissions',
+      }),
     ]);
     return sub;
   }
@@ -2064,6 +2084,25 @@ class PagesDatabaseService {
       this.syncSubmissionToSupabase(res.submission),
       this.syncProfileToSupabase(res.profile),
       ver ? this.syncSubmissionVersionToSupabase(ver) : Promise.resolve(),
+      sendNotificationEmail({
+        to: ADMIN_NOTIFICATION_EMAILS,
+        recipientName: 'Admin',
+        type: 'REVIEW',
+        title: `Audition Sample Submitted: ${res.profile.display_name}`,
+        message: `${res.profile.display_name} (${res.profile.email}) has submitted a 30-second page-turning audition sample for review.`,
+        link: '/admin/submissions',
+      }),
+      res.profile.email
+        ? sendNotificationEmail({
+            to: res.profile.email,
+            recipientName: res.profile.display_name || 'Creator',
+            type: 'REVIEW',
+            title: '30-Second Audition Sample Submitted',
+            message:
+              'Your 30-second audition sample has been received and is currently under review by our administration team. You will receive an email as soon as your sample is reviewed.',
+            link: '/creator/upload',
+          })
+        : Promise.resolve(),
     ]);
     return res;
   }
