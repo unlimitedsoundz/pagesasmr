@@ -18,6 +18,7 @@ import {
   PayoutStatus,
   PayoutItemStatus,
   PlatformMembership,
+  ChatMessage,
 } from '@/types';
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
@@ -51,6 +52,7 @@ interface DatabaseData {
   audit_events: AuditEvent[];
   settings: PlatformSettings;
   guideline_samples: GuidelineSample[];
+  chat_messages: ChatMessage[];
 }
 
 const APP_DATA_DIR = path.resolve(__dirname, '../../data');
@@ -174,6 +176,7 @@ function getInitialSeedData(): DatabaseData {
     ],
     settings: DEFAULT_SETTINGS,
     guideline_samples,
+    chat_messages: [],
   };
 }
 
@@ -413,6 +416,24 @@ class PagesDatabaseService {
         }
       }
 
+      // 7. Live sync Chat Messages
+      const { data: chats, error: cErr } = await supabaseAdmin
+        .from('chat_messages')
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (!cErr && chats && chats.length > 0) {
+        this.data.chat_messages = chats.map((c: any) => ({
+          id: c.id,
+          creator_id: c.creator_id,
+          sender_id: c.sender_id,
+          sender_name: c.sender_name,
+          sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
+          message: c.message,
+          is_read: Boolean(c.is_read),
+          created_at: c.created_at,
+        }));
+      }
+
       this.save();
     } catch (err) {
       console.warn('[Pages DB] Supabase live sync exception:', err);
@@ -460,6 +481,9 @@ class PagesDatabaseService {
               !s.creator_name?.includes('Test')
             );
           });
+        }
+        if (!parsed.chat_messages) {
+          parsed.chat_messages = [];
         }
         return parsed;
       }
@@ -2249,9 +2273,144 @@ class PagesDatabaseService {
       creatorCount,
       totalLedgerEntries,
       totalAuditEvents,
-      unreadChatCount: 0,
-      activeChatConversations: 0,
+      unreadChatCount: (this.data.chat_messages || []).filter(
+        (m) => !m.is_read && m.sender_role === 'CREATOR'
+      ).length,
+      activeChatConversations: this.getChatConversations().length,
     };
+  }
+
+  // ==========================================
+  // REAL-TIME CREATOR <-> ADMIN CHAT
+  // ==========================================
+  public async syncChatToSupabase(msg: ChatMessage) {
+    try {
+      const targetCreatorId = ensureUuid(msg.creator_id);
+      const targetSenderId = (msg.sender_id === 'admin-001' || msg.sender_id === 'admin-unlymitedsoundz-001')
+        ? '694d15ea-ff2c-43ff-967d-80b7817534a8'
+        : ensureUuid(msg.sender_id);
+
+      const creator = this.data.profiles.find((p) => p.id === targetCreatorId);
+      if (creator) await this.syncProfileToSupabase(creator);
+      const sender = this.data.profiles.find((p) => p.id === targetSenderId);
+      if (sender) await this.syncProfileToSupabase(sender);
+
+      const payload: any = {
+        id: ensureUuid(msg.id),
+        creator_id: targetCreatorId,
+        sender_id: targetSenderId,
+        sender_name: msg.sender_name,
+        sender_role: msg.sender_role,
+        message: msg.message,
+        is_read: Boolean(msg.is_read),
+        created_at: msg.created_at,
+      };
+      const { error } = await supabaseAdmin.from('chat_messages').upsert(payload, { onConflict: 'id' });
+      if (error) {
+        console.error('[Pages DB] Failed to sync chat message to Supabase:', error);
+      }
+    } catch (err) {
+      console.error('[Pages DB] Supabase chat sync exception:', err);
+    }
+  }
+
+  getChatMessages(creatorId: string): ChatMessage[] {
+    if (!this.data.chat_messages) this.data.chat_messages = [];
+    return this.data.chat_messages
+      .filter((m) => m.creator_id === creatorId)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+
+  getChatConversations(): { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] {
+    if (!this.data.chat_messages) this.data.chat_messages = [];
+    const creators = this.getProfiles('CREATOR');
+    const result: { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] = [];
+
+    for (const creator of creators) {
+      const messages = this.getChatMessages(creator.id);
+      if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        const unreadCount = messages.filter((m) => !m.is_read && m.sender_role === 'CREATOR').length;
+        result.push({ creator, lastMessage, unreadCount });
+      }
+    }
+
+    return result.sort(
+      (a, b) => new Date(b.lastMessage.created_at).getTime() - new Date(a.lastMessage.created_at).getTime()
+    );
+  }
+
+  sendChatMessage(creatorId: string, sender: Profile, messageText: string): ChatMessage {
+    if (!this.data.chat_messages) this.data.chat_messages = [];
+    const newMsg: ChatMessage = {
+      id: ensureUuid(),
+      creator_id: creatorId,
+      sender_id: sender.id,
+      sender_name: sender.display_name,
+      sender_role: sender.role,
+      message: messageText.trim(),
+      created_at: new Date().toISOString(),
+      is_read: false,
+    };
+
+    this.data.chat_messages.push(newMsg);
+
+    // If sender is ADMIN, notify the creator
+    if (sender.role === 'ADMIN') {
+      this.createNotification({
+        user_id: creatorId,
+        title: 'New Support Message from Admin',
+        message: messageText.length > 80 ? messageText.substring(0, 77) + '...' : messageText,
+        type: 'REVIEW',
+        link: '/creator/messages',
+      });
+    } else {
+      // If sender is CREATOR, notify admins
+      this.createNotification({
+        user_id: 'admin-001',
+        title: `New Message from ${sender.display_name}`,
+        message: messageText.length > 80 ? messageText.substring(0, 77) + '...' : messageText,
+        type: 'REVIEW',
+        link: `/admin/chat?creatorId=${creatorId}`,
+      });
+    }
+
+    this.save();
+    this.syncChatToSupabase(newMsg);
+    return newMsg;
+  }
+
+  markChatRead(creatorId: string, readerRole: 'CREATOR' | 'ADMIN'): void {
+    if (!this.data.chat_messages) return;
+    let changed = false;
+    const updated: ChatMessage[] = [];
+    this.data.chat_messages.forEach((m) => {
+      if (m.creator_id === creatorId && m.sender_role !== readerRole && !m.is_read) {
+        m.is_read = true;
+        changed = true;
+        updated.push(m);
+      }
+    });
+    if (changed) {
+      this.save();
+      for (const m of updated) {
+        this.syncChatToSupabase(m);
+      }
+    }
+  }
+
+  getAdminUnreadChatCount(): number {
+    this.reload();
+    return (this.data.chat_messages || []).filter(
+      (m) => !m.is_read && m.sender_role === 'CREATOR'
+    ).length;
+  }
+
+  getCreatorUnreadChatCount(creatorId: string): number {
+    this.reload();
+    return (this.data.chat_messages || []).filter(
+      (m) => m.creator_id === creatorId && !m.is_read && m.sender_role === 'ADMIN'
+    ).length;
   }
 }
 
