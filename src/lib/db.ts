@@ -262,11 +262,11 @@ class PagesDatabaseService {
         }));
       }
 
-      // 3. Sync Submissions for pinkroom_pages ONLY
+      // 3. Sync Submissions for pinkroom_pages ONLY (strict platform isolation)
       const { data: subs, error: sErr } = await supabaseAdmin
         .from('submissions')
         .select('*')
-        .or('platform_id.eq.pinkroom_pages,platform_id.is.null');
+        .eq('platform_id', PLATFORM_ID);
       if (!sErr && subs) {
         for (const ss of subs) {
           const existingIdx = this.data.submissions.findIndex((s) => s.id === ss.id);
@@ -416,22 +416,41 @@ class PagesDatabaseService {
         }
       }
 
-      // 7. Live sync Chat Messages
-      const { data: chats, error: cErr } = await supabaseAdmin
-        .from('chat_messages')
-        .select('*')
-        .order('created_at', { ascending: true });
-      if (!cErr && chats && chats.length > 0) {
-        this.data.chat_messages = chats.map((c: any) => ({
-          id: c.id,
-          creator_id: c.creator_id,
-          sender_id: c.sender_id,
-          sender_name: c.sender_name,
-          sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
-          message: c.message,
-          is_read: Boolean(c.is_read),
-          created_at: c.created_at,
-        }));
+      // 7. Live sync Chat Messages — only for pinkroom_pages creators
+      // Build list of creator IDs belonging to this platform
+      const pagesCreatorIds = new Set(
+        this.data.platform_memberships
+          .filter((m) => m.platform_id === PLATFORM_ID && m.role === 'CREATOR')
+          .map((m) => m.user_id)
+      );
+      // Also include creators who have submissions on this platform
+      this.data.submissions
+        .filter((s) => s.platform_id === PLATFORM_ID)
+        .forEach((s) => pagesCreatorIds.add(s.creator_id));
+
+      if (pagesCreatorIds.size > 0) {
+        const creatorIdList = Array.from(pagesCreatorIds);
+        const { data: chats, error: cErr } = await supabaseAdmin
+          .from('chat_messages')
+          .select('*')
+          .in('creator_id', creatorIdList)
+          .order('created_at', { ascending: true });
+        if (!cErr && chats && chats.length > 0) {
+          this.data.chat_messages = chats.map((c: any) => ({
+            id: c.id,
+            creator_id: c.creator_id,
+            sender_id: c.sender_id,
+            sender_name: c.sender_name,
+            sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
+            message: c.message,
+            is_read: Boolean(c.is_read),
+            created_at: c.created_at,
+          }));
+        } else if (!cErr) {
+          this.data.chat_messages = [];
+        }
+      } else {
+        this.data.chat_messages = [];
       }
 
       this.save();
@@ -481,8 +500,25 @@ class PagesDatabaseService {
               !s.creator_name?.includes('Test')
             );
           });
+          // Strip any leaked submissions from the main platform
+          parsed.submissions = parsed.submissions.filter((s) =>
+            !s.platform_id || s.platform_id === PLATFORM_ID
+          );
         }
-        if (!parsed.chat_messages) {
+        // Filter chat messages to only those belonging to pinkroom_pages creators
+        const pagesMemberIds = new Set<string>([
+          ...(parsed.platform_memberships || [])
+            .filter((m) => m.platform_id === PLATFORM_ID && m.role === 'CREATOR')
+            .map((m) => m.user_id),
+          ...(parsed.submissions || [])
+            .filter((s) => s.platform_id === PLATFORM_ID)
+            .map((s) => s.creator_id),
+        ]);
+        if (parsed.chat_messages && pagesMemberIds.size > 0) {
+          parsed.chat_messages = parsed.chat_messages.filter((m) =>
+            pagesMemberIds.has(m.creator_id)
+          );
+        } else if (!parsed.chat_messages) {
           parsed.chat_messages = [];
         }
         return parsed;
@@ -2323,7 +2359,8 @@ class PagesDatabaseService {
 
   getChatConversations(): { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] {
     if (!this.data.chat_messages) this.data.chat_messages = [];
-    const creators = this.getProfiles('CREATOR');
+    // Use getPlatformCreators() to ensure only pinkroom_pages creators are shown
+    const creators = this.getPlatformCreators();
     const result: { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] = [];
 
     for (const creator of creators) {
