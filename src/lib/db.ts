@@ -2183,6 +2183,23 @@ class PagesDatabaseService {
       sub.status = 'APPROVED';
       sub.updated_at = new Date().toISOString();
       this.syncSubmissionToSupabase(sub);
+
+      // Auto-set the approved sample as official guideline reference sample
+      if (sub.file_url) {
+        try {
+          this.createGuidelineSample({
+            title: `Official Guideline Sample: Page Turning (${creator.display_name || 'Exemplary Audition'})`,
+            description: notes || 'Official verified reference sample for page-turning audio standards, pacing, and overhead camera framing.',
+            video_url: sub.file_url,
+            file_name: sub.file_name || 'official_page_turning_sample.mp4',
+            duration_seconds: sub.duration_seconds || 30,
+            category: 'PAGE_TURNING',
+            uploaded_by: adminUser.id || adminUser.display_name,
+          });
+        } catch (sampleErr) {
+          console.warn('[Pages DB] Auto-publishing approved sample as guideline error:', sampleErr);
+        }
+      }
     }
 
     this.createNotification({
