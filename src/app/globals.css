@@ -1164,8 +1164,14 @@ a[class*="px-"][class*="py-"][class*="bg-[#7B1E4B]"]:hover {
 [class*="StatusBadge"],
 .pill-badge,
 .pill,
-[class*="bg-[#FDF2F4]"],
-[class*="bg-[#fdf2f4]"] {
+span[class*="bg-[#FDF2F4]"],
+span[class*="bg-[#fdf2f4]"],
+button[class*="bg-[#FDF2F4]"],
+button[class*="bg-[#fdf2f4]"],
+a[class*="bg-[#FDF2F4]"],
+a[class*="bg-[#fdf2f4]"],
+.rounded-full[class*="bg-[#FDF2F4]"],
+.rounded-full[class*="bg-[#fdf2f4]"] {
   background-color: #FDF2F4 !important;
   color: #7B1E4B !important;
   border: 0 !important;
@@ -1179,14 +1185,34 @@ a[class*="px-"][class*="py-"][class*="bg-[#7B1E4B]"]:hover {
 [class*="StatusBadge"] *,
 .pill-badge *,
 .pill *,
-[class*="bg-[#FDF2F4]"] *,
-[class*="bg-[#fdf2f4]"] * {
+span[class*="bg-[#FDF2F4]"] *,
+span[class*="bg-[#fdf2f4]"] *,
+button[class*="bg-[#FDF2F4]"] *,
+button[class*="bg-[#fdf2f4]"] *,
+a[class*="bg-[#FDF2F4]"] *,
+a[class*="bg-[#fdf2f4]"] *,
+.rounded-full[class*="bg-[#FDF2F4]"] *,
+.rounded-full[class*="bg-[#fdf2f4]"] * {
   color: #7B1E4B !important;
 }
 
+/* Card Container Overrides: ensure cards with bg-[#FDF2F4] or bg-[#7B1E4B] retain clean rounded card corners */
+div[class*="bg-[#FDF2F4]"]:not(.pill):not(.status-badge):not([class*="StatusBadge"]):not(.rounded-full),
+div[class*="bg-[#fdf2f4]"]:not(.pill):not(.status-badge):not([class*="StatusBadge"]):not(.rounded-full),
+div[class*="bg-[#7B1E4B]"]:not(.pill):not(.status-badge):not([class*="StatusBadge"]):not(.rounded-full),
+div[class*="bg-[#7b1e4b]"]:not(.pill):not(.status-badge):not([class*="StatusBadge"]):not(.rounded-full) {
+  border-radius: 8px !important;
+}
+
 /* Completed / Paid / Primary Fill Pill Exception (Solid #7B1E4B Plum, NO glassmorphism) */
-[class*="bg-[#7B1E4B]"],
-[class*="bg-[#7b1e4b]"] {
+span[class*="bg-[#7B1E4B]"],
+span[class*="bg-[#7b1e4b]"],
+button[class*="bg-[#7B1E4B]"],
+button[class*="bg-[#7b1e4b]"],
+a[class*="bg-[#7B1E4B]"],
+a[class*="bg-[#7b1e4b]"],
+.rounded-full[class*="bg-[#7B1E4B]"],
+.rounded-full[class*="bg-[#7b1e4b]"] {
   background-color: #7B1E4B !important;
   background: #7B1E4B !important;
   color: #FFFFFF !important;

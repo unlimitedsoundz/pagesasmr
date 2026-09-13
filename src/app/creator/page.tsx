@@ -638,7 +638,7 @@ export default function CreatorDashboardPage() {
             </div>
 
             {/* Before You Press Record: The Essentials Card */}
-            <div className="bg-[#FDF2F4] dark:bg-[#22131A] border border-[#FCE3E8] dark:border-[#3B1E2C] rounded-lg p-6 sm:p-7 space-y-5">
+            <div className="bg-[#FDF2F4] dark:bg-[#22131A] border border-[#FCE3E8] dark:border-[#3B1E2C] rounded-2xl p-6 sm:p-7 space-y-5">
               <div>
                 <div className="text-[10px] font-bold tracking-[0.2em] text-[#9D174D] dark:text-pink-300 uppercase">
                   BEFORE YOU PRESS RECORD
