@@ -9,6 +9,7 @@ export interface UploadMetadata {
   notes?: string;
   durationSeconds: number;
   isSample?: boolean;
+  isOfficeBonus?: boolean;
   consentConfirmed?: boolean;
   category?: string;
 }
@@ -196,6 +197,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
                   fileSizeBytes,
                   notes: meta.notes,
                   consentConfirmed: meta.consentConfirmed ?? true,
+                  is_office_bonus: Boolean(meta.isOfficeBonus),
                 };
 
             const subRes = await fetch(submitEndpoint, {
