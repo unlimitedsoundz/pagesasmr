@@ -695,7 +695,10 @@ export default function CreatorDashboardPage() {
 
         {/* Centered Ticker Bar */}
         <div className="text-center text-xs text-neutral-400 dark:text-neutral-500 tracking-wider py-8">
-          $50 flat rate. &nbsp;·&nbsp; 8-video minimum. &nbsp;·&nbsp; Your work. Your earnings.
+          ${rate} flat rate &nbsp;&middot;&nbsp; {minRequired}-video minimum &nbsp;&middot;&nbsp;{' '}
+          <span className="italic text-neutral-600 dark:text-neutral-400">
+            Your work. Your earnings.
+          </span>
         </div>
       </div>
     </div>

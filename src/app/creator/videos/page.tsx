@@ -369,6 +369,7 @@ export default function SubmissionsPage() {
     (s) => !s.is_sample && s.status === 'APPROVED'
   ).length;
   const minRequired = statsData?.minRequired || 8;
+  const rate = user?.rate_per_video_usd || 50;
   const availableBalance = statsData?.availablePayoutBalance ?? 0;
 
   const tabCounts = {
@@ -449,7 +450,7 @@ export default function SubmissionsPage() {
                 ? 'No approved videos yet'
                 : `${
                     approvedCount === 1 ? '1 audition' : `${approvedCount} videos`
-                  } Â· ${fullApprovedCount} full videos`
+                  } \u00B7 ${fullApprovedCount} full videos`
             }
             icon={<CheckCircle2 className="w-4 h-4" />}
           />
@@ -640,7 +641,7 @@ export default function SubmissionsPage() {
                                 Audition sample
                               </span>
                             )}
-                            <span>Â· {durationLabel}</span>
+                            <span>&middot; {durationLabel}</span>
                           </div>
                         </div>
                       </div>
@@ -796,14 +797,9 @@ export default function SubmissionsPage() {
           </div>
         </div>
 
-        {/* Design preview notice */}
-        <p className="text-[11px] text-neutral-400 dark:text-neutral-600 text-center">
-          Design preview Â· Showing the submission from your dashboard. Live review updates are connected.
-        </p>
-
         {/* Ticker */}
         <div className="text-center text-xs text-neutral-400 dark:text-neutral-500 tracking-wider py-2">
-          $50 flat rate.&nbsp;Â·&nbsp; 8-video minimum.&nbsp;Â·&nbsp;{' '}
+          ${rate} flat rate &nbsp;&middot;&nbsp; {minRequired}-video minimum &nbsp;&middot;&nbsp;{' '}
           <span className="italic text-neutral-600 dark:text-neutral-400">
             Your work. Your earnings.
           </span>
@@ -1105,7 +1101,7 @@ export default function SubmissionsPage() {
                         )}
                       </div>
                       <div className="text-[11px] text-neutral-500 font-normal">
-                        {Math.round(v.duration_seconds)}s Â· Uploaded{' '}
+                        {Math.round(v.duration_seconds)}s &middot; Uploaded{' '}
                         {new Date(v.created_at).toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric',
