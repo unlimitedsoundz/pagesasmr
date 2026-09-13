@@ -1116,14 +1116,14 @@ div[class*="fixed"][class*="inset-0"]>div button.bg-black,
    ======================================================== */
 
 /* 1. FORCE ALL BUTTONS, ACTION LINKS & CTAs TO PINK PILLS WITH ZERO BORDER */
-button:not(.chat-bubble):not([data-message-bubble]):not(.notification-card):not(.animate-spin),
+button:not(.chat-bubble):not([data-message-bubble]):not(.notification-card):not(.animate-spin):not(.official-sample-banner):not([data-official-sample-banner]),
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
-[role="button"]:not(.chat-bubble),
+[role="button"]:not(.chat-bubble):not(.official-sample-banner):not([data-official-sample-banner]),
 .btn,
 .button,
-a[class*="px-"][class*="py-"]:not(.notification-card) {
+a[class*="px-"][class*="py-"]:not(.notification-card):not(.official-sample-banner):not([data-official-sample-banner]) {
   border-radius: 9999px !important;
   border: 0 !important;
   border-style: none !important;
@@ -1257,4 +1257,22 @@ a[class*="bg-[#7b1e4b]"],
   border-style: none !important;
   border-width: 0 !important;
   border-color: transparent !important;
+}
+
+/* ========================================================
+   OFFICIAL SAMPLE GUIDELINE BANNER - CARD SHAPE (NEVER PILL)
+   ======================================================== */
+.official-sample-banner,
+div.official-sample-banner,
+button.official-sample-banner,
+[data-official-sample-banner] {
+  border-radius: 16px !important;
+  border: 1px solid #F3D3E1 !important;
+}
+
+.dark .official-sample-banner,
+.dark div.official-sample-banner,
+.dark button.official-sample-banner,
+.dark [data-official-sample-banner] {
+  border: 1px solid #3D2132 !important;
 }

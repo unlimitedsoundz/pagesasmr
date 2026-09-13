@@ -474,15 +474,7 @@ export default function CreatorUploadPage() {
 
         {/* Official Guideline Sample Prominent Banner (Matches Official Sample Reference Spec) */}
         <div
-          role="button"
-          tabIndex={0}
           onClick={openSampleVideoModal}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              openSampleVideoModal();
-            }
-          }}
           data-official-sample-banner="true"
           className="official-sample-banner w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-6 sm:p-8 lg:p-10 transition-all hover:bg-[#F9E2EC] dark:hover:bg-[#2A1825] group text-left cursor-pointer shadow-xs"
         >
