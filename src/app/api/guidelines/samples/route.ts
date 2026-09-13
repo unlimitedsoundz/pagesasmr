@@ -7,13 +7,14 @@ import { PLATFORM_ID } from '@/lib/constants';
 
 export async function GET() {
   try {
-    // 1. Fetch from Supabase guideline_samples (without column filtering that can fail)
+    // 1. Fetch from Supabase guideline_samples
     const { data: supaSamples, error: supaErr } = await supabaseAdmin
       .from('guideline_samples')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!supaErr && supaSamples && supaSamples.length > 0) {
+    let formattedSupa: any[] = [];
+    if (!supaErr && supaSamples) {
       const pageSamples = supaSamples.filter(
         (gs: any) =>
           (gs.platform_id === PLATFORM_ID || gs.category === 'PAGE_TURNING') &&
@@ -23,7 +24,7 @@ export async function GET() {
           !gs.video_url?.includes('ForBiggerBlazes.mp4')
       );
 
-      const formattedSupa = pageSamples.map((gs: any) => ({
+      formattedSupa = pageSamples.map((gs: any) => ({
         id: gs.id,
         title: gs.title || 'Page Turning Sample',
         description: gs.description || 'Master reference recording for audio quality, camera framing, and pacing.',
@@ -35,59 +36,31 @@ export async function GET() {
         created_at: gs.created_at,
         platform_id: PLATFORM_ID,
       }));
-
-      // Merge with local db samples to include any recently uploaded admin sample
-      const localSamples = db.getGuidelineSamples().filter(
-        (loc) => loc.id !== 'b0000000-0000-4000-8000-000000000001' && !loc.video_url?.includes('ForBiggerBlazes.mp4')
-      );
-      const combined: any[] = [...formattedSupa];
-      for (const loc of localSamples) {
-        if (!combined.some((s) => s.id === loc.id || s.video_url === loc.video_url)) {
-          combined.push({
-            ...loc,
-            title: loc.title || 'Page Turning Sample',
-          });
-        }
-      }
-
-      // Sort by newest created_at so the latest admin upload is always first
-      combined.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
-
-      return NextResponse.json({ samples: combined });
     }
+
+    // Merge with local db samples to include any recently uploaded admin sample
+    const localSamples = db.getGuidelineSamples().filter(
+      (loc) => loc.id !== 'b0000000-0000-4000-8000-000000000001' && !loc.video_url?.includes('ForBiggerBlazes.mp4')
+    );
+    const combined: any[] = [...formattedSupa];
+    for (const loc of localSamples) {
+      if (!combined.some((s) => s.id === loc.id || s.video_url === loc.video_url)) {
+        combined.push({
+          ...loc,
+          title: loc.title || 'Page Turning Sample',
+        });
+      }
+    }
+
+    // Sort by newest created_at so the latest admin upload is always first
+    combined.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+
+    return NextResponse.json({ samples: combined });
   } catch (e) {
     console.error('Failed to query Supabase guideline_samples:', e);
   }
 
-  const cleanTitle = (raw?: string): string => {
-    return 'Page Turning Sample';
-  };
-
-  let samples = db.getGuidelineSamples();
-  if (!samples || samples.length === 0) {
-    const approvedAudition = db.getSubmissions().find(
-      (s) => s.is_sample && s.status === 'APPROVED' && Boolean(s.file_url)
-    );
-    if (approvedAudition) {
-      samples = [{
-        id: approvedAudition.id,
-        platform_id: PLATFORM_ID,
-        title: cleanTitle(approvedAudition.title),
-        description: 'Official verified reference sample for page-turning audio standards, pacing, and overhead camera framing.',
-        video_url: approvedAudition.file_url,
-        file_name: approvedAudition.file_name || 'official_page_turning_sample.mp4',
-        duration_seconds: approvedAudition.duration_seconds || 30,
-        category: 'PAGE_TURNING',
-        uploaded_by: 'Admin',
-        created_at: approvedAudition.created_at || new Date().toISOString(),
-      }];
-    }
-  } else {
-    samples = samples.map((s) => ({
-      ...s,
-      title: cleanTitle(s.title),
-    }));
-  }
+  const samples = db.getGuidelineSamples();
   return NextResponse.json({ samples: samples || [] });
 }
 

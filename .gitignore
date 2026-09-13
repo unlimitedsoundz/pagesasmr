@@ -1,5 +1,5 @@
 # dependencies
-node_modules
+/node_modules
 /.pnp
 .pnp.js
 
@@ -26,22 +26,17 @@ yarn-error.log*
 .env*.local
 .env
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# local persistent database
-data/database.json
-
 # uploads
 uploads/
 *.mp4
 *.mov
 
-# binaries
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# apps
+supabase/.temp/
 bin/
 *.exe
 

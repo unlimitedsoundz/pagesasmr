@@ -7,6 +7,7 @@ import {
   UploadCloud,
   FileVideo,
   X,
+  Trash2,
 } from 'lucide-react';
 import { GuidelineSample } from '@/types';
 
@@ -36,6 +37,11 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
   const [saving, setSaving] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadError, setUploadError] = useState('');
+
+  // Admin delete modal state
+  const [sampleToDelete, setSampleToDelete] = useState<GuidelineSample | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -129,6 +135,27 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
     setSelectedSample(null);
   };
 
+  const handleDeleteSample = async (sample: GuidelineSample) => {
+    setDeletingId(sample.id);
+    setDeleteError('');
+    try {
+      const res = await fetch(`/api/guidelines/samples?id=${encodeURIComponent(sample.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete guideline sample');
+
+      setSampleToDelete(null);
+      await loadSamples();
+      window.dispatchEvent(new CustomEvent('guideline-sample-updated'));
+      if (onSampleUpdated) onSampleUpdated();
+    } catch (err: any) {
+      setDeleteError(err.message || 'Error deleting guideline sample.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   useEffect(() => {
     loadSamples();
     const handleUpdate = () => loadSamples();
@@ -219,14 +246,26 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
         </div>
 
         {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setShowUploadModal(true)}
-            className="inline-flex items-center px-4 py-2 rounded-md bg-white text-black hover:bg-neutral-100 text-xs font-bold transition-colors self-start sm:self-auto"
-          >
-            <UploadCloud className="w-4 h-4 mr-1.5" />
-            <span>Upload Reference Sample</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            {selectedSample && (
+              <button
+                type="button"
+                onClick={() => setSampleToDelete(selectedSample)}
+                className="inline-flex items-center px-3.5 py-2 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors shadow-sm"
+              >
+                <Trash2 className="w-4 h-4 mr-1.5" />
+                <span>Delete Sample</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowUploadModal(true)}
+              className="inline-flex items-center px-4 py-2 rounded-md bg-white text-black hover:bg-neutral-100 text-xs font-bold transition-colors"
+            >
+              <UploadCloud className="w-4 h-4 mr-1.5" />
+              <span>Upload Reference Sample</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -249,23 +288,35 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
         )}
       </div>
 
-      {/* Multiple Sample Selector (if more than 1 sample is published) */}
-      {samples.length > 1 && (
+      {/* Multiple Sample Selector (if sample versions exist or in admin mode) */}
+      {samples.length > 0 && (samples.length > 1 || isAdmin) && (
         <div className="flex items-center gap-2 p-3 bg-neutral-100 border-b border-neutral-200 overflow-x-auto text-xs font-medium">
           <span className="text-[10px] uppercase font-bold text-neutral-500 shrink-0">Sample Versions:</span>
           {samples.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => setSelectedSample(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                selectedSample?.id === s.id
-                  ? 'bg-black text-white shadow-sm'
-                  : 'bg-white text-black hover:bg-neutral-200 border border-neutral-300'
-              }`}
-            >
-              {s.title}
-            </button>
+            <div key={s.id} className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelectedSample(s)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
+                  selectedSample?.id === s.id
+                    ? 'bg-black text-white shadow-sm'
+                    : 'bg-white text-black hover:bg-neutral-200 border border-neutral-300'
+                }`}
+              >
+                {s.title}
+              </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setSampleToDelete(s)}
+                  className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded transition-colors"
+                  title={`Delete ${s.title}`}
+                  aria-label={`Delete ${s.title}`}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}
@@ -453,6 +504,81 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
                 </button>
               </div>
             </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Admin Delete Confirmation Modal */}
+      {sampleToDelete && mounted && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[110] bg-black/60 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          onClick={() => setSampleToDelete(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-sample-modal-title"
+        >
+          <div
+            className="bg-white rounded-xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-2xl border border-neutral-200 text-neutral-900 animate-fade-in my-auto min-w-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3 gap-3">
+              <h3 id="delete-sample-modal-title" className="font-serif text-base sm:text-lg font-bold text-neutral-900 leading-snug">
+                Delete Guideline Sample?
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSampleToDelete(null)}
+                className="p-1 -mr-1 text-neutral-500 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5 text-neutral-700" />
+              </button>
+            </div>
+
+            {deleteError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 font-medium">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="space-y-2 text-xs sm:text-sm text-neutral-600 leading-relaxed font-medium">
+              <p>
+                Are you sure you want to delete <strong className="text-black">{sampleToDelete.title}</strong>?
+              </p>
+              <p className="text-xs text-neutral-500">
+                This will permanently remove this guideline sample video and it will disappear from the frontend guidelines sample player for creators.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-neutral-100">
+              <button
+                type="button"
+                onClick={() => setSampleToDelete(null)}
+                disabled={Boolean(deletingId)}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-xs font-bold text-neutral-800 hover:bg-neutral-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteSample(sampleToDelete)}
+                disabled={Boolean(deletingId)}
+                className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
+              >
+                {deletingId ? (
+                  <>
+                    <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Sample</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>,
         document.body

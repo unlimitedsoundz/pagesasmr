@@ -2019,27 +2019,27 @@ class PagesDatabaseService {
 
   deleteGuidelineSample(id: string, adminUser?: Profile): boolean {
     if (!this.data.guideline_samples) return false;
-    const idx = this.data.guideline_samples.findIndex((g) => g.id === id && (g.platform_id === PLATFORM_ID || g.category === 'PAGE_TURNING'));
-    if (idx !== -1) {
-      this.data.guideline_samples.splice(idx, 1);
+    const initialLen = this.data.guideline_samples.length;
+    this.data.guideline_samples = this.data.guideline_samples.filter((g) => g.id !== id);
+    const deleted = this.data.guideline_samples.length !== initialLen;
+    if (deleted) {
       this.save();
-      try {
-        supabaseAdmin.from('guideline_samples').delete().eq('id', id);
-      } catch { }
-      if (adminUser) {
-        this.createAuditEvent({
-          platform_id: PLATFORM_ID,
-          actor_id: adminUser.id,
-          actor_name: adminUser.display_name,
-          action: 'GUIDELINE_SAMPLE_DELETED',
-          target_type: 'GUIDELINE_SAMPLE',
-          target_id: id,
-          details: { sampleId: id },
-        });
-      }
-      return true;
     }
-    return false;
+    try {
+      supabaseAdmin.from('guideline_samples').delete().eq('id', id);
+    } catch { }
+    if (adminUser) {
+      this.createAuditEvent({
+        platform_id: PLATFORM_ID,
+        actor_id: adminUser.id,
+        actor_name: adminUser.display_name,
+        action: 'GUIDELINE_SAMPLE_DELETED',
+        target_type: 'GUIDELINE_SAMPLE',
+        target_id: id,
+        details: { sampleId: id },
+      });
+    }
+    return true;
   }
 
   getPayoutRequests(filters?: { creatorId?: string; status?: PayoutStatus }): PayoutRequest[] {
