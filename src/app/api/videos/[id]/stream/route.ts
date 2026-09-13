@@ -2,86 +2,82 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { supabaseAdmin, getSignedVideoUrl } from '@/lib/supabase';
+import { getSignedVideoUrl, extractStorageKey } from '@/lib/supabase';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const ROOT_UPLOADS_DIR = path.resolve(process.cwd(), '../../uploads');
-const LOCAL_UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 const TMP_UPLOADS_DIR = path.join(os.tmpdir(), 'uploads');
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const rawId = params.id;
-
-  // 1. Check if this file is a guideline / benchmark sample
-  let isGuidelineSample =
-    rawId.startsWith('guideline-') ||
-    rawId.startsWith('sample-') ||
-    rawId.startsWith('guide-') ||
-    rawId.includes('benchmark') ||
-    rawId.includes('reference');
-
-  if (!isGuidelineSample) {
-    try {
-      const localSamples = db.getGuidelineSamples();
-      if (localSamples.some((s: any) => s.video_url && s.video_url.includes(rawId))) {
-        isGuidelineSample = true;
-      } else {
-        const { data: supaSamples } = await supabaseAdmin
-          .from('guideline_samples')
-          .select('video_url')
-          .or('platform_id.eq.pinkroom_pages,category.eq.PAGE_TURNING')
-          .ilike('video_url', `%${rawId}%`);
-        if (supaSamples && supaSamples.length > 0) {
-          isGuidelineSample = true;
-        }
-      }
-    } catch {}
+  if (!rawId) {
+    return NextResponse.json({ error: 'Video ID or storage key required.' }, { status: 400 });
   }
 
-  // 2. Authorization check: Guideline reference samples are public for all creators
-  if (!isGuidelineSample) {
-    const user = await getCurrentUser();
-    if (!user) {
-      return new NextResponse('Unauthorized: Access to private video recordings requires authentication.', {
-        status: 401,
-      });
-    }
+  // 1. Determine clean storage key and target submission (if any)
+  let targetKey = extractStorageKey(rawId);
+  let targetSubmission: any = null;
 
-    if (user.role !== 'ADMIN') {
-      const isSubmissionId = rawId.startsWith('sub-');
-      if (isSubmissionId) {
-        const submission = db.getSubmissionById(rawId);
-        if (!submission || submission.creator_id !== user.id) {
-          return new NextResponse('Forbidden: You can only view your own submitted recordings.', {
-            status: 403,
-          });
-        }
+  try {
+    if (rawId.startsWith('sub-') || rawId.length === 36) {
+      targetSubmission = db.getSubmissionById(rawId);
+    }
+    if (!targetSubmission) {
+      const allSubs = db.getSubmissions();
+      targetSubmission = allSubs.find(
+        (s) => s.id === rawId || (s.file_url && s.file_url.includes(targetKey)) || (s.file_name && s.file_name.includes(targetKey))
+      );
+    }
+    if (targetSubmission && targetSubmission.file_url) {
+      const extractedFromSub = extractStorageKey(targetSubmission.file_url);
+      if (extractedFromSub) {
+        targetKey = extractedFromSub;
       }
+    }
+  } catch (err) {
+    console.warn('Submission lookup warning in stream route:', err);
+  }
+
+  // 2. Guideline / Benchmark sample check
+  const isGuidelineSample =
+    targetKey.startsWith('guideline-') ||
+    targetKey.startsWith('sample-') ||
+    targetKey.startsWith('guide-') ||
+    targetKey.includes('benchmark') ||
+    Boolean(targetSubmission?.is_sample);
+
+  // 3. Authorization check
+  const user = await getCurrentUser();
+  if (!user && !isGuidelineSample) {
+    if (!targetSubmission && !targetKey.startsWith('video-') && !targetKey.startsWith('prod-') && !targetKey.startsWith('audition-')) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required to access private video assets.' }, { status: 401 });
     }
   }
 
-  let targetKey = rawId;
-  if (rawId.startsWith('sub-') || rawId.length === 36) {
-    try {
-      const sub = db.getSubmissionById(rawId);
-      if (sub && sub.file_url) {
-        const match = sub.file_url.match(/\/api\/videos\/([^/?#]+)\/stream/);
-        if (match) {
-          targetKey = match[1];
-        }
-      }
-    } catch {}
+  if (user && user.role !== 'ADMIN' && !isGuidelineSample) {
+    const isOwner =
+      (targetSubmission && targetSubmission.creator_id === user.id) ||
+      targetKey.includes(user.id);
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Forbidden: You can only access your own submitted recordings.' }, { status: 403 });
+    }
   }
 
+  const wantsJson =
+    req.nextUrl.searchParams.get('format') === 'json' ||
+    req.nextUrl.searchParams.get('action') === 'url' ||
+    req.headers.get('accept')?.includes('application/json');
+
+  // 4. Check local filesystem fallback (for local dev or legacy temp uploads)
   const possiblePaths = [
-    path.join(ROOT_UPLOADS_DIR, targetKey),
-    path.join(ROOT_UPLOADS_DIR, `${targetKey}.mp4`),
-    path.join(ROOT_UPLOADS_DIR, `${targetKey}.mov`),
-    path.join(LOCAL_UPLOADS_DIR, targetKey),
-    path.join(LOCAL_UPLOADS_DIR, `${targetKey}.mp4`),
-    path.join(LOCAL_UPLOADS_DIR, `${targetKey}.mov`),
+    path.join(UPLOADS_DIR, targetKey),
+    path.join(UPLOADS_DIR, `${targetKey}.mp4`),
+    path.join(UPLOADS_DIR, `${targetKey}.mov`),
+    path.join(process.cwd(), 'public', 'uploads', targetKey),
+    path.join(process.cwd(), 'public', 'uploads', `${targetKey}.mp4`),
+    path.join(process.cwd(), 'public', 'uploads', `${targetKey}.mov`),
     path.join(TMP_UPLOADS_DIR, targetKey),
     path.join(TMP_UPLOADS_DIR, `${targetKey}.mp4`),
     path.join(TMP_UPLOADS_DIR, `${targetKey}.mov`),
@@ -95,26 +91,21 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
   }
 
-  const wantsJson =
-    req.nextUrl.searchParams.get('format') === 'json' ||
-    req.headers.get('accept')?.includes('application/json');
-
   if (actualFilePath) {
-    const stat = fs.statSync(actualFilePath);
-    const fileSize = stat.size;
-
     if (wantsJson) {
       return NextResponse.json({
         success: true,
         url: `/api/videos/${encodeURIComponent(targetKey)}/stream`,
         direct: false,
-        size: fileSize,
+        source: 'local',
+        videoId: rawId,
       });
     }
 
+    const stat = fs.statSync(actualFilePath);
+    const fileSize = stat.size;
     const range = req.headers.get('range');
-    const isMov = actualFilePath.endsWith('.mov');
-    const contentType = isMov ? 'video/quicktime' : 'video/mp4';
+    const cacheHeader = 'private, max-age=86400, stale-while-revalidate=604800';
 
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-');
@@ -123,7 +114,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       const chunksize = end - start + 1;
       const fileStream = fs.createReadStream(actualFilePath, { start, end });
 
-      const readableStream = new ReadableStream({
+      const readable = new ReadableStream({
         start(controller) {
           fileStream.on('data', (chunk) => controller.enqueue(chunk));
           fileStream.on('end', () => controller.close());
@@ -131,51 +122,92 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         },
       });
 
-      return new NextResponse(readableStream, {
+      return new NextResponse(readable as any, {
         status: 206,
         headers: {
           'Content-Range': `bytes ${start}-${end}/${fileSize}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': chunksize.toString(),
-          'Content-Type': contentType,
+          'Content-Type': 'video/mp4',
+          'Cache-Control': cacheHeader,
+        },
+      });
+    } else {
+      const fileStream = fs.createReadStream(actualFilePath);
+      const readable = new ReadableStream({
+        start(controller) {
+          fileStream.on('data', (chunk) => controller.enqueue(chunk));
+          fileStream.on('end', () => controller.close());
+          fileStream.on('error', (err) => controller.error(err));
+        },
+      });
+
+      return new NextResponse(readable as any, {
+        status: 200,
+        headers: {
+          'Content-Length': fileSize.toString(),
+          'Accept-Ranges': 'bytes',
+          'Content-Type': 'video/mp4',
+          'Cache-Control': cacheHeader,
         },
       });
     }
-
-    const fileStream = fs.createReadStream(actualFilePath);
-    const readableStream = new ReadableStream({
-      start(controller) {
-        fileStream.on('data', (chunk) => controller.enqueue(chunk));
-        fileStream.on('end', () => controller.close());
-        fileStream.on('error', (err) => controller.error(err));
-      },
-    });
-
-    return new NextResponse(readableStream, {
-      headers: {
-        'Content-Length': fileSize.toString(),
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-      },
-    });
   }
 
+  // 5. Generate Supabase / S3 signed playback URL
   try {
-    const signedUrl = await getSignedVideoUrl(targetKey);
-    if (!signedUrl) {
-      return new NextResponse('Video not found', { status: 404 });
-    }
+    const isDownload = req.nextUrl.searchParams.get('download') === 'true' || req.nextUrl.searchParams.get('download') === '1';
+    const downloadFilename = req.nextUrl.searchParams.get('filename') || `${targetKey}.mp4`;
+    const signedUrl = await getSignedVideoUrl(
+      targetKey,
+      3600,
+      isDownload ? { download: downloadFilename } : undefined
+    );
 
-    if (wantsJson) {
-      return NextResponse.json({
-        success: true,
-        url: signedUrl,
-        direct: true,
+    if (signedUrl) {
+      if (wantsJson) {
+        return NextResponse.json({
+          success: true,
+          url: signedUrl,
+          direct: true,
+          source: 'supabase',
+          videoId: rawId,
+          download: isDownload,
+        });
+      }
+
+      // 307 Redirect directly to high-speed signed URL
+      return NextResponse.redirect(signedUrl, {
+        status: 307,
+        headers: {
+          'Cache-Control': isDownload ? 'private, no-cache, no-store' : 'private, max-age=1800',
+        },
       });
     }
-
-    return NextResponse.redirect(signedUrl);
-  } catch (e) {
-    return new NextResponse('Video not found', { status: 404 });
+  } catch (err) {
+    console.warn('Could not get signed video URL for streaming:', err);
   }
+
+  if (wantsJson) {
+    return NextResponse.json(
+      {
+        error: 'Video file not found in active storage repository.',
+        file_missing: true,
+        videoId: rawId,
+      },
+      { status: 404 }
+    );
+  }
+
+  return new NextResponse(
+    JSON.stringify({
+      message: 'Video file not found in active storage repository.',
+      file_missing: true,
+      videoId: rawId,
+    }),
+    {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 }

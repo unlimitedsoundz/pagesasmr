@@ -92,23 +92,16 @@ export default function AdminVideoPreview({
         return;
       }
 
-      // If it points to private-videos storage (without token), resolve signed stream URL
+      // Resolve target stream API route
       let queryUrl = src;
       if (src.includes('/private-videos/')) {
         const fileKey = src.split('/private-videos/')[1].split('?')[0];
         queryUrl = `/api/videos/${encodeURIComponent(fileKey)}/stream`;
-      } else if (src.startsWith('http') && !src.includes('/api/videos/')) {
-        if (!isCancelled) {
-          setActiveUrl(src);
-          setIsDirectCdn(true);
-          setResolvingUrl(false);
-        }
-        return;
       }
 
       try {
         // Query the JSON endpoint for the direct storage CDN signed URL
-        const jsonUrl = src.includes('?') ? `${src}&format=json` : `${src}?format=json`;
+        const jsonUrl = queryUrl.includes('?') ? `${queryUrl}&format=json` : `${queryUrl}?format=json`;
         const res = await fetch(jsonUrl, { cache: 'no-store' });
 
         if (res.ok) {

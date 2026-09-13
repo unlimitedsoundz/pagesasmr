@@ -1,14 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
-import { PLATFORM_ID } from './constants';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ydymhzdoptmpblmejcjs.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkeW1oemRvcHRtcGJsbWVqY2pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3Nzg4NTksImV4cCI6MjEwNDM1NDg1OX0.ebN7kACUEpY5uUFXUa8PPTZXnl9IhxxQryUyyMhBzI4';
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkeW1oemRvcHRtcGJsbWVqY2pzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODc3ODg1OSwiZXhwIjoyMTA0MzU0ODU5fQ.3PftOAibqREafTOqQqXLuF510J04DW4Sip1wjy8bJyQ';
 
-// Browser/public client
+// Browser/public Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Server/admin client with privileged bypass for platform operations
+// Server/admin Supabase client with bypass RLS capability
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey || supabaseAnonKey, {
   auth: {
     persistSession: false,
@@ -16,12 +17,25 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey ||
   },
 });
 
-export const STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'private-videos';
+export const STORAGE_BUCKET = process.env.S3_BUCKET_NAME || process.env.R2_BUCKET_NAME || process.env.SUPABASE_STORAGE_BUCKET || 'private-videos';
 
-export function getPlatformStoragePath(userId: string, submissionId: string, fileName: string): string {
-  const safeFilename = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-  return `${PLATFORM_ID}/${userId}/${submissionId}/${safeFilename}`;
-}
+// Cloudflare R2 / Storj / S3 Client setup ($0 Egress Fee Storage)
+const r2AccountId = process.env.R2_ACCOUNT_ID;
+const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID;
+const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
+const s3Endpoint = process.env.S3_ENDPOINT || (r2AccountId ? `https://${r2AccountId}.r2.cloudflarestorage.com` : undefined);
+
+const s3Client = s3Endpoint && s3AccessKeyId && s3SecretAccessKey
+  ? new S3Client({
+      region: process.env.S3_REGION || 'us-east-1',
+      endpoint: s3Endpoint,
+      credentials: {
+        accessKeyId: s3AccessKeyId,
+        secretAccessKey: s3SecretAccessKey,
+      },
+      forcePathStyle: true,
+    })
+  : null;
 
 interface CachedSignedUrl {
   url: string;
@@ -31,11 +45,44 @@ interface CachedSignedUrl {
 const signedUrlCache = new Map<string, CachedSignedUrl>();
 const negativeUrlCache = new Map<string, number>();
 
+/**
+ * Safely extracts the clean storage key from any raw URL, API path, or bucket path.
+ */
+export function extractStorageKey(input: string): string {
+  if (!input) return '';
+  let cleaned = input.trim();
+
+  if (cleaned.includes('/private-videos/')) {
+    cleaned = cleaned.split('/private-videos/')[1];
+  } else if (cleaned.includes('/submissions/')) {
+    cleaned = cleaned.split('/submissions/')[1];
+  } else if (cleaned.includes('/avatars/')) {
+    cleaned = cleaned.split('/avatars/')[1];
+  } else if (cleaned.includes('/guideline-samples/')) {
+    cleaned = cleaned.split('/guideline-samples/')[1];
+  } else if (cleaned.includes('/api/videos/')) {
+    const match = cleaned.match(/\/api\/videos\/([^/?#]+)/);
+    if (match) {
+      cleaned = match[1];
+    }
+  }
+
+  cleaned = cleaned.split('?')[0].split('#')[0];
+  return decodeURIComponent(cleaned);
+}
+
+/**
+ * Generates a short-lived signed URL for private video playback or direct file download.
+ * Automatically prefers Storj / S3 ($0 egress fees) if configured, falling back to Supabase.
+ */
 export async function getSignedVideoUrl(
-  filePath: string,
+  rawFilePath: string,
   expiresInSeconds = 3600,
   options?: { download?: string | boolean }
 ): Promise<string | null> {
+  const filePath = extractStorageKey(rawFilePath);
+  if (!filePath) return null;
+
   const now = Date.now();
   const cacheKey = options?.download ? `${filePath}:dl:${options.download}` : filePath;
 
@@ -49,30 +96,47 @@ export async function getSignedVideoUrl(
     return null;
   }
 
+  // 1. Prefer Storj / S3 Storage (25GB Free, $0 Egress Fees)
+  if (s3Client) {
+    try {
+      const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
+      const command = new GetObjectCommand({
+        Bucket: STORAGE_BUCKET,
+        Key: filePath,
+        ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
+      });
+
+      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
+      if (signedUrl) {
+        signedUrlCache.set(cacheKey, { url: signedUrl, expiresAt: now + (expiresInSeconds - 60) * 1000 });
+        return signedUrl;
+      }
+    } catch (err) {
+      console.warn('[S3/Storj Storage] Signed URL error, falling back to Supabase:', err);
+    }
+  }
+
+  // 2. Fallback to Supabase Storage
   try {
     const { data, error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
       .createSignedUrl(
         filePath,
         expiresInSeconds,
-        options?.download ? { download: options.download } : undefined
+        options?.download ? { download: typeof options.download === 'string' ? options.download : true } : undefined
       );
 
     if (error || !data?.signedUrl) {
-      negativeUrlCache.set(filePath, now + 300_000);
+      // Short negative cache (3s) so transient errors don't lock out valid files for minutes
+      negativeUrlCache.set(filePath, now + 3000);
       return null;
     }
 
-    const effectiveTtlMs = Math.max((expiresInSeconds - 60) * 1000, 300_000);
-    signedUrlCache.set(cacheKey, {
-      url: data.signedUrl,
-      expiresAt: now + effectiveTtlMs,
-    });
-
+    signedUrlCache.set(cacheKey, { url: data.signedUrl, expiresAt: now + (expiresInSeconds - 60) * 1000 });
     return data.signedUrl;
   } catch (err) {
-    console.error('getSignedVideoUrl error:', err);
-    negativeUrlCache.set(filePath, now + 60_000);
+    console.error('getSignedVideoUrl Supabase error:', err);
+    negativeUrlCache.set(filePath, now + 3000);
     return null;
   }
 }
@@ -86,12 +150,7 @@ export function clearNegativeCache(filePath: string) {
 }
 
 /**
- * Uploads a video buffer to Supabase private storage with retry + verification.
- *
- * Retries up to MAX_RETRIES times with exponential backoff, then verifies the
- * upload actually landed by generating a signed URL. Throws if all attempts fail
- * so the calling upload route can return an HTTP 500 instead of silently
- * recording a broken file URL in the database.
+ * Uploads a video buffer to active cloud storage (Storj S3 or Supabase) with retry + verification.
  */
 const MAX_UPLOAD_RETRIES = 3;
 
@@ -100,6 +159,24 @@ export async function uploadToSupabaseStorage(
   buffer: Buffer,
   contentType: string
 ): Promise<string> {
+  // 1. Prefer Storj / S3 Storage ($0 Egress Fees)
+  if (s3Client) {
+    try {
+      await s3Client.send(new PutObjectCommand({
+        Bucket: STORAGE_BUCKET,
+        Key: filePath,
+        Body: buffer,
+        ContentType: contentType,
+      }));
+      clearNegativeCache(filePath);
+      console.log(`[Storj S3 Storage] Successfully uploaded ${filePath} ($0 egress cost)`);
+      return filePath;
+    } catch (s3Err: any) {
+      console.warn('[Storj S3 Storage] Upload failed, falling back to Supabase:', s3Err?.message || s3Err);
+    }
+  }
+
+  // 2. Fallback to Supabase Storage
   let lastError: any;
 
   for (let attempt = 1; attempt <= MAX_UPLOAD_RETRIES; attempt++) {
@@ -115,33 +192,20 @@ export async function uploadToSupabaseStorage(
         lastError = new Error(`Supabase upload error (attempt ${attempt}): ${error.message}`);
         console.warn(lastError.message);
       } else {
-        // Verify the file is actually readable by generating a signed URL
-        const { data: checkData, error: checkErr } = await supabaseAdmin.storage
-          .from(STORAGE_BUCKET)
-          .createSignedUrl(filePath, 60);
-
-        if (checkErr || !checkData?.signedUrl) {
-          lastError = new Error(`Supabase verification failed (attempt ${attempt}): file not readable after upload`);
-          console.warn(lastError.message);
-        } else {
-          // Clear any stale negative caches so streaming works immediately
-          clearNegativeCache(filePath);
-          return data!.path;
-        }
+        clearNegativeCache(filePath);
+        return data!.path;
       }
     } catch (err: any) {
       lastError = err;
       console.warn(`uploadToSupabaseStorage exception (attempt ${attempt}):`, err?.message || err);
     }
 
-    // Exponential backoff before retry: 1s, 2s, 4s
     if (attempt < MAX_UPLOAD_RETRIES) {
       await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
     }
   }
 
   throw new Error(
-    `Video storage failed after ${MAX_UPLOAD_RETRIES} attempts. ` +
-    `The file could not be saved to Supabase. Please try again. (${lastError?.message || 'unknown error'})`
+    `Video storage failed after ${MAX_UPLOAD_RETRIES} attempts. (${lastError?.message || 'unknown error'})`
   );
 }

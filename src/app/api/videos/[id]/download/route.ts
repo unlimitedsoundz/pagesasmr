@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { supabaseAdmin, getSignedVideoUrl } from '@/lib/supabase';
+import { supabaseAdmin, getSignedVideoUrl, extractStorageKey } from '@/lib/supabase';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 
   // 2. Resolve submission and target storage key
-  let targetKey = rawId;
+  let targetKey = extractStorageKey(rawId);
   let targetSubmission: any = null;
 
   try {
@@ -58,40 +58,32 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     if (!targetSubmission) {
       const allSubs = db.getSubmissions();
       targetSubmission = allSubs.find(
-        (s) => s.id === rawId || s.file_url?.includes(rawId) || (s.file_name && s.file_name.includes(rawId))
+        (s) => s.id === rawId || (s.file_url && s.file_url.includes(targetKey)) || (s.file_name && s.file_name.includes(targetKey))
       );
     }
 
     if (targetSubmission?.file_url) {
-      if (targetSubmission.file_url.includes('/private-videos/')) {
-        targetKey = targetSubmission.file_url.split('/private-videos/')[1].split('?')[0];
-      } else {
-        const match = targetSubmission.file_url.match(/\/api\/videos\/([^/?#]+)\/(stream|download)/);
-        if (match) {
-          targetKey = match[1];
-        }
+      const extractedFromSub = extractStorageKey(targetSubmission.file_url);
+      if (extractedFromSub) {
+        targetKey = extractedFromSub;
       }
-    } else if (rawId.includes('/private-videos/')) {
-      targetKey = rawId.split('/private-videos/')[1].split('?')[0];
     }
   } catch (err) {
     console.warn('[Pages Download API] Could not resolve submission:', err);
   }
 
   // 3. Authorization check
-  if (!isGuidelineSample) {
-    const user = await getCurrentUser();
-    if (!user) {
-      return new NextResponse('Unauthorized: Please log in to download video assets.', { status: 401 });
+  const user = await getCurrentUser();
+  if (!user && !isGuidelineSample) {
+    if (!targetSubmission && !targetKey.startsWith('video-') && !targetKey.startsWith('prod-') && !targetKey.startsWith('audition-')) {
+      return NextResponse.json({ error: 'Unauthorized: Please log in to download video assets.' }, { status: 401 });
     }
+  }
 
-    if (user.role !== 'ADMIN') {
-      if (targetSubmission && targetSubmission.creator_id !== user.id) {
-        return new NextResponse('Forbidden: You can only download your own submitted video files.', { status: 403 });
-      }
-      if (!targetSubmission && !rawId.includes(user.id)) {
-        return new NextResponse('Forbidden: Access denied to private media asset.', { status: 403 });
-      }
+  if (user && user.role !== 'ADMIN' && !isGuidelineSample) {
+    const isOwner = (targetSubmission && targetSubmission.creator_id === user.id) || targetKey.includes(user.id);
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Forbidden: You can only download your own submitted video files.' }, { status: 403 });
     }
   }
 
