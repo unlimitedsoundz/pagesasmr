@@ -154,8 +154,8 @@ export default function SubmissionsPage() {
       if (event.type === 'AUDITION_REVIEWED') {
         if (event.action === 'APPROVE') {
           toast.success(
-            'Audition approved! Production guideline: The 8 videos should be with the same knee length skirt, but with different panties each.',
-            'Audition Approved ðŸŽ‰'
+            'Audition approved! Production guideline: Record 8 full page-turning ASMR videos with clear acoustics and consistent table-level framing.',
+            'Audition Approved'
           );
           playNotificationChime('success');
         }
@@ -392,10 +392,11 @@ export default function SubmissionsPage() {
   });
 
   const formatCategoryShort = (cat: string) => {
+    if (cat === 'PAGE_TURNING') return 'Page-Turning';
     if (cat === 'THIGH_FLAPPING_AND_GUM_CHEWING')
       return 'Thigh-Flapping & Gum-Chewing';
     if (cat === 'THIGH_FLAPPING') return 'Thigh-Flapping';
-    return 'Gum-Chewing';
+    return cat || 'Page-Turning';
   };
 
   return (
@@ -553,11 +554,7 @@ export default function SubmissionsPage() {
                 className="px-3 py-2 text-xs rounded-lg border border-neutral-200 dark:border-neutral-700 focus:outline-none bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
               >
                 <option value="ALL">All types</option>
-                <option value="THIGH_FLAPPING_AND_GUM_CHEWING">
-                  Thigh-Flapping &amp; Gum-Chewing
-                </option>
-                <option value="THIGH_FLAPPING">Thigh-Flapping</option>
-                <option value="GUM_CHEWING">Gum-Chewing</option>
+                <option value="PAGE_TURNING">Page-Turning</option>
               </select>
             </div>
           </div>

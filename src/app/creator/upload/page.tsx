@@ -37,7 +37,7 @@ interface UploadQueueItem {
   id: string;
   file: File;
   title: string;
-  category: 'THIGH_FLAPPING_AND_GUM_CHEWING' | 'THIGH_FLAPPING' | 'GUM_CHEWING';
+  category: 'PAGE_TURNING' | 'THIGH_FLAPPING_AND_GUM_CHEWING';
   notes: string;
   status: 'PENDING' | 'COMPRESSING' | 'UPLOADING' | 'VERIFYING' | 'SUCCESS' | 'ERROR';
   progress: number;
@@ -46,7 +46,6 @@ interface UploadQueueItem {
   previewUrl?: string;
   uploadedKey?: string;
   compressingMsg?: string;
-  isOfficeBonus?: boolean;
   compressionStats?: {
     originalSize: number;
     compressedSize: number;
@@ -64,7 +63,6 @@ export default function CreatorUploadPage() {
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
   const [batchTitle, setBatchTitle] = useState('');
   const [batchNotes, setBatchNotes] = useState('');
-  const [isOfficeBonusBatch, setIsOfficeBonusBatch] = useState(false);
   const [consentConfirmed, setConsentConfirmed] = useState(false);
   const [isAdultConfirmed, setIsAdultConfirmed] = useState(false);
   const [activePreviewUrl, setActivePreviewUrl] = useState<string | null>(null);
@@ -169,12 +167,12 @@ export default function CreatorUploadPage() {
         if (msg.type === 'AUDITION_REVIEWED') {
           if (msg.action === 'APPROVE') {
             toast.success(
-              'Audition approved! Production guideline: The 8 videos should be with the same knee length skirt, but with different panties each.',
-              'Audition Approved 🎉'
+              'Audition approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
+              'Audition Approved'
             );
             playNotificationChime('success');
             sendBrowserPushNotification('Audition Approved!', {
-              body: 'Your 30-second audition was approved! Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.',
+              body: 'Your 30-second audition was approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
             });
           } else {
             toast.warning(
@@ -200,12 +198,12 @@ export default function CreatorUploadPage() {
         if (data.type === 'AUDITION_REVIEWED') {
           if (data.action === 'APPROVE') {
             toast.success(
-              'Audition approved! Production guideline: The 8 videos should be with the same knee length skirt, but with different panties each.',
+              'Audition approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
               'Audition Approved 🎉'
             );
             playNotificationChime('success');
             sendBrowserPushNotification('Audition Approved! 🚀', {
-              body: 'Your 30-second audition was approved! Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.',
+              body: 'Your 30-second audition was approved! Production guideline: Record your 8 full page-turning ASMR videos with clear acoustics and consistent framing.',
             });
           } else {
             toast.warning(
@@ -333,7 +331,7 @@ export default function CreatorUploadPage() {
         id: `upload-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         file,
         title: itemTitle.charAt(0).toUpperCase() + itemTitle.slice(1),
-        category: 'THIGH_FLAPPING_AND_GUM_CHEWING',
+        category: 'PAGE_TURNING',
         notes: '',
         status: 'PENDING',
         progress: 0,
@@ -381,7 +379,6 @@ export default function CreatorUploadPage() {
         notes: itemNotesCombined,
         consentConfirmed: true,
         isSample: false,
-        isOfficeBonus: Boolean(item.isOfficeBonus),
       });
 
       updateItem(item.id, { status: 'SUCCESS', progress: 100 });
@@ -499,31 +496,6 @@ export default function CreatorUploadPage() {
           </div>
         </div>
 
-        {/* Special Office Setting & Under-Desk View Bonus Banner */}
-        <div className="bg-[#130E14] text-white rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-neutral-800 shadow-sm">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 text-white flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm font-medium text-white">
-                <span className="font-serif font-normal text-base sm:text-lg text-white">
-                  Special Office Setting & Under-Desk View Bonus
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-[#BE185D] text-white">
-                  +$100.00 BONUS
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-[#BE185D] text-white">
-                  $150.00 Total Payout / Video
-                </span>
-              </div>
-              <p className="text-xs text-white/80 leading-relaxed font-normal">
-                Earn an extra <strong>$100 bonus</strong> per video (<strong>$150.00 total payout</strong> instead of the standard $50 rate) by recording in an authentic office environment with your camera positioned under the desk framing the thigh-flapping & gum-chewing ASMR! Simply check the <strong>Office Bonus</strong> option on your video card below before uploading.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* 30s Audition Sample Gate Card (When sampleStatus !== 'APPROVED') */}
         {sampleStatus !== 'APPROVED' && (
           <div className="bg-white dark:bg-[#18151C] border-2 border-[#BE185D] dark:border-[#BE185D] rounded-2xl p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-sm">
@@ -542,7 +514,7 @@ export default function CreatorUploadPage() {
             </div>
 
             <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">
-              To ensure quality standards, all creators submit a <strong>30-second sample</strong> demonstrating natural thigh-flapping lap clapping (knee length skirt worn) and crisp gum-chewing together without background noise. <strong>Setup rule:</strong> Sit on a chair and table setup and keep the camera mounted at knee level. Once approved by an administrator, full {minRequired}-video production unlocks immediately.
+              To ensure quality standards, all creators submit a <strong>30-second sample</strong> demonstrating natural, crisp page-turning ASMR without background noise. <strong>Setup rule:</strong> Keep camera steadily mounted at table level focusing on the book or document pages being turned. Once approved by an administrator, full {minRequired}-video production unlocks immediately.
             </p>
 
             {sampleStatus === 'PENDING_REVIEW' && (
@@ -828,7 +800,7 @@ export default function CreatorUploadPage() {
                     Recording format
                   </label>
                   <div className="w-full px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl bg-neutral-50 dark:bg-[#1D1924] border border-neutral-200 dark:border-neutral-800 text-xs font-semibold text-neutral-900 dark:text-white flex items-center justify-between">
-                    <span>Thigh-flapping & gum-chewing</span>
+                    <span>Page-turning ASMR</span>
                     <Lock className="w-3.5 h-3.5 text-neutral-400" />
                   </div>
                 </div>
@@ -867,36 +839,6 @@ export default function CreatorUploadPage() {
                   <div className="text-right text-[10px] text-neutral-400">
                     {batchNotes.length}/1,000
                   </div>
-                </div>
-
-                {/* Office Setting & Under-Desk Camera View Bonus Toggle */}
-                <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
-                  <label className="flex items-start gap-3 p-3.5 rounded-xl border border-[#FBCFE8] dark:border-[#3D182A] bg-[#FFF9FB] dark:bg-[#1C1620] cursor-pointer transition-all hover:border-[#BE185D]">
-                    <input
-                      type="checkbox"
-                      checked={isOfficeBonusBatch}
-                      onChange={(e) => {
-                        setIsOfficeBonusBatch(e.target.checked);
-                        setQueue((prev) => prev.map((item) => ({ ...item, isOfficeBonus: e.target.checked })));
-                      }}
-                      className="mt-0.5 w-4 h-4 rounded border-neutral-300 text-[#BE185D] focus:ring-[#BE185D] accent-[#BE185D]"
-                    />
-                    <div className="text-xs space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap font-bold text-neutral-900 dark:text-white">
-                        <Building2 className="w-4 h-4 text-[#BE185D] dark:text-[#F472B6] shrink-0" />
-                        <span>Office Setting & Under-Desk Camera View</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#BE185D] text-white">
-                          +$100.00 BONUS
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#BE185D] text-white">
-                          $150.00 Total Payout / Video
-                        </span>
-                      </div>
-                      <p className="text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed text-[11px]">
-                        Check this box if this batch was recorded in an authentic office environment with the camera positioned under the desk framing the thigh-flapping & gum-chewing ASMR ($150 total payout per approved video).
-                      </p>
-                    </div>
-                  </label>
                 </div>
               </div>
             </div>
@@ -981,8 +923,8 @@ export default function CreatorUploadPage() {
                     <div
                       key={idx}
                       className={`h-7 sm:h-8 rounded-md sm:rounded-lg border text-[9px] sm:text-[10px] font-bold flex items-center justify-center transition-all ${isReady
-                          ? 'bg-[#BE185D] border-[#BE185D] text-white'
-                          : 'border-white/20 text-white/40 bg-white/5'
+                        ? 'bg-[#BE185D] border-[#BE185D] text-white'
+                        : 'border-white/20 text-white/40 bg-white/5'
                         }`}
                     >
                       {slotNum}
@@ -1036,25 +978,25 @@ export default function CreatorUploadPage() {
                   <div className="w-4 h-4 rounded-full bg-[#FCE7F0] dark:bg-[#3D1527] text-[#9D174D] dark:text-[#F472B6] flex items-center justify-center shrink-0">
                     <Check className="w-3 h-3" />
                   </div>
-                  <span>Stable lighting and faceless framing</span>
+                  <span>Clear paper and page-turning acoustics</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-[#FCE7F0] dark:bg-[#3D1527] text-[#9D174D] dark:text-[#F472B6] flex items-center justify-center shrink-0">
                     <Check className="w-3 h-3" />
                   </div>
-                  <span>The same knee-length skirt across all 8 videos</span>
+                  <span>Steady table-level framing with no camera shake</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-[#FCE7F0] dark:bg-[#3D1527] text-[#9D174D] dark:text-[#F472B6] flex items-center justify-center shrink-0">
                     <Check className="w-3 h-3" />
                   </div>
-                  <span>Different panties for each video</span>
+                  <span>Consistent environment across all 8 batch videos</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-[#FCE7F0] dark:bg-[#3D1527] text-[#9D174D] dark:text-[#F472B6] flex items-center justify-center shrink-0">
                     <Check className="w-3 h-3" />
                   </div>
-                  <span>Safe, painless rhythmic pacing</span>
+                  <span>Quiet room with zero background noise</span>
                 </li>
               </ul>
 
@@ -1183,8 +1125,8 @@ export default function CreatorUploadPage() {
                   Guideline Checklist
                 </div>
                 <ul className="space-y-1">
-                  <li>&bull; Natural thigh-flapping lap clapping — Knee length skirts worn</li>
-                  <li>&bull; Crisp gum-chewing</li>
+                  <li>&bull; Clear, crisp page-turning acoustics — books, magazines, or paper</li>
+                  <li>&bull; Steady table-level framing focused on page manipulation</li>
                   <li>&bull; Quiet room — zero background TV, fan, or traffic noise</li>
                   <li>&bull; Faceless framing — no face or identifying features visible</li>
                   <li>&bull; Minimum 30 seconds (30s) runtime for sample audition</li>

@@ -192,8 +192,8 @@ export default function CreatorDashboardPage() {
 
   const stats = data?.stats;
   const profile = data?.profile;
-  const displayName = profile?.display_name || 'Ada Wunor';
-  const firstName = displayName.trim().split(/\s+/)[0] || 'Ada';
+  const displayName = profile?.display_name || 'Creator';
+  const firstName = displayName.trim().split(/\s+/)[0] || 'Creator';
   const minRequired = stats?.minRequired || 8;
   const eligibleCount = stats?.eligibleCount || 0;
   const progressPercent = Math.min(100, Math.round((eligibleCount / minRequired) * 100));
@@ -208,7 +208,7 @@ export default function CreatorDashboardPage() {
   const canRequestPayout = stats?.canRequestPayout ?? false;
 
   const formatDate = (dateStr?: string) => {
-    if (!dateStr) return 'Sep 7, 2026 · 10:05 PM';
+    if (!dateStr) return 'Recently';
     try {
       const d = new Date(dateStr);
       return d.toLocaleDateString('en-US', {

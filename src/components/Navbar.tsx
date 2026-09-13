@@ -378,10 +378,10 @@ export default function Navbar() {
                 <div className="w-7 h-7 rounded-full bg-[#FCE7F0] text-[#9D174D] border border-[#FBCFE8] flex items-center justify-center text-[10px] font-bold shrink-0">
                   {user?.display_name
                     ? user.display_name.split(/\s+/).map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
-                    : 'AW'}
+                    : 'CR'}
                 </div>
                 <span className="hidden sm:inline-block max-w-[130px] truncate text-xs font-medium text-neutral-800 dark:text-neutral-200">
-                  {user?.display_name || 'Ada Wunor'}
+                  {user?.display_name || 'Creator'}
                 </span>
               </NextLink>
 

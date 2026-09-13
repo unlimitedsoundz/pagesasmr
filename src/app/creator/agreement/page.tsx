@@ -31,6 +31,8 @@ export default function CreatorAgreementPage() {
     creator_name?: string;
   } | null>(null);
 
+  const [profile, setProfile] = useState<any>(null);
+
   // Review checklist states
   const [formatConfirmed, setFormatConfirmed] = useState(false);
   const [termsConfirmed, setTermsConfirmed] = useState(false);
@@ -48,20 +50,27 @@ export default function CreatorAgreementPage() {
       }
     } catch {}
 
-    fetch('/api/creator/agreement', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        setAgreementData(data);
+    Promise.all([
+      fetch('/api/creator/agreement', { cache: 'no-store' }).then((res) => res.json()).catch(() => null),
+      fetch('/api/creator/profile', { cache: 'no-store' }).then((res) => res.json()).catch(() => null),
+    ])
+      .then(([agData, profData]) => {
+        if (agData) setAgreementData(agData);
+        if (profData?.profile) setProfile(profData.profile);
       })
-      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const creatorName =
+    profile?.display_name ||
     agreementData?.creator_name ||
     agreementData?.signature_name ||
     (typeof window !== 'undefined' ? localStorage.getItem('pinkroom_display_name') : null) ||
-    'Ada Wunor';
+    'Creator';
+
+  const rate = profile?.rate_per_video_usd || 50;
+  const minVideos = 8;
+  const minPayout = rate * minVideos;
 
   const isSigned = agreementData?.signed;
   const canConfirm = formatConfirmed && termsConfirmed;
@@ -128,7 +137,7 @@ export default function CreatorAgreementPage() {
               YOUR RATE
             </div>
             <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
-              <span>$50</span>
+              <span>${rate}</span>
               <span className="font-sans text-xs font-bold text-neutral-400 tracking-wider">USD</span>
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
@@ -142,11 +151,11 @@ export default function CreatorAgreementPage() {
               YOUR PAYOUT
             </div>
             <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
-              <span>8</span>
+              <span>{minVideos}</span>
               <span className="font-sans text-xs font-medium text-neutral-400">videos</span>
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
-              $400 minimum · approved and unpaid
+              ${minPayout} minimum · approved and unpaid
             </div>
           </div>
 
@@ -160,7 +169,7 @@ export default function CreatorAgreementPage() {
               <span className="font-sans text-xs font-medium text-neutral-400">minimum</span>
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
-              Original, faceless ASMR
+              Original page-turning ASMR
             </div>
           </div>
         </div>
@@ -190,7 +199,7 @@ export default function CreatorAgreementPage() {
                     Creator agreement
                   </h2>
                   <p className="text-xs text-neutral-400 font-medium mt-0.5">
-                    Thigh-flapping & gum-chewing
+                    Page-turning ASMR
                   </p>
                 </div>
 
@@ -250,21 +259,21 @@ export default function CreatorAgreementPage() {
                       What you create.
                     </h3>
                     <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                      Original, faceless ASMR recordings combining rhythmic thigh-flapping with gum-chewing sounds. Each full video must be at least three minutes long.
+                      Original, calming ASMR recordings focusing on natural, crisp page-turning acoustics and paper textures. Each full video must be at least three minutes long.
                     </p>
 
                     <ul className="space-y-2 text-xs text-neutral-600 dark:text-neutral-400 pl-1">
                       <li className="flex items-start gap-2">
                         <span className="text-neutral-400 text-base leading-none">•</span>
-                        <span>Keep framing steady and faceless, with consistent lighting.</span>
+                        <span>Keep framing steady at table level focusing on the book or document being turned, with consistent lighting.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-neutral-400 text-base leading-none">•</span>
-                        <span>Capture clear original audio without music, television, voices, or other background noise.</span>
+                        <span>Capture clear, authentic page-turning sounds without music, television, talking, or background noise.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-neutral-400 text-base leading-none">•</span>
-                        <span>Maintain safe, painless rhythmic pacing. Stop if you experience discomfort.</span>
+                        <span>Maintain steady, rhythmic pacing with gentle page flips and tactile handling.</span>
                       </li>
                     </ul>
 
@@ -272,9 +281,9 @@ export default function CreatorAgreementPage() {
                     <div className="bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F5D5E3] dark:border-[#3D2132] rounded-xl p-4 flex items-start gap-3 text-xs text-[#7B1E4B] dark:text-[#F472B6]">
                       <Video className="w-4 h-4 shrink-0 mt-0.5 opacity-90" />
                       <div className="space-y-0.5">
-                        <span className="font-bold">The eight-video batch rule:</span>
+                        <span className="font-bold">The eight-video batch consistency rule:</span>
                         <p className="font-medium text-[11px] opacity-90">
-                          Wear the same knee-length skirt across all eight videos, with different panties for each submission.
+                          Maintain clean desk-level framing and consistent acoustic environment across all eight submissions.
                         </p>
                       </div>
                     </div>
@@ -333,7 +342,7 @@ export default function CreatorAgreementPage() {
                       What you earn.
                     </h3>
                     <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                      Each approved full video earns <strong>$50 USD</strong>. Your dashboard displays this as your locked-in rate.
+                      Each approved full video earns <strong>${rate} USD</strong>. Your dashboard displays this as your locked-in rate.
                     </p>
 
                     {/* Highlight Pill Container: Audition samples are non-billable */}
@@ -342,7 +351,7 @@ export default function CreatorAgreementPage() {
                       <div className="space-y-0.5">
                         <span className="font-bold">Audition samples are non-billable.</span>
                         <p className="font-medium text-[11px] opacity-90">
-                          Your approved audition lets you move on to full recordings. It does not earn $50 or count toward the payout minimum.
+                          Your approved audition lets you move on to full recordings. It does not earn ${rate} or count toward the payout minimum.
                         </p>
                       </div>
                     </div>
@@ -361,7 +370,7 @@ export default function CreatorAgreementPage() {
                       When you get paid.
                     </h3>
                     <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                      A payout becomes available with at least <strong>eight approved, unpaid full videos</strong>, for a minimum of <strong>$400 USD</strong>. Additional approved, unpaid videos can be included in the same request.
+                      A payout becomes available with at least <strong>{minVideos} approved, unpaid full videos</strong>, for a minimum of <strong>${minPayout} USD</strong>. Additional approved, unpaid videos can be included in the same request.
                     </p>
                     <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                       Earnings allocated to a processing payout are shown as reserved. Confirmed payments appear in your payout history, and the same video cannot be paid twice.
@@ -406,7 +415,7 @@ export default function CreatorAgreementPage() {
                     className="mt-0.5 w-4 h-4 rounded border-neutral-300 text-[#7B1E4B] focus:ring-[#7B1E4B] accent-[#7B1E4B]"
                   />
                   <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                    I have reviewed the recording format, quality standards, and eight-video batch requirements.
+                    I have reviewed the recording format, quality standards, and {minVideos}-video batch requirements.
                   </span>
                 </label>
 
@@ -418,7 +427,7 @@ export default function CreatorAgreementPage() {
                     className="mt-0.5 w-4 h-4 rounded border-neutral-300 text-[#7B1E4B] focus:ring-[#7B1E4B] accent-[#7B1E4B]"
                   />
                   <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                    I understand the $50 rate, non-billable audition, and eight-approved-video payout minimum.
+                    I understand the ${rate} rate, non-billable audition, and {minVideos}-approved-video payout minimum (${minPayout}).
                   </span>
                 </label>
               </div>
@@ -562,10 +571,12 @@ export default function CreatorAgreementPage() {
               <div className="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 rounded-2xl p-5 space-y-2 shadow-2xs">
                 <div className="flex items-center gap-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
                   <FileText className="w-4 h-4 text-neutral-400" />
-                  <span>No document connected</span>
+                  <span>{isSigned ? 'Creator Agreement (Active)' : 'No document connected'}</span>
                 </div>
                 <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed font-normal">
-                  Your complete agreement, version, and acceptance history will appear when your account is connected.
+                  {isSigned
+                    ? `Active agreement executed on ${agreementData?.signed_at ? new Date(agreementData.signed_at).toLocaleDateString() : 'record'} by ${creatorName}.`
+                    : 'Your complete agreement, version, and acceptance history will appear when your account is connected.'}
                 </p>
               </div>
             </div>
@@ -577,9 +588,9 @@ export default function CreatorAgreementPage() {
         {/* ─── Bottom Summary Bar ──────────────────────────────────── */}
         <div className="pt-8 border-t border-neutral-200/70 dark:border-neutral-800">
           <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 font-medium tracking-wide">
-            <span>$50 flat rate.</span>
+            <span>${rate} flat rate.</span>
             <span>·</span>
-            <span>8-video minimum.</span>
+            <span>{minVideos}-video minimum.</span>
             <span>·</span>
             <span>Your work. Your earnings.</span>
           </div>

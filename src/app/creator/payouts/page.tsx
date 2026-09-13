@@ -60,13 +60,16 @@ export default function CreatorPayoutsPage() {
     loadData();
   }, []);
 
+  const rate = profile?.rate_per_video_usd || 50;
+  const threshold = profile?.payout_min_videos || 8;
+  const minPayout = threshold * rate;
+
   const approvedCount = stats?.approved_count ?? stats?.approvedCount ?? 0;
   const approvedUnpaidCount = stats?.approved_unpaid_count ?? stats?.approvedUnpaidCount ?? 0;
-  const availableBalance = stats?.available_balance ?? stats?.availableBalance ?? (approvedUnpaidCount * 50);
+  const availableBalance = stats?.available_balance ?? stats?.availableBalance ?? (approvedUnpaidCount * rate);
   const reservedAmount = stats?.reserved_amount ?? stats?.reservedAmount ?? 0;
   const totalDisbursed = stats?.total_paid ?? stats?.totalPaid ?? stats?.total_disbursed ?? 0;
 
-  const threshold = 8;
   const canRequest = approvedUnpaidCount >= threshold;
 
   const toggleFaq = (index: number) => {
@@ -196,7 +199,7 @@ export default function CreatorPayoutsPage() {
             <div>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[10px] tracking-[0.2em] font-bold text-[#7B1E4B] dark:text-[#F472B6] uppercase">
-                  YOUR FIRST $400
+                  YOUR FIRST ${minPayout}
                 </span>
                 <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200/80 dark:border-neutral-700">
                   {Math.min(approvedCount, threshold)} of {threshold} approved
@@ -208,9 +211,9 @@ export default function CreatorPayoutsPage() {
                 <span className="italic text-[#7B1E4B] dark:text-[#F472B6]">closer.</span>
               </h2>
 
-              {/* 8 Milestone Steps */}
-              <div className="grid grid-cols-8 gap-1.5 sm:gap-2 mt-5">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((step) => {
+              {/* Milestone Steps */}
+              <div className={`grid gap-1.5 sm:gap-2 mt-5`} style={{ gridTemplateColumns: `repeat(${threshold}, minmax(0, 1fr))` }}>
+                {Array.from({ length: threshold }, (_, i) => i + 1).map((step) => {
                   const isDone = approvedCount >= step;
                   return (
                     <div
@@ -229,8 +232,8 @@ export default function CreatorPayoutsPage() {
 
               {/* Range indicators */}
               <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 mt-2 font-medium">
-                <span>${(approvedCount * 50).toFixed(0)} earned</span>
-                <span>$400 minimum</span>
+                <span>${(approvedCount * rate).toFixed(0)} earned</span>
+                <span>${minPayout} minimum</span>
               </div>
 
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-3 font-normal leading-relaxed">
@@ -287,7 +290,7 @@ export default function CreatorPayoutsPage() {
               <Video className="w-4 h-4 text-neutral-400" />
             </div>
             <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
-              $50.00
+              ${rate.toFixed(2)}
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Per approved full video
@@ -455,7 +458,7 @@ export default function CreatorPayoutsPage() {
               </button>
               {openFaq === 1 && (
                 <div className="mt-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed animate-in fade-in duration-150 pr-8">
-                  You can request a payout as soon as you have at least 8 approved full-production recordings ($400.00 minimum threshold). Once reached, the Request Payout button unlocks automatically.
+                  You can request a payout as soon as you have at least {threshold} approved full-production recordings (${minPayout.toFixed(2)} minimum threshold). Once reached, the Request Payout button unlocks automatically.
                 </div>
               )}
             </div>
@@ -493,7 +496,7 @@ export default function CreatorPayoutsPage() {
               </button>
               {openFaq === 3 && (
                 <div className="mt-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed animate-in fade-in duration-150 pr-8">
-                  The initial 30-second audition is a free quality & framing check to ensure your setup meets production standards. All subsequent approved full recordings earn $50.00 flat rate each.
+                  The initial 30-second audition is a quality & framing check to ensure your setup meets production standards. All subsequent approved full recordings earn ${rate.toFixed(2)} flat rate each.
                 </div>
               )}
             </div>
@@ -503,13 +506,13 @@ export default function CreatorPayoutsPage() {
         {/* ─── Bottom Note & Summary Bar ────────────────────────────── */}
         <div className="pt-4 space-y-6">
           <p className="text-[11px] text-neutral-400 text-center font-normal">
-            Design preview: Balances reflect the supplied dashboard. Live payments and payout requests aren't connected.
+            Balances reflect your verified submissions. Payouts are reviewed and disbursed according to your payment preferences.
           </p>
 
           <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 font-medium tracking-wide">
-            <span>$50 flat rate.</span>
+            <span>${rate} flat rate.</span>
             <span>·</span>
-            <span>8-video minimum.</span>
+            <span>{threshold}-video minimum.</span>
             <span>·</span>
             <span>Your work. Your earnings.</span>
           </div>

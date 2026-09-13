@@ -33,7 +33,7 @@ export default function CreatorSettingsPage() {
   const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'appearance' | 'payment' | 'account'>('profile');
 
   // Form states
-  const [displayName, setDisplayName] = useState('Ada Wunor');
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
 
@@ -298,7 +298,7 @@ export default function CreatorSettingsPage() {
     setBankName('');
     setRoutingNumber('');
     setAccountNumber('');
-    setDisplayName('Ada Wunor');
+    setDisplayName(profile?.display_name || '');
     try {
       localStorage.removeItem('pinkroom_notif_prefs');
       localStorage.removeItem('pinkroom_payment_method');
@@ -314,7 +314,7 @@ export default function CreatorSettingsPage() {
     .map((w) => w[0])
     .join('')
     .slice(0, 2)
-    .toUpperCase() || 'AW';
+    .toUpperCase() || 'CR';
 
   const scrollToSection = (id: string, section: typeof activeSection) => {
     setActiveSection(section);
