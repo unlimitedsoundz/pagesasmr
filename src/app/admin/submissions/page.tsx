@@ -26,6 +26,7 @@ import {
   History,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import AdminVideoPreview from '@/components/AdminVideoPreview';
 import { Submission, SubmissionVersion } from '@/types';
 import { useToast } from '@/components/ToastProvider';
@@ -683,6 +684,9 @@ export default function AdminSubmissionsPage() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-serif text-lg font-bold text-black">{group.creatorName}</span>
+                        {(group.submissions.some((s) => s.creator_sample_status === 'APPROVED' || (s.is_sample && s.status === 'APPROVED')) || group.approvedCount > 0) && (
+                          <VerifiedBadge size={18} />
+                        )}
                         {group.creatorEmail && (
                           <span className="text-xs text-neutral-600 font-medium">({group.creatorEmail})</span>
                         )}
@@ -883,8 +887,12 @@ export default function AdminSubmissionsPage() {
                   {reviewingSub.title}
                 </h3>
                 {reviewingSub.creator_name && (
-                  <div className="text-xs text-neutral-600 font-medium">
-                    Creator: <strong>{reviewingSub.creator_name}</strong> {reviewingSub.creator_email ? `(${reviewingSub.creator_email})` : ''}
+                  <div className="text-xs text-neutral-600 font-medium flex items-center gap-1.5 flex-wrap">
+                    <span>Creator: <strong>{reviewingSub.creator_name}</strong></span>
+                    {(reviewingSub.creator_sample_status === 'APPROVED' || (reviewingSub.is_sample && reviewingSub.status === 'APPROVED')) && (
+                      <VerifiedBadge size={15} />
+                    )}
+                    <span>{reviewingSub.creator_email ? `(${reviewingSub.creator_email})` : ''}</span>
                   </div>
                 )}
               </div>

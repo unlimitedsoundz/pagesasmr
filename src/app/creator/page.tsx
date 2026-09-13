@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import VideoThumbnail from '@/components/VideoThumbnail';
 import StatusBadge from '@/components/StatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ToastProvider';
 import {
@@ -257,8 +258,9 @@ export default function CreatorDashboardPage() {
             <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.22em] text-[#9D174D] dark:text-pink-400 uppercase">
               YOUR CREATOR DASHBOARD
             </div>
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-neutral-900 dark:text-white">
-              Welcome back, <span className="italic font-serif text-[#8E2848] dark:text-pink-400">{firstName}.</span>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-neutral-900 dark:text-white flex items-center gap-2.5 flex-wrap">
+              <span>Welcome back, <span className="italic font-serif text-[#8E2848] dark:text-pink-400">{firstName}.</span></span>
+              {profile?.sample_status === 'APPROVED' && <VerifiedBadge size={20} className="mt-1" />}
             </h1>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-normal">
               Your next chapter starts with a recording.
@@ -636,7 +638,7 @@ export default function CreatorDashboardPage() {
             </div>
 
             {/* Before You Press Record: The Essentials Card */}
-            <div className="bg-[#FDF2F4] dark:bg-[#22131A] border border-[#FCE3E8] dark:border-[#3B1E2C] rounded-2xl p-6 sm:p-7 space-y-5">
+            <div className="bg-[#FDF2F4] dark:bg-[#22131A] border border-[#FCE3E8] dark:border-[#3B1E2C] rounded-lg p-6 sm:p-7 space-y-5">
               <div>
                 <div className="text-[10px] font-bold tracking-[0.2em] text-[#9D174D] dark:text-pink-300 uppercase">
                   BEFORE YOU PRESS RECORD

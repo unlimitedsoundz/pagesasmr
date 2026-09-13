@@ -20,6 +20,7 @@ import {
   Check,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import { supabase } from '@/lib/supabase';
 import {
   sendBrowserPushNotification,
@@ -681,8 +682,9 @@ export default function Navbar() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xs font-bold text-black dark:text-[#F0F0F6] max-w-[100px] truncate">
-                        {user.display_name || 'Creator'}
+                      <span className="text-xs font-bold text-black dark:text-[#F0F0F6] max-w-[120px] truncate flex items-center gap-1">
+                        <span>{user.display_name || 'Creator'}</span>
+                        {user.sample_status === 'APPROVED' && <VerifiedBadge size={14} />}
                       </span>
                     </NextLink>
 
@@ -869,7 +871,10 @@ export default function Navbar() {
                   </div>
                 </NextLink>
                 <div className="min-w-0 flex-1">
-                  <div className="font-bold text-black dark:text-[#F0F0F6] text-sm truncate">{user.display_name}</div>
+                  <div className="font-bold text-black dark:text-[#F0F0F6] text-sm truncate flex items-center gap-1">
+                    <span>{user.display_name}</span>
+                    {user.role === 'CREATOR' && user.sample_status === 'APPROVED' && <VerifiedBadge size={15} />}
+                  </div>
                   <div className="text-xs text-neutral-600 dark:text-neutral-400 font-medium truncate">{user.email} • {user.role}</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">

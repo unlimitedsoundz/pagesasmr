@@ -14,6 +14,7 @@ import {
   Search,
 } from 'lucide-react';
 import { ChatMessage, Profile } from '@/types';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import { useToast } from '@/components/ToastProvider';
 
 interface ConversationItem {
@@ -251,10 +252,11 @@ export default function AdminChatPage() {
                     }`}
                   >
                     <div className="space-y-1 flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="font-bold text-sm text-black truncate">
-                          {conv.creator.display_name}
-                        </div>
+                      <div className="flex-1 min-w-0">
+                      <div className="font-bold text-black text-sm truncate flex items-center gap-1.5">
+                        <span>{conv.creator.display_name}</span>
+                        {conv.creator.sample_status === 'APPROVED' && <VerifiedBadge size={15} />}
+                      </div>
                         <span className="text-[10px] text-black font-bold">{time}</span>
                       </div>
                       <p className="text-xs text-black truncate">
@@ -295,6 +297,7 @@ export default function AdminChatPage() {
                   <div>
                     <div className="font-serif text-lg font-bold text-black flex items-center gap-2">
                       <span>{creatorName}</span>
+                      {activeConv?.creator.sample_status === 'APPROVED' && <VerifiedBadge size={18} />}
                     </div>
                     <div className="text-[11px] text-black font-medium">
                       Direct Creator Channel
@@ -305,8 +308,15 @@ export default function AdminChatPage() {
                 {activeConv && (
                   <div className="text-right hidden sm:block">
                     <span className="text-[10px] uppercase font-bold text-black">Status</span>
-                    <div className="text-xs font-bold text-black">
-                      {activeConv.creator.sample_status === 'APPROVED' ? 'Verified Creator' : 'Audition Stage'}
+                    <div className="text-xs font-bold text-black flex items-center gap-1.5 justify-end">
+                      {activeConv.creator.sample_status === 'APPROVED' ? (
+                        <>
+                          <VerifiedBadge size={14} />
+                          <span>Verified Creator</span>
+                        </>
+                      ) : (
+                        'Audition Stage'
+                      )}
                     </div>
                   </div>
                 )}

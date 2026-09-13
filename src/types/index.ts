@@ -109,6 +109,7 @@ export interface Submission {
   creator_id: string;
   creator_name?: string;
   creator_email?: string;
+  creator_sample_status?: SampleStatus;
   title: string;
   category: ContentCategory | string;
   duration_seconds: number;
@@ -161,6 +162,7 @@ export interface PayoutRequest {
   creator_id: string;
   creator_name: string;
   creator_email: string;
+  creator_sample_status?: SampleStatus;
   amount_usd: number;
   video_count: number;
   status: PayoutStatus;

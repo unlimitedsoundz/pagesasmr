@@ -12,6 +12,7 @@ import {
   Shield,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import { PayoutRequest } from '@/types';
 import { useToast } from '@/components/ToastProvider';
 
@@ -109,6 +110,7 @@ export default function AdminPayoutsPage() {
             <table className="w-full text-left text-xs">
               <thead className="bg-neutral-50 border-b border-neutral-200 uppercase font-bold text-neutral-600">
                 <tr>
+                  <th className="p-4">Creator</th>
                   <th className="p-4">Reference</th>
                   <th className="p-4">Date</th>
                   <th className="p-4">Videos</th>
@@ -122,6 +124,13 @@ export default function AdminPayoutsPage() {
               <tbody className="divide-y divide-neutral-200 font-medium">
                 {payouts.map((p) => (
                   <tr key={p.id} className="hover:bg-neutral-50">
+                    <td className="p-4">
+                      <div className="font-bold text-black flex items-center gap-1.5">
+                        <span>{p.creator_name || 'Creator'}</span>
+                        <VerifiedBadge size={16} />
+                      </div>
+                      <div className="text-[11px] text-neutral-500 font-mono">{p.creator_email}</div>
+                    </td>
                     <td className="p-4 font-mono font-bold text-black">{p.id.substring(0, 8)}...</td>
                     <td className="p-4 text-neutral-600">{new Date(p.created_at || p.requested_at).toLocaleDateString()}</td>
                     <td className="p-4 text-black font-bold">{p.video_count} videos</td>

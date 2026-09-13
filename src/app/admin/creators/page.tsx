@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import { useToast } from '@/components/ToastProvider';
 
 export default function AdminCreatorsPage() {
@@ -284,7 +285,10 @@ export default function AdminCreatorsPage() {
                   return (
                     <tr key={c.id} className="hover:bg-neutral-50 transition-colors">
                       <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
-                        <div className="font-bold text-black text-sm">{c.display_name}</div>
+                        <div className="font-bold text-black text-sm flex items-center gap-1.5">
+                          <span>{c.display_name}</span>
+                          {sampleStatus === 'APPROVED' && <VerifiedBadge size={16} />}
+                        </div>
                         <div className="text-[11px] text-black font-medium">{c.email}</div>
                         <div className="text-[10px] text-neutral-500 font-bold">
                           Joined: {new Date(c.created_at).toLocaleDateString()}

@@ -15,6 +15,7 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { Profile, PaymentMethodType } from '@/types';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import { ALL_COUNTRIES } from '@/lib/countries';
 import { NIGERIAN_BANKS } from '@/lib/nigerian-banks';
 import { AFRICAN_MOBILE_MONEY_COUNTRIES, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
@@ -339,14 +340,19 @@ export default function CreatorSettingsPage() {
               )}
 
               {/* Audition Benchmark Status Badge */}
-              {profile?.sample_status && (
+              {profile?.sample_status === 'APPROVED' ? (
+                <div className="sm:self-start inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FDF2F4] text-[#7B1E4B]">
+                  <VerifiedBadge size={16} />
+                  <span>Verified Creator (Audition Approved)</span>
+                </div>
+              ) : profile?.sample_status ? (
                 <div className="sm:self-start inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FDF2F4] text-[#7B1E4B] border-0">
                   <span className="text-[#7B1E4B]/80 font-medium">Audition Status:</span>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#7B1E4B] text-white border-0">
                     {profile.sample_status.replace('_', ' ')}
                   </span>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

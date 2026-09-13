@@ -450,7 +450,7 @@ class PagesDatabaseService {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
       }
-    } catch {}
+    } catch { }
   }
 
   private readFromDisk(): DatabaseData {
@@ -620,7 +620,7 @@ class PagesDatabaseService {
         await supabaseAdmin.from('profiles').delete().eq('id', id);
         try {
           await supabaseAdmin.auth.admin.deleteUser(id);
-        } catch {}
+        } catch { }
       } catch (e) {
         console.warn('[Pages DB] removeStaleCreators Supabase delete warning:', e);
       }
@@ -685,7 +685,7 @@ class PagesDatabaseService {
         this.save();
         return profile;
       }
-    } catch {}
+    } catch { }
     return undefined;
   }
 
@@ -722,7 +722,7 @@ class PagesDatabaseService {
         this.save();
         return profile;
       }
-    } catch {}
+    } catch { }
     return undefined;
   }
 
@@ -754,7 +754,7 @@ class PagesDatabaseService {
         this.save();
         return mapped;
       }
-    } catch {}
+    } catch { }
     return undefined;
   }
 
@@ -1724,6 +1724,25 @@ class PagesDatabaseService {
 
   getNotifications(userId: string): NotificationItem[] {
     this.reload();
+
+    // Ensure verified creators receive their congratulatory notification bell item
+    const profile = this.getProfileById(userId);
+    if (profile && profile.role === 'CREATOR' && profile.sample_status === 'APPROVED') {
+      const hasVerifiedNotif = (this.data.notifications || []).some(
+        (n) => n.user_id === userId && n.platform_id === PLATFORM_ID && (n.title.includes('Verified Creator') || n.title.includes('Verified Badge') || n.title.includes('Audition Approved'))
+      );
+      if (!hasVerifiedNotif) {
+        this.createNotification({
+          user_id: userId,
+          title: 'Audition Approved — Verified Creator Badge Added',
+          message:
+            'Congratulations! You are now an official Verified Creator. Your audition sample has been approved, and your official Verified Creator Badge is now live beside your name across the platform.',
+          type: 'REVIEW',
+          link: '/creator',
+        });
+      }
+    }
+
     return this.data.notifications.filter(
       (n) => n.user_id === userId && n.platform_id === PLATFORM_ID
     );
@@ -1978,7 +1997,7 @@ class PagesDatabaseService {
         category: 'PAGE_TURNING',
         uploaded_by:
           sample.uploaded_by &&
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sample.uploaded_by)
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sample.uploaded_by)
             ? sample.uploaded_by
             : null,
         created_at: sample.created_at,
@@ -1997,7 +2016,7 @@ class PagesDatabaseService {
       this.save();
       try {
         supabaseAdmin.from('guideline_samples').delete().eq('id', id);
-      } catch {}
+      } catch { }
       if (adminUser) {
         this.createAuditEvent({
           platform_id: PLATFORM_ID,
@@ -2146,14 +2165,14 @@ class PagesDatabaseService {
       }),
       res.profile.email
         ? sendNotificationEmail({
-            to: res.profile.email,
-            recipientName: res.profile.display_name || 'Creator',
-            type: 'REVIEW',
-            title: '30-Second Audition Sample Submitted',
-            message:
-              'Your 30-second audition sample has been received and is currently under review by our administration team. You will receive an email as soon as your sample is reviewed.',
-            link: '/creator/upload',
-          })
+          to: res.profile.email,
+          recipientName: res.profile.display_name || 'Creator',
+          type: 'REVIEW',
+          title: '30-Second Audition Sample Submitted',
+          message:
+            'Your 30-second audition sample has been received and is currently under review by our administration team. You will receive an email as soon as your sample is reviewed.',
+          link: '/creator/upload',
+        })
         : Promise.resolve(),
     ]);
     return res;
@@ -2192,16 +2211,15 @@ class PagesDatabaseService {
           console.warn('[Pages DB] Auto-publishing approved sample as guideline error:', sampleErr);
         }
       }
+      this.createNotification({
+        user_id: creator.id,
+        title: 'Audition Approved — Verified Creator Badge Added',
+        message:
+          'Congratulations! You are now an official Verified Creator. Your 30-second audition sample meets our page-turning quality standard! Your official Verified Creator Badge is live beside your name, and your full production portal is unlocked.',
+        type: 'REVIEW',
+        link: '/creator/upload',
+      });
     }
-
-    this.createNotification({
-      user_id: creator.id,
-      title: 'Audition Approved — Full Production Unlocked! 🎉',
-      message:
-        'Your 30-second audition sample meets our page-turning quality standard! Full production portal unlocked: you may now upload your 8 full videos ($50 each).',
-      type: 'REVIEW',
-      link: '/creator/upload',
-    });
 
     this.createAuditEvent({
       platform_id: PLATFORM_ID,

@@ -180,23 +180,23 @@ body::before {
 /* Clean, modern curves across cards & containers */
 .rounded-3xl,
 [class*="rounded-3xl"] {
-  border-radius: 18px !important;
+  border-radius: 12px !important;
 }
 
 .rounded-2xl,
 [class*="rounded-2xl"],
 .card {
-  border-radius: 14px !important;
+  border-radius: 8px !important;
 }
 
 .rounded-xl,
 [class*="rounded-xl"] {
-  border-radius: 10px !important;
+  border-radius: 8px !important;
 }
 
 .rounded-lg,
 [class*="rounded-lg"] {
-  border-radius: 8px !important;
+  border-radius: 6px !important;
 }
 
 .rounded-md,
