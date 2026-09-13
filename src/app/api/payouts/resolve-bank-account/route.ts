@@ -10,6 +10,8 @@ export async function POST(req: NextRequest) {
     const rawAccount = (body.accountNumber || body.account_number || '').toString().trim();
     const accountNumber = rawAccount.replace(/\D/g, '');
 
+    const clientProvidedName = (body.displayName || body.beneficiaryName || '').toString().trim();
+
     if (!bankCode) {
       return NextResponse.json({ error: 'Bank code is required' }, { status: 400 });
     }
@@ -22,8 +24,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Paystack Integration
-    const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    if (paystackSecret) {
+    const paystackSecret = process.env.PAYSTACK_SECRET_KEY?.trim();
+    if (paystackSecret && !paystackSecret.startsWith('your_')) {
       try {
         const paystackRes = await fetch(
           `https://api.paystack.co/bank/resolve?account_number=${encodeURIComponent(
@@ -63,8 +65,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Flutterwave Integration
-    const flutterwaveSecret = process.env.FLUTTERWAVE_SECRET_KEY;
-    if (flutterwaveSecret) {
+    const flutterwaveSecret = process.env.FLUTTERWAVE_SECRET_KEY?.trim();
+    if (flutterwaveSecret && !flutterwaveSecret.startsWith('your_')) {
       try {
         const flwRes = await fetch('https://api.flutterwave.com/v3/accounts/resolve', {
           method: 'POST',
@@ -103,8 +105,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 3. Fallback for Local / Sandbox / Dev environment when API keys are not configured yet
-    let fallbackName = 'VERIFIED CREATOR ACCOUNT';
+    // 3. Fallback for Local / Sandbox / Dev environment when live API keys are not yet configured
+    let fallbackName = clientProvidedName ? clientProvidedName.toUpperCase() : 'VERIFIED CREATOR ACCOUNT';
     try {
       const user = await requireUser();
       const profile = await db.getProfileByIdAsync(user.id);
@@ -112,7 +114,7 @@ export async function POST(req: NextRequest) {
         fallbackName = profile.display_name.toUpperCase();
       }
     } catch {
-      // Not authenticated or fallback
+      // Not authenticated or session unavailable
     }
 
     return NextResponse.json({
@@ -122,7 +124,7 @@ export async function POST(req: NextRequest) {
       bankCode,
       isSimulated: true,
       notice:
-        'Simulated NIBSS verification (configure PAYSTACK_SECRET_KEY or FLUTTERWAVE_SECRET_KEY for live interbank lookup).',
+        'Simulated NIBSS verification (configure PAYSTACK_SECRET_KEY or FLUTTERWAVE_SECRET_KEY in .env.local for live interbank lookup).',
     });
   } catch (error: any) {
     console.error('Account resolution error:', error);
