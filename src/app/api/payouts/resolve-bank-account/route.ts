@@ -23,7 +23,53 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Paystack Integration
+    // 1. Korapay Integration (Active)
+    const korapaySecret = process.env.KORAPAY_SECRET_KEY?.trim();
+    if (korapaySecret && !korapaySecret.startsWith('your_')) {
+      try {
+        let koraBankCode = bankCode;
+        if (bankCode === '999992') koraBankCode = '100004';
+        if (bankCode === '999991') koraBankCode = '100033';
+
+        const koraRes = await fetch('https://api.korapay.com/merchant/api/v1/misc/banks/resolve', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${korapaySecret}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            bank: koraBankCode,
+            account: accountNumber,
+          }),
+          cache: 'no-store',
+        });
+
+        const data = await koraRes.json();
+        if (koraRes.ok && data?.status && data?.data?.account_name) {
+          return NextResponse.json({
+            success: true,
+            accountName: data.data.account_name,
+            accountNumber,
+            bankCode,
+            bankName: data.data.bank_name,
+            provider: 'korapay',
+          });
+        }
+
+        return NextResponse.json(
+          {
+            error:
+              data?.message ||
+              "Could not resolve bank account. Please check the account number and bank.",
+          },
+          { status: 400 }
+        );
+      } catch (err: any) {
+        console.error('Korapay resolve error:', err);
+      }
+    }
+
+    // 2. Paystack Integration
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY?.trim();
     if (paystackSecret && !paystackSecret.startsWith('your_')) {
       try {
