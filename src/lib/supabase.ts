@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ydymhzdoptmpblmejcjs.supabase.co';
@@ -44,6 +44,7 @@ interface CachedSignedUrl {
 
 const signedUrlCache = new Map<string, CachedSignedUrl>();
 const negativeUrlCache = new Map<string, number>();
+const storjVerifiedKeys = new Map<string, boolean>();
 
 /**
  * Safely extracts the clean storage key from any raw URL, API path, or bucket path.
@@ -96,32 +97,47 @@ export async function getSignedVideoUrl(
     return null;
   }
 
-  // 1. Prefer Storj / S3 Storage (25GB Free, $0 Egress Fees)
+  // 1. Prefer Storj / S3 Storage ($0 Egress Fees) if object exists in Storj bucket
   if (s3Client) {
-    try {
-      const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
-      const isMov = filePath.toLowerCase().endsWith('.mov');
-      const isWebm = filePath.toLowerCase().endsWith('.webm');
-      const mimeType = isMov ? 'video/quicktime' : isWebm ? 'video/webm' : 'video/mp4';
+    let isOnFileStorj = storjVerifiedKeys.get(filePath);
 
-      const command = new GetObjectCommand({
-        Bucket: STORAGE_BUCKET,
-        Key: filePath,
-        ResponseContentType: mimeType,
-        ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
-      });
-
-      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
-      if (signedUrl) {
-        signedUrlCache.set(cacheKey, { url: signedUrl, expiresAt: now + (expiresInSeconds - 60) * 1000 });
-        return signedUrl;
+    if (isOnFileStorj === undefined) {
+      try {
+        await s3Client.send(new HeadObjectCommand({ Bucket: STORAGE_BUCKET, Key: filePath }));
+        isOnFileStorj = true;
+        storjVerifiedKeys.set(filePath, true);
+      } catch {
+        isOnFileStorj = false;
+        storjVerifiedKeys.set(filePath, false);
       }
-    } catch (err) {
-      console.warn('[S3/Storj Storage] Signed URL error, falling back to Supabase:', err);
+    }
+
+    if (isOnFileStorj) {
+      try {
+        const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
+        const isMov = filePath.toLowerCase().endsWith('.mov');
+        const isWebm = filePath.toLowerCase().endsWith('.webm');
+        const mimeType = isMov ? 'video/quicktime' : isWebm ? 'video/webm' : 'video/mp4';
+
+        const command = new GetObjectCommand({
+          Bucket: STORAGE_BUCKET,
+          Key: filePath,
+          ResponseContentType: mimeType,
+          ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
+        });
+
+        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
+        if (signedUrl) {
+          signedUrlCache.set(cacheKey, { url: signedUrl, expiresAt: now + (expiresInSeconds - 60) * 1000 });
+          return signedUrl;
+        }
+      } catch (err) {
+        console.warn('[S3/Storj Storage] Signed URL error, falling back to Supabase:', err);
+      }
     }
   }
 
-  // 2. Fallback to Supabase Storage
+  // 2. Fallback seamlessly to Supabase Storage
   try {
     const { data, error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
@@ -147,11 +163,12 @@ export async function getSignedVideoUrl(
 }
 
 /**
- * Clears a file from the negative signed-URL cache (call after a successful upload).
+ * Clears a file from negative & verified caches (call after a successful upload).
  */
 export function clearNegativeCache(filePath: string) {
   negativeUrlCache.delete(filePath);
   signedUrlCache.delete(filePath);
+  storjVerifiedKeys.set(filePath, true);
 }
 
 /**
