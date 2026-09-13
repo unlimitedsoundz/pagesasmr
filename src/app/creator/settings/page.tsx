@@ -20,9 +20,10 @@ import {
   Landmark,
   Smartphone,
   Building2,
+  Loader2,
 } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
-import { NIGERIAN_BANKS } from '@/lib/nigerian-banks';
+import { NIGERIAN_BANKS, getBankCodeByName } from '@/lib/nigerian-banks';
 
 export default function CreatorSettingsPage() {
   const { toast } = useToast();
@@ -58,6 +59,80 @@ export default function CreatorSettingsPage() {
   const [routingNumber, setRoutingNumber] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [savingPayment, setSavingPayment] = useState(false);
+
+  // NUBAN resolution state
+  const [resolvingNuban, setResolvingNuban] = useState(false);
+  const [resolvedNubanName, setResolvedNubanName] = useState('');
+  const [nubanResolveError, setNubanResolveError] = useState('');
+
+  // Auto-resolve Nigerian Bank Account Name (NUBAN)
+  useEffect(() => {
+    if (paymentMethod !== 'NIGERIA_BANK') {
+      setResolvedNubanName('');
+      setNubanResolveError('');
+      return;
+    }
+
+    const cleanAcc = nigerianAccountNumber.replace(/\D/g, '');
+    if (cleanAcc.length !== 10) {
+      setResolvedNubanName('');
+      setNubanResolveError('');
+      return;
+    }
+
+    const bankCode = getBankCodeByName(nigerianBankName);
+    if (!bankCode) {
+      setResolvedNubanName('');
+      setNubanResolveError('');
+      return;
+    }
+
+    let isCancelled = false;
+    setResolvingNuban(true);
+    setNubanResolveError('');
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/payouts/resolve-bank-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bankCode,
+            accountNumber: cleanAcc,
+          }),
+        });
+
+        const data = await res.json();
+        if (isCancelled) return;
+
+        if (res.ok && data?.success && data?.accountName) {
+          setResolvedNubanName(data.accountName);
+          setBeneficiaryName(data.accountName);
+          setNubanResolveError('');
+          toast.success(`Account verified: ${data.accountName}`, 'Bank Account Resolved');
+        } else {
+          setResolvedNubanName('');
+          setNubanResolveError(
+            data?.error || 'Could not verify account holder with this bank and account number.'
+          );
+        }
+      } catch {
+        if (!isCancelled) {
+          setResolvedNubanName('');
+          setNubanResolveError('Network error while verifying bank account.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setResolvingNuban(false);
+        }
+      }
+    }, 450);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [paymentMethod, nigerianAccountNumber, nigerianBankName, toast]);
 
   // Initial load
   useEffect(() => {
@@ -843,9 +918,17 @@ export default function CreatorSettingsPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                        10-Digit NUBAN Account Number
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                          10-Digit NUBAN Account Number
+                        </label>
+                        {resolvingNuban && (
+                          <span className="flex items-center gap-1.5 text-[11px] font-medium text-[#7B1E4B] dark:text-pink-400">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            <span>Verifying...</span>
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="text"
                         maxLength={10}
@@ -857,6 +940,44 @@ export default function CreatorSettingsPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Verification Status Card */}
+                  {resolvingNuban && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs">
+                      <Loader2 className="w-4 h-4 animate-spin text-[#7B1E4B] dark:text-pink-400 shrink-0" />
+                      <span>Querying NIBSS interbank network for legal account holder...</span>
+                    </div>
+                  )}
+
+                  {resolvedNubanName && !resolvingNuban && (
+                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-emerald-900 dark:text-emerald-200">Verified Account Holder:</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold uppercase tracking-wider">
+                            NIBSS Match
+                          </span>
+                        </div>
+                        <div className="font-mono text-sm font-bold tracking-wide text-emerald-950 dark:text-emerald-100">
+                          {resolvedNubanName}
+                        </div>
+                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-normal">
+                          Auto-filled into your Legal Beneficiary Full Name.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {nubanResolveError && !resolvingNuban && (
+                    <div className="flex items-start gap-2 p-3 rounded-xl bg-rose-50/90 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs">
+                      <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5">
+                        <span className="font-semibold">Verification Alert: </span>
+                        <span>{nubanResolveError}</span>
+                      </div>
+                    </div>
+                  )}
                   <p className="text-[11px] text-neutral-400">
                     Direct automated settlement in Nigerian Naira (NGN) via instant NUBAN interbank clearing.
                   </p>
