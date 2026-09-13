@@ -688,7 +688,7 @@ export default function Navbar() {
 
                     <NextLink
                       href="/creator/upload"
-                      className="inline-flex items-center px-3.5 py-1.5 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors"
+                      className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#7B1E4B] hover:bg-[#63183C] text-white text-xs font-bold transition-colors border-0 shadow-xs"
                     >
                       <UploadCloud className="w-3.5 h-3.5 mr-1" />
                       Upload
@@ -697,10 +697,10 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 text-xs font-bold text-black dark:text-[#F0F0F6] hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                      className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#FDF2F4] hover:bg-[#F8E2EC] text-[#7B1E4B] text-xs font-bold transition-colors border-0 shadow-xs"
                       title="Log Out"
                     >
-                      <LogOut className="w-3.5 h-3.5 mr-1 text-red-500" />
+                      <LogOut className="w-3.5 h-3.5 mr-1 text-[#7B1E4B]" />
                       <span>Log Out</span>
                     </button>
                   </>
