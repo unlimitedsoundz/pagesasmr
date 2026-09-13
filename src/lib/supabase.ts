@@ -100,9 +100,14 @@ export async function getSignedVideoUrl(
   if (s3Client) {
     try {
       const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
+      const isMov = filePath.toLowerCase().endsWith('.mov');
+      const isWebm = filePath.toLowerCase().endsWith('.webm');
+      const mimeType = isMov ? 'video/quicktime' : isWebm ? 'video/webm' : 'video/mp4';
+
       const command = new GetObjectCommand({
         Bucket: STORAGE_BUCKET,
         Key: filePath,
+        ResponseContentType: mimeType,
         ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
       });
 
