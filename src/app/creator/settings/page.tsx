@@ -326,7 +326,7 @@ export default function CreatorSettingsPage() {
 
   return (
     <div className="w-full min-h-screen bg-[#FDFBFD] dark:bg-[#120F15] text-neutral-900 dark:text-neutral-100 transition-colors">
-      <main className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-10">
+      <main className="max-w-[1100px] mx-auto px-3 sm:px-4 lg:px-4 py-8 sm:py-12 space-y-8 sm:space-y-10">
 
         {/* ─── Page Header ─────────────────────────────────────────── */}
         <div className="space-y-1.5 pb-1">

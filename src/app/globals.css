@@ -1276,3 +1276,18 @@ button.official-sample-banner,
 .dark [data-official-sample-banner] {
   border: 1px solid #3D2132 !important;
 }
+
+/* ========================================================
+   DESKTOP VIEW: DECREASED LEFT & RIGHT PADDING ACROSS ALL PAGES
+   ======================================================== */
+@media (min-width: 1024px) {
+  /* Tighten side padding on all container layouts in desktop view */
+  .lg\:px-8 {
+    padding-left: 1rem !important;  /* 16px instead of 32px */
+    padding-right: 1rem !important; /* 16px instead of 32px */
+  }
+  .lg\:px-6 {
+    padding-left: 0.75rem !important;  /* 12px instead of 24px */
+    padding-right: 0.75rem !important; /* 12px instead of 24px */
+  }
+}
