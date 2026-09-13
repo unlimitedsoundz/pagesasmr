@@ -18,7 +18,7 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!botToken || !chatId) {
-    console.log('[Telegram Pages Alert] Skipped - TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not configured.');
+    console.warn('[Telegram Pages Alert] Skipped - TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not configured.');
     return { success: false, reason: 'Not configured' };
   }
 
@@ -33,11 +33,11 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
     }
   }
 
-  const safeTitle = params.title.replace(/[^a-z0-9_\-\s]/gi, '').trim().replace(/\s+/g, '_');
-  const safeCreator = params.creatorName.replace(/[^a-z0-9_\-\s]/gi, '').trim().replace(/\s+/g, '_');
+  const safeTitle = (params.title || 'video').replace(/[^a-z0-9_\-\s]/gi, '').trim().replace(/\s+/g, '_');
+  const safeCreator = (params.creatorName || 'creator').replace(/[^a-z0-9_\-\s]/gi, '').trim().replace(/\s+/g, '_');
   const downloadFilename = `${safeTitle}_${safeCreator}.mp4`;
 
-  // Generate signed URLs for direct streaming and download if hosted on Supabase
+  // Generate signed URLs for direct streaming and download if hosted on Supabase / Storj
   let directSignedUrl: string | null = null;
   let downloadUrl: string | null = null;
 
@@ -58,83 +58,72 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
   const durationSec = Math.round(params.durationSeconds % 60);
   const formattedDuration = `${durationMin}m ${durationSec}s (${Math.round(params.durationSeconds)}s)`;
 
-  const emoji = params.type === 'SAMPLE' ? '📖' : params.type === 'REVISION' ? '🔄' : '📚';
-  const typeLabel = params.type === 'SAMPLE' ? 'Pages Audition Sample (30s)' : params.type === 'REVISION' ? 'Pages Video Revision' : 'Page Turning Video Submission';
+  const emoji = params.type === 'SAMPLE' ? '🎤' : params.type === 'REVISION' ? '🔄' : '🎬';
+  const typeLabel = params.type === 'SAMPLE' ? 'Audition Sample' : params.type === 'REVISION' ? 'Video Revision' : 'Full Video Submission';
 
   const captionHtml = [
-    `<b>${emoji} NEW PAGES SUBMISSION RECEIVED</b>`,
+    `<b>${emoji} NEW SUBMISSION RECEIVED (PINKROOM PAGES)</b>`,
     ``,
     `📌 <b>Type:</b> ${typeLabel}`,
     `👤 <b>Creator:</b> ${escapeHtml(params.creatorName)} (${escapeHtml(params.creatorEmail)})`,
     `📽️ <b>Title:</b> ${escapeHtml(params.title)}`,
-    `🏷️ <b>Platform:</b> The Pink Room Pages`,
+    params.category ? `🏷️ <b>Category:</b> ${escapeHtml(params.category)}` : null,
     `⏱️ <b>Duration:</b> ${formattedDuration}`,
     params.fileSizeMb ? `📦 <b>Size:</b> ${params.fileSizeMb.toFixed(1)} MB` : null,
     params.notes ? `💬 <b>Notes:</b> <i>${escapeHtml(params.notes)}</i>` : null,
     ``,
-    `⬇️ <a href="${publicDownloadUrl}">Download MP4 File (${downloadFilename})</a>`,
-    `🖥️ <a href="${adminReviewUrl}">Open Admin Dashboard</a>`,
+    `⬇️ <a href="${escapeHtml(publicDownloadUrl)}">Download Video File (${downloadFilename})</a>`,
+    `🖥️ <a href="${escapeHtml(adminReviewUrl)}">Open Admin Dashboard</a>`,
   ]
     .filter(Boolean)
     .join('\n');
 
   try {
-    let sentMedia = false;
-    if (directSignedUrl) {
-      const videoRes = await fetch(`https://api.telegram.org/bot${botToken}/sendVideo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          video: directSignedUrl,
-          caption: captionHtml,
-          parse_mode: 'HTML',
-          reply_markup: {
-            inline_keyboard: [
-              [
-                { text: '⬇️ Download MP4 File', url: publicDownloadUrl },
-                { text: '⚡ Review in Dashboard', url: adminReviewUrl },
-              ],
+    // 1. Primary: Send immediate, guaranteed alert message with action buttons
+    const msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: captionHtml,
+        parse_mode: 'HTML',
+        disable_web_page_preview: false,
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: '⬇️ Download MP4 File', url: publicDownloadUrl },
+              { text: '⚡ Review in Dashboard', url: adminReviewUrl },
             ],
-          },
-        }),
-      });
+          ],
+        },
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
 
-      const videoData = await videoRes.json();
-      if (videoData.ok) {
-        sentMedia = true;
-        console.log('[Telegram Pages] Video submission alert sent successfully via sendVideo.');
-      } else {
-        console.warn('[Telegram Pages] sendVideo notice:', videoData.description || videoData);
-      }
+    const msgData = await msgRes.json();
+    if (!msgData.ok) {
+      console.error('[Telegram Pages Error] sendMessage failed:', msgData);
+      return { success: false, error: msgData.description };
     }
+    console.log('[Telegram Pages] Submission text alert sent successfully.');
 
-    if (!sentMedia) {
-      const msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: captionHtml,
-          parse_mode: 'HTML',
-          disable_web_page_preview: false,
-          reply_markup: {
-            inline_keyboard: [
-              [
-                { text: '⬇️ Download MP4 File', url: publicDownloadUrl },
-                { text: '⚡ Review in Dashboard', url: adminReviewUrl },
-              ],
-            ],
-          },
-        }),
-      });
-
-      const msgData = await msgRes.json();
-      if (!msgData.ok) {
-        console.error('[Telegram Pages Error] sendMessage failed:', msgData);
-        return { success: false, error: msgData.description };
+    // 2. Optional: If media is under 20MB and has a direct signed URL, also try to post video preview directly
+    if (directSignedUrl && params.fileSizeMb && params.fileSizeMb <= 20) {
+      try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendVideo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            video: directSignedUrl,
+            caption: `🎬 <b>Video Stream:</b> ${escapeHtml(params.title)}`,
+            parse_mode: 'HTML',
+          }),
+          signal: AbortSignal.timeout(6000),
+        });
+      } catch (videoErr) {
+        console.warn('[Telegram Pages] Optional sendVideo preview skipped:', videoErr);
       }
-      console.log('[Telegram Pages] Submission text alert sent successfully.');
     }
 
     return { success: true };
@@ -145,8 +134,10 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
 }
 
 function escapeHtml(text: string): string {
+  if (!text) return '';
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

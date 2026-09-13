@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { SubmissionStatus } from '@/types';
+import { sendTelegramSubmissionNotification } from '@/lib/telegram';
 
 export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
@@ -76,9 +77,9 @@ export async function POST(req: NextRequest) {
       is_sample: false,
     });
 
-    // Auto-send submission details & video link to Telegram (non-blocking)
-    import('@/lib/telegram').then(({ sendTelegramSubmissionNotification }) => {
-      sendTelegramSubmissionNotification({
+    // Auto-send submission details & video link to Telegram
+    try {
+      await sendTelegramSubmissionNotification({
         type: 'SUBMISSION',
         creatorName: user.display_name,
         creatorEmail: user.email,
@@ -89,8 +90,10 @@ export async function POST(req: NextRequest) {
         fileUrl,
         notes: notes?.trim(),
         submissionId: submission.id,
-      }).catch((err) => console.error('[Pages] Telegram notification error:', err));
-    }).catch(() => {});
+      });
+    } catch (err) {
+      console.error('[Pages] Telegram notification error:', err);
+    }
 
     return NextResponse.json({ submission }, { status: 201 });
   } catch (error: any) {

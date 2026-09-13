@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { sendTelegramSubmissionNotification } from '@/lib/telegram';
 
 export async function GET() {
   try {
@@ -61,9 +62,9 @@ export async function POST(req: NextRequest) {
       notes: notes?.trim(),
     });
 
-    // Auto-send audition sample details & video link to Telegram (non-blocking)
-    import('@/lib/telegram').then(({ sendTelegramSubmissionNotification }) => {
-      sendTelegramSubmissionNotification({
+    // Auto-send audition sample details & video link to Telegram
+    try {
+      await sendTelegramSubmissionNotification({
         type: 'SAMPLE',
         creatorName: user.display_name,
         creatorEmail: user.email,
@@ -74,8 +75,10 @@ export async function POST(req: NextRequest) {
         fileUrl,
         notes: notes?.trim(),
         submissionId: result.submission?.id,
-      }).catch((err) => console.error('[Pages] Telegram notification error:', err));
-    }).catch(() => {});
+      });
+    } catch (err) {
+      console.error('[Pages] Telegram notification error:', err);
+    }
 
     return NextResponse.json({
       success: true,

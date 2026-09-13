@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { sendTelegramSubmissionNotification } from '@/lib/telegram';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -45,9 +46,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       notes,
     });
 
-    // Auto-send revision video & details to Telegram (non-blocking)
-    import('@/lib/telegram').then(({ sendTelegramSubmissionNotification }) => {
-      sendTelegramSubmissionNotification({
+    // Auto-send revision video & details to Telegram
+    try {
+      await sendTelegramSubmissionNotification({
         type: 'REVISION',
         creatorName: user.display_name,
         creatorEmail: user.email,
@@ -58,8 +59,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         fileUrl,
         notes: notes?.trim(),
         submissionId: updated.id,
-      }).catch((err) => console.error('[Pages] Telegram notification error:', err));
-    }).catch(() => {});
+      });
+    } catch (err) {
+      console.error('[Pages] Telegram notification error:', err);
+    }
 
     return NextResponse.json({ success: true, submission: updated });
   } catch (error: any) {
