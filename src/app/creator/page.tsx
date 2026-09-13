@@ -195,6 +195,8 @@ export default function CreatorDashboardPage() {
   const displayName = profile?.display_name || 'Creator';
   const firstName = displayName.trim().split(/\s+/)[0] || 'Creator';
   const minRequired = stats?.minRequired || 8;
+  const rate = profile?.rate_per_video_usd || 50;
+  const targetPayout = minRequired * rate;
   const eligibleCount = stats?.eligibleCount || 0;
   const progressPercent = Math.min(100, Math.round((eligibleCount / minRequired) * 100));
   const remainingVideos = Math.max(0, minRequired - eligibleCount);
@@ -322,7 +324,7 @@ export default function CreatorDashboardPage() {
                   YOUR FIRST PAYOUT
                 </span>
                 <span className="px-3 py-1 rounded-full text-[11px] font-bold text-[#7B1E4B] bg-[#FDF2F4] border-0">
-                  8 videos = $400
+                  {minRequired} videos = ${targetPayout}
                 </span>
               </div>
 
@@ -339,9 +341,12 @@ export default function CreatorDashboardPage() {
                 <span className="text-neutral-500 dark:text-neutral-400">{progressPercent}%</span>
               </div>
 
-              {/* 8 Distinct Bar Segments */}
-              <div className="grid grid-cols-8 gap-1.5 w-full">
-                {Array.from({ length: 8 }).map((_, idx) => (
+              {/* Distinct Bar Segments */}
+              <div
+                className="grid gap-1.5 w-full"
+                style={{ gridTemplateColumns: `repeat(${minRequired}, minmax(0, 1fr))` }}
+              >
+                {Array.from({ length: minRequired }).map((_, idx) => (
                   <div
                     key={idx}
                     className={`h-2 rounded-full transition-all duration-300 ${
@@ -354,8 +359,8 @@ export default function CreatorDashboardPage() {
               </div>
 
               <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 pt-1">
-                <span>${(eligibleCount * 50).toFixed(0)} earned</span>
-                <span className="font-semibold text-neutral-700 dark:text-neutral-300">$400 minimum payout</span>
+                <span>${(eligibleCount * rate).toFixed(0)} earned</span>
+                <span className="font-semibold text-neutral-700 dark:text-neutral-300">${targetPayout} minimum payout</span>
               </div>
             </div>
 
@@ -419,7 +424,7 @@ export default function CreatorDashboardPage() {
                   </button>
                 )}
                 <div className="text-[11px] text-white/80 text-center mt-2 font-normal">
-                  Unlocks at 8 approved, unpaid videos
+                  Unlocks at {minRequired} approved, unpaid videos
                 </div>
               </div>
             </div>

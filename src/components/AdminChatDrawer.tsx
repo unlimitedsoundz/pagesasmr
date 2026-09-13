@@ -192,7 +192,7 @@ export default function AdminChatDrawer() {
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-[#fb1e4b] hover:bg-[#e0153f] text-white shadow-lg transition-all duration-200 group border border-[#fb1e4b]/40"
+          className="relative flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-[#7b1e4b] hover:bg-[#68173e] text-white shadow-lg transition-all duration-200 group border border-[#7b1e4b]/40"
           title="Chat with Admin Support"
         >
           <MessageSquare className="w-5 h-5 text-white" />

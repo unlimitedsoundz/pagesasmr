@@ -41,15 +41,15 @@ function StatCard({
 }) {
   const formatted = count.toString().padStart(2, '0');
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-xl p-5 space-y-2">
-      <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-        <span className="font-medium">{label}</span>
-        <span className="text-neutral-300 dark:text-neutral-600">{icon}</span>
+    <div className="p-5 sm:p-6 space-y-1.5">
+      <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <span>{label}</span>
+        <span className="text-neutral-400">{icon}</span>
       </div>
-      <div className="font-serif text-3xl font-normal text-neutral-900 dark:text-white leading-none">
+      <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
         {formatted}
       </div>
-      <div className="text-[11px] text-neutral-400 dark:text-neutral-500">
+      <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
         {subtitle}
       </div>
     </div>
@@ -430,7 +430,7 @@ export default function SubmissionsPage() {
         </div>
 
         {/* â”€â”€ Stat Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 divide-y md:divide-y-0 md:divide-x divide-neutral-200/90 dark:divide-neutral-800 overflow-hidden">
           <StatCard
             label="Total submissions"
             count={totalCount}

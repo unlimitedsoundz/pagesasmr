@@ -16,6 +16,7 @@ import {
   AlertCircle,
   FileCode,
   ShieldCheck,
+  Clock,
 } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
 
@@ -130,15 +131,15 @@ export default function CreatorAgreementPage() {
         </div>
 
         {/* ─── Top 3-Stat Metric Row (Creator Dashboard Connected Grid) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 divide-y md:divide-y-0 md:divide-x divide-neutral-200/90 dark:border-neutral-800 overflow-hidden shadow-2xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 divide-y md:divide-y-0 md:divide-x divide-neutral-200/90 dark:divide-neutral-800 overflow-hidden shadow-2xs">
           {/* Metric 1: Rate */}
           <div className="p-5 sm:p-6 space-y-1.5">
-            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#9D174D] dark:text-pink-400 uppercase">
-              YOUR RATE
+            <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <span>Your locked-in rate</span>
+              <Video className="w-4 h-4 text-neutral-400" />
             </div>
-            <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
-              <span>${rate}</span>
-              <span className="font-sans text-xs font-bold text-neutral-400 tracking-wider">USD</span>
+            <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
+              ${rate.toFixed(2)}
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Per approved full video
@@ -147,26 +148,26 @@ export default function CreatorAgreementPage() {
 
           {/* Metric 2: Payout Minimum */}
           <div className="p-5 sm:p-6 space-y-1.5">
-            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#9D174D] dark:text-pink-400 uppercase">
-              YOUR PAYOUT
+            <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <span>Payout threshold</span>
+              <Lock className="w-4 h-4 text-neutral-400" />
             </div>
-            <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
-              <span>{minVideos}</span>
-              <span className="font-sans text-xs font-medium text-neutral-400">videos</span>
+            <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
+              {minVideos} videos
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
-              ${minPayout} minimum · approved and unpaid
+              ${minPayout.toFixed(2)} minimum · approved and unpaid
             </div>
           </div>
 
           {/* Metric 3: Recording Duration */}
           <div className="p-5 sm:p-6 space-y-1.5">
-            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#9D174D] dark:text-pink-400 uppercase">
-              YOUR RECORDING
+            <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <span>Minimum duration</span>
+              <Clock className="w-4 h-4 text-neutral-400" />
             </div>
-            <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
-              <span>3:00</span>
-              <span className="font-sans text-xs font-medium text-neutral-400">minimum</span>
+            <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
+              3:00 min
             </div>
             <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Original page-turning ASMR

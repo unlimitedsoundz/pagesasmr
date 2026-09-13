@@ -84,8 +84,8 @@ export default function CreatorMobileNav() {
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center group-active:scale-95 transition-all border-2 ${
                     isActive
-                      ? 'bg-[#fb1e4b] text-white border-white dark:border-[#161619] ring-2 ring-[#fb1e4b]/30'
-                      : 'bg-[#fb1e4b] hover:bg-[#e0153f] text-white border-white dark:border-[#161619]'
+                      ? 'bg-[#7b1e4b] text-white border-white dark:border-[#161619] ring-2 ring-[#7b1e4b]/30'
+                      : 'bg-[#7b1e4b] hover:bg-[#68173e] text-white border-white dark:border-[#161619]'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
