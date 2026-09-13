@@ -100,6 +100,8 @@ export interface Profile {
   agreement_signed?: boolean;
   agreement_signed_at?: string;
   agreement_signature_name?: string;
+  referral_code?: string;
+  referred_by_id?: string;
   created_at: string;
 }
 
@@ -218,4 +220,20 @@ export interface ChatMessage {
   message: string;
   is_read: boolean;
   created_at: string;
+}
+
+export interface Referral {
+  id: string;
+  referrer_id: string;
+  referred_user_id: string;
+  referred_user_name: string;
+  referred_user_email: string;
+  audition_passed: boolean;
+  videos_completed_count: number;
+  milestone_reached: boolean;
+  reward_amount_usd: number;
+  reward_status: 'PENDING' | 'REWARDED';
+  rewarded_at?: string;
+  created_at: string;
+  updated_at: string;
 }

@@ -19,6 +19,7 @@ import {
   PayoutItemStatus,
   PlatformMembership,
   ChatMessage,
+  Referral,
 } from '@/types';
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
@@ -53,6 +54,7 @@ interface DatabaseData {
   settings: PlatformSettings;
   guideline_samples: GuidelineSample[];
   chat_messages: ChatMessage[];
+  referrals?: Referral[];
 }
 
 const APP_DATA_DIR = path.resolve(__dirname, '../../data');
@@ -1264,6 +1266,13 @@ class PagesDatabaseService {
 
     this.save();
     this.syncSubmissionToSupabase(sub);
+
+    try {
+      this.checkAndUpdateReferralMilestone(sub.creator_id);
+    } catch (refErr) {
+      console.warn('Referral milestone check warning:', refErr);
+    }
+
     return sub;
   }
 
@@ -2475,6 +2484,184 @@ class PagesDatabaseService {
     return (this.data.chat_messages || []).filter(
       (m) => m.creator_id === creatorId && !m.is_read && m.sender_role === 'ADMIN'
     ).length;
+  }
+
+  // ==========================================
+  // REFERRAL LINK & MILESTONE SYSTEM ($35 BONUS)
+  // ==========================================
+  getReferralCodeForProfile(profileId: string): string {
+    const profile = this.getProfileById(profileId);
+    if (!profile) return '';
+
+    if (profile.referral_code) {
+      return profile.referral_code;
+    }
+
+    const cleanName = (profile.display_name || 'CREATOR')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .slice(0, 6);
+    const randomSuffix = crypto.randomBytes(2).toString('hex').toUpperCase();
+    let code = `${cleanName}-${randomSuffix}`;
+
+    while (this.data.profiles.some((p) => p.referral_code === code)) {
+      const extra = crypto.randomBytes(2).toString('hex').toUpperCase();
+      code = `${cleanName}-${extra}`;
+    }
+
+    profile.referral_code = code;
+    this.updateProfile(profileId, { referral_code: code });
+    return code;
+  }
+
+  getProfileByReferralCode(code: string): Profile | undefined {
+    this.reload();
+    const cleanCode = (code || '').trim().toUpperCase();
+    if (!cleanCode) return undefined;
+    return this.data.profiles.find((p) => (p.referral_code || '').toUpperCase() === cleanCode);
+  }
+
+  createReferral(referrerId: string, referredUserId: string): Referral {
+    if (!this.data.referrals) {
+      this.data.referrals = [];
+    }
+
+    const existing = this.data.referrals.find(
+      (r) => r.referrer_id === referrerId && r.referred_user_id === referredUserId
+    );
+    if (existing) {
+      return existing;
+    }
+
+    const referrer = this.getProfileById(referrerId);
+    const referredUser = this.getProfileById(referredUserId);
+
+    if (!referrer || !referredUser) {
+      throw new Error('Referrer or Referred User not found.');
+    }
+
+    const now = new Date().toISOString();
+    const approvedVideosCount = this.data.submissions.filter(
+      (s) => s.creator_id === referredUserId && s.status === 'APPROVED' && !s.is_sample
+    ).length;
+
+    const newReferral: Referral = {
+      id: ensureUuid(),
+      referrer_id: referrerId,
+      referred_user_id: referredUserId,
+      referred_user_name: referredUser.display_name,
+      referred_user_email: referredUser.email,
+      audition_passed: referredUser.sample_status === 'APPROVED',
+      videos_completed_count: approvedVideosCount,
+      milestone_reached: false,
+      reward_amount_usd: 35.0,
+      reward_status: 'PENDING',
+      created_at: now,
+      updated_at: now,
+    };
+
+    this.data.referrals.push(newReferral);
+    this.save();
+
+    this.createNotification({
+      user_id: referrerId,
+      title: 'New Creator Joined via Your Link!',
+      message: `${referredUser.display_name} registered using your referral link. You will earn $35.00 once they pass their audition and upload 8 approved videos!`,
+      type: 'SYSTEM',
+      link: '/creator/referrals',
+    });
+
+    this.checkAndUpdateReferralMilestone(referredUserId);
+
+    return newReferral;
+  }
+
+  checkAndUpdateReferralMilestone(referredUserId: string): void {
+    if (!this.data.referrals) {
+      this.data.referrals = [];
+    }
+
+    const referralIndex = this.data.referrals.findIndex((r) => r.referred_user_id === referredUserId);
+    if (referralIndex === -1) return;
+
+    const referral = this.data.referrals[referralIndex];
+    if (referral.reward_status === 'REWARDED') return;
+
+    const referredUser = this.getProfileById(referredUserId);
+    if (!referredUser) return;
+
+    const auditionPassed = referredUser.sample_status === 'APPROVED';
+    const videosCompletedCount = this.data.submissions.filter(
+      (s) => s.creator_id === referredUserId && s.status === 'APPROVED' && !s.is_sample
+    ).length;
+
+    referral.audition_passed = auditionPassed;
+    referral.videos_completed_count = videosCompletedCount;
+
+    if (auditionPassed && videosCompletedCount >= 8) {
+      referral.milestone_reached = true;
+      referral.reward_status = 'REWARDED';
+      referral.rewarded_at = new Date().toISOString();
+
+      const existingRewardLedger = this.data.earnings_ledger.find(
+        (l) => l.creator_id === referral.referrer_id && l.description.includes(referredUserId)
+      );
+
+      if (!existingRewardLedger) {
+        const creditEntry: EarningsLedgerEntry = {
+          id: ensureUuid(),
+          platform_id: PLATFORM_ID,
+          creator_id: referral.referrer_id,
+          type: 'CREDIT',
+          amount_usd: 35.0,
+          description: `Referral Bonus ($35): ${referral.referred_user_name} (${referredUserId}) passed audition & 8 videos milestone`,
+          created_at: new Date().toISOString(),
+        };
+        this.data.earnings_ledger.push(creditEntry);
+        this.syncLedgerToSupabase(creditEntry);
+      }
+
+      this.createNotification({
+        user_id: referral.referrer_id,
+        title: 'Referral Bonus Unlocked! (+$35.00)',
+        message: `Congratulations! ${referral.referred_user_name} completed their audition and 8 videos milestone. $35.00 has been credited to your earnings!`,
+        type: 'PAYOUT',
+        link: '/creator/referrals',
+      });
+
+      try {
+        const referrer = this.getProfileById(referral.referrer_id);
+        sendNotificationEmail({
+          to: ADMIN_NOTIFICATION_EMAILS,
+          recipientName: 'Admin',
+          type: 'GENERAL',
+          title: `$35 Referral Payout Triggered for ${referrer?.display_name || 'Referrer'}`,
+          message: `Creator ${referrer?.display_name || 'Referrer'} (${referral.referrer_id}) earned a $35 referral bonus because ${referral.referred_user_name} passed audition and reached 8 approved production videos.`,
+          link: '/admin/referrals',
+        });
+      } catch (err) {
+        console.warn('Referral alert email warning:', err);
+      }
+    }
+
+    this.save();
+  }
+
+  getReferralsByReferrer(referrerId: string): Referral[] {
+    this.reload();
+    if (!this.data.referrals) return [];
+    return this.data.referrals.filter((r) => r.referrer_id === referrerId);
+  }
+
+  getPlatformReferrals(): Referral[] {
+    this.reload();
+    if (!this.data.referrals) return [];
+    return this.data.referrals;
+  }
+
+  getLedgerEntries(): EarningsLedgerEntry[] {
+    this.reload();
+    return this.data.earnings_ledger || [];
   }
 }
 

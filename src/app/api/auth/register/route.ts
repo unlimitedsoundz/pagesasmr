@@ -17,7 +17,15 @@ export async function POST(req: NextRequest) {
       dateOfBirth,
       isAdultConfirmed,
       termsAgreed,
+      referralCode,
+      ref,
     } = body;
+
+    const rawRef = (referralCode || ref || '').trim();
+    let referrerProfile = rawRef ? db.getProfileByReferralCode(rawRef) : undefined;
+    if (!referrerProfile && rawRef) {
+      referrerProfile = db.getProfileById(rawRef);
+    }
 
     const resolvedName = (fullName || displayName || '').trim();
 
