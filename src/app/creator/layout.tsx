@@ -27,12 +27,16 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-3 px-4">
-        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
-        <div className="text-xs text-black font-medium">Verifying creator credentials...</div>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-3 px-4 bg-[#FDFBFD] dark:bg-[#120F15]">
+        <div className="w-8 h-8 border-2 border-black dark:border-white border-t-transparent rounded-full animate-spin" />
+        <div className="text-xs text-neutral-800 dark:text-neutral-200 font-medium">Verifying creator credentials...</div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  return (
+    <div className="w-full min-h-screen bg-[#FDFBFD] dark:bg-[#120F15] text-neutral-900 dark:text-neutral-100 transition-colors">
+      {children}
+    </div>
+  );
 }

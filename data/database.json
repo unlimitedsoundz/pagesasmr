@@ -653,13 +653,13 @@
       "payment_method": null,
       "payment_details": {},
       "date_of_birth": "1998-06-12",
-      "sample_status": "REVISION_REQUESTED",
+      "sample_status": "PENDING_REVIEW",
       "password": "Deborah@1998",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T10:11:08.222+00:00",
       "agreement_signature_name": "Deborah Adeyinka",
       "created_at": "2026-09-12T10:11:08.222+00:00",
-      "sample_submission_id": "143e8359-4991-4e43-8913-b28ce49e84f2",
+      "sample_submission_id": "d99558d8-222a-45f0-9269-93c48381b9d1",
       "sample_review_notes": "Resend the sample again"
     },
     {
@@ -718,12 +718,13 @@
       },
       "avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-a332a130-ff0d-491e-8799-6f6729754933-1789244766888.jpg",
       "date_of_birth": "2006-01-09",
-      "sample_status": "NOT_SUBMITTED",
+      "sample_status": "PENDING_REVIEW",
       "password": "@Jhaywone321",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T20:00:09.013+00:00",
       "agreement_signature_name": "Joseph",
-      "created_at": "2026-09-12T20:00:09.013+00:00"
+      "created_at": "2026-09-12T20:00:09.013+00:00",
+      "sample_submission_id": "a50fa20f-1962-4127-ad26-a491f8f1ca73"
     },
     {
       "id": "75c9bd8c-974e-4569-98a6-3712211baf2d",
@@ -1143,6 +1144,42 @@
       "agreement_signed_at": "2026-09-13T16:18:49.909+00:00",
       "agreement_signature_name": "Elizabeth Solomon",
       "created_at": "2026-09-13T16:18:49.912+00:00"
+    },
+    {
+      "id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "email": "chcmistress@gmail.com",
+      "display_name": "Chidi lindamary Chinelo",
+      "role": "CREATOR",
+      "country": "United States",
+      "is_adult_confirmed": true,
+      "payment_method": null,
+      "payment_details": {},
+      "date_of_birth": "1994-11-02",
+      "password": "Toughet789@#",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
+      "sample_status": "NOT_SUBMITTED",
+      "agreement_signed": true,
+      "agreement_signed_at": "2026-09-13T19:32:04.52+00:00",
+      "agreement_signature_name": "Chidi lindamary Chinelo",
+      "created_at": "2026-09-13T19:32:04.524+00:00"
+    },
+    {
+      "id": "2e356046-80e0-4e6e-b050-744b5a91eec8",
+      "email": "slymsandra12@gmail.com",
+      "display_name": "Sandra ojike",
+      "role": "CREATOR",
+      "country": "United States",
+      "is_adult_confirmed": true,
+      "payment_method": null,
+      "payment_details": {},
+      "date_of_birth": "2004-08-14",
+      "password": "sandygold12?",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
+      "sample_status": "NOT_SUBMITTED",
+      "agreement_signed": true,
+      "agreement_signed_at": "2026-09-13T19:39:11.374+00:00",
+      "agreement_signature_name": "Sandra ojike",
+      "created_at": "2026-09-13T19:39:11.378+00:00"
     }
   ],
   "submissions": [
@@ -1260,13 +1297,53 @@
       "file_url": "/api/videos/video-1789318430314-wrqfgx.mp4/stream",
       "file_name": "Night page - lv_0_20260913150324.mp4",
       "file_size_bytes": 183847273,
-      "status": "SUBMITTED",
+      "status": "APPROVED",
       "is_sample": false,
       "agreed_rate_usd": 50,
       "payout_status": "UNPAID",
       "version_number": 1,
       "created_at": "2026-09-13T16:53:53.149+00:00",
-      "updated_at": "2026-09-13T16:53:53.149+00:00"
+      "updated_at": "2026-09-13T18:32:39.084+00:00"
+    },
+    {
+      "id": "a50fa20f-1962-4127-ad26-a491f8f1ca73",
+      "platform_id": "pinkroom_pages",
+      "creator_id": "a332a130-ff0d-491e-8799-6f6729754933",
+      "creator_name": "Joseph",
+      "creator_email": "jhayukwone@gmail.com",
+      "title": "Joseph - 30s Audition Sample",
+      "category": "PAGE_TURNING",
+      "duration_seconds": 35,
+      "file_url": "/api/videos/video-1789330956733-zrw8t1.mp4/stream",
+      "file_name": "WIN_20260913_19_54_43_Pro.mp4",
+      "file_size_bytes": 34987631,
+      "status": "UNDER_REVIEW",
+      "is_sample": true,
+      "agreed_rate_usd": 0,
+      "payout_status": "UNPAID",
+      "version_number": 1,
+      "created_at": "2026-09-13T20:22:38.296+00:00",
+      "updated_at": "2026-09-13T20:22:38.296+00:00"
+    },
+    {
+      "id": "d99558d8-222a-45f0-9269-93c48381b9d1",
+      "platform_id": "pinkroom_pages",
+      "creator_id": "aef8ede7-c898-418f-a4a4-45d01bbf3278",
+      "creator_name": "Deborah Adeyinka",
+      "creator_email": "deborahadeyinka98@gmail.com",
+      "title": "Deborah Adeyinka - 30s Audition Sample",
+      "category": "PAGE_TURNING",
+      "duration_seconds": 31,
+      "file_url": "/api/videos/video-1789330298445-n0g345.mp4/stream",
+      "file_name": "193429.mp4",
+      "file_size_bytes": 77881070,
+      "status": "UNDER_REVIEW",
+      "is_sample": true,
+      "agreed_rate_usd": 0,
+      "payout_status": "UNPAID",
+      "version_number": 1,
+      "created_at": "2026-09-13T20:11:40.144+00:00",
+      "updated_at": "2026-09-13T20:11:40.144+00:00"
     }
   ],
   "submission_versions": [
@@ -1503,6 +1580,16 @@
   ],
   "earnings_ledger": [
     {
+      "id": "ed2451a7-90d3-4c22-b8c4-4e74c33e1b58",
+      "platform_id": "pinkroom_pages",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "submission_id": "cba715f4-1bea-4ecf-a244-e6c7eaa5edf4",
+      "type": "CREDIT",
+      "amount_usd": 50,
+      "description": "Approval credit: Thigh flapping",
+      "created_at": "2026-09-13T18:32:39.084+00:00"
+    },
+    {
       "id": "d5f935bd-e492-4d9d-b7d2-a17188975e0b",
       "platform_id": "pinkroom_pages",
       "creator_id": "c8208612-a9d2-42df-abb6-ef6b4ec5847d",
@@ -1515,6 +1602,17 @@
   ],
   "payout_requests": [],
   "notifications": [
+    {
+      "user_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "title": "Audition Approved — Verified Creator Badge Added",
+      "message": "Congratulations! You are now an official Verified Creator. Your audition sample has been approved, and your official Verified Creator Badge is now live beside your name across the platform.",
+      "type": "REVIEW",
+      "link": "/creator",
+      "id": "b67cd023-c917-4c10-a28f-0cd1e786b1e6",
+      "platform_id": "pinkroom_pages",
+      "is_read": false,
+      "created_at": "2026-09-13T20:53:10.612Z"
+    },
     {
       "user_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
       "title": "Audition Approved — Verified Creator Badge Added! 🎉",
@@ -1617,6 +1715,32 @@
     }
   ],
   "audit_events": [
+    {
+      "platform_id": "pinkroom_pages",
+      "actor_id": "c0000000-0000-4000-8000-000000000001",
+      "actor_name": "Ophelia Adeleke",
+      "action": "GUIDELINE_SAMPLE_DELETED",
+      "target_type": "GUIDELINE_SAMPLE",
+      "target_id": "bfa0d277-6c60-4f99-b13f-06e4ab528913",
+      "details": {
+        "sampleId": "bfa0d277-6c60-4f99-b13f-06e4ab528913"
+      },
+      "id": "477c7131-11ea-491d-9651-08aced063248",
+      "created_at": "2026-09-13T18:27:08.587Z"
+    },
+    {
+      "platform_id": "pinkroom_pages",
+      "actor_id": "c0000000-0000-4000-8000-000000000001",
+      "actor_name": "Ophelia Adeleke",
+      "action": "GUIDELINE_SAMPLE_DELETED",
+      "target_type": "GUIDELINE_SAMPLE",
+      "target_id": "58ff3173-0810-4ed1-be2f-875a90ce58d7",
+      "details": {
+        "sampleId": "58ff3173-0810-4ed1-be2f-875a90ce58d7"
+      },
+      "id": "6be7534f-3b27-4c4f-b7f4-e7e6b3cd4fdb",
+      "created_at": "2026-09-13T18:27:00.170Z"
+    },
     {
       "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "actor_name": "Unlymited Soundz",
@@ -2142,30 +2266,6 @@
       "category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "uploaded_by": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "created_at": "2026-09-11T12:18:25.14+00:00"
-    },
-    {
-      "id": "58ff3173-0810-4ed1-be2f-875a90ce58d7",
-      "platform_id": "pinkroom_pages",
-      "title": "Official Sample Guideline: Page Turning Reference",
-      "description": "",
-      "video_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/guideline-samples/sample-1789027319261-YouCut_20260908_095413092.mp4",
-      "file_name": "admin_guideline_reference.mp4",
-      "duration_seconds": 30,
-      "category": "PAGE_TURNING",
-      "uploaded_by": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "created_at": "2026-09-10T08:02:18.067+00:00"
-    },
-    {
-      "id": "bfa0d277-6c60-4f99-b13f-06e4ab528913",
-      "platform_id": "pinkroom_pages",
-      "title": "Page-Turning Guideline Reference Video",
-      "description": "",
-      "video_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/guideline-samples/video-1789062495003-pocm16.mov",
-      "file_name": "admin_guideline_reference.mp4",
-      "duration_seconds": 189,
-      "category": "PAGE_TURNING",
-      "uploaded_by": "c0000000-0000-4000-8000-000000000001",
-      "created_at": "2026-09-10T17:49:25.728+00:00"
     },
     {
       "id": "5f299ff5-77f9-4a6b-9e18-b33ab982041c",

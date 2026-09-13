@@ -4,29 +4,46 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Film, Play } from 'lucide-react';
 
 interface VideoThumbnailProps {
-  videoId: string;
+  videoId?: string;
+  videoUrl?: string;
   durationSeconds?: number;
   className?: string;
   altTitle?: string;
+  isSample?: boolean;
 }
 
 export default function VideoThumbnail({
   videoId,
+  videoUrl,
   durationSeconds,
   className = 'w-20 h-20 sm:w-24 sm:h-24',
   altTitle = 'Video thumbnail',
+  isSample = false,
 }: VideoThumbnailProps) {
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const streamUrl = `/api/videos/${videoId}/stream`;
+  const resolvedStreamUrl = React.useMemo(() => {
+    if (videoUrl && (videoUrl.startsWith('http://') || videoUrl.startsWith('https://') || videoUrl.startsWith('/api/'))) {
+      return videoUrl;
+    }
+    if (isSample || videoId === 'sample-audition' || videoId === 'audition-sample') {
+      return '/api/videos/sample/stream';
+    }
+    if (videoId) {
+      return `/api/videos/${videoId}/stream`;
+    }
+    return '';
+  }, [videoId, videoUrl, isSample]);
 
   useEffect(() => {
+    if (!resolvedStreamUrl) return;
+
     let isMounted = true;
     const video = document.createElement('video');
     video.crossOrigin = 'anonymous';
-    video.src = streamUrl;
+    video.src = resolvedStreamUrl;
     video.muted = true;
     video.preload = 'metadata';
 
@@ -43,7 +60,7 @@ export default function VideoThumbnail({
           if (isMounted) setThumbUrl(dataUri);
         }
       } catch (err) {
-        // Cross-origin redirect fallback: native video element renders frame
+        // Canvas export blocked by CORS or browser policy, fallback to DOM <video> element
       }
     };
 
@@ -54,9 +71,6 @@ export default function VideoThumbnail({
 
     video.addEventListener('loadedmetadata', onLoadedMetadata);
     video.addEventListener('seeked', onSeeked);
-    video.addEventListener('error', () => {
-      if (isMounted) setHasError(true);
-    });
 
     return () => {
       isMounted = false;
@@ -64,7 +78,7 @@ export default function VideoThumbnail({
       video.removeEventListener('seeked', onSeeked);
       video.src = '';
     };
-  }, [videoId, streamUrl]);
+  }, [resolvedStreamUrl]);
 
   const minutes = durationSeconds ? Math.floor(durationSeconds / 60) : 0;
   const seconds = durationSeconds ? Math.round(durationSeconds % 60) : 0;
@@ -80,10 +94,10 @@ export default function VideoThumbnail({
           alt={altTitle}
           className="w-full h-full object-cover"
         />
-      ) : !hasError ? (
+      ) : !hasError && resolvedStreamUrl ? (
         <video
           ref={videoRef}
-          src={`${streamUrl}#t=0.5`}
+          src={`${resolvedStreamUrl}#t=0.5`}
           preload="metadata"
           muted
           playsInline
@@ -109,3 +123,4 @@ export default function VideoThumbnail({
     </div>
   );
 }
+

@@ -103,38 +103,39 @@ export default function WatchOfficialSampleModal({ className = '' }: WatchOffici
   return (
     <div className={className}>
       {/* === WATCH OFFICIAL SAMPLE — PROMINENT BANNER === */}
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={handleOpen}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleOpen();
+          }
+        }}
         data-official-sample-banner="true"
-        className="official-sample-banner w-full bg-neutral-950 dark:bg-[#161619] text-white p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-neutral-900 dark:hover:bg-[#1f1f24] active:scale-[0.99] transition-all group text-left border border-neutral-800 dark:border-[#2E2E38] shadow-md hover:shadow-xl rounded-2xl"
+        className="official-sample-banner w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-6 sm:p-8 lg:p-10 transition-all hover:bg-[#F9E2EC] dark:hover:bg-[#2A1825] group text-left cursor-pointer shadow-xs"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#7b1e4b] text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-all shadow-md rounded-full">
-            <Play className="w-6 h-6 text-white fill-white ml-0.5" />
+        <div className="flex items-start gap-4 sm:gap-6">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white shadow-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mt-0.5">
+            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-[#721C38] text-[#721C38] ml-0.5" />
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-serif text-lg sm:text-2xl font-bold text-white tracking-tight">
-                Watch the Official Sample Guideline
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#7b1e4b] text-white uppercase tracking-wide">
-                Official Reference
+          <div className="flex-1 min-w-0">
+            <h2 className="font-serif text-2xl sm:text-3xl lg:text-[2.1rem] font-normal text-[#2A0E19] dark:text-[#FDF2F7] leading-tight tracking-tight">
+              Watch the Official Sample Guideline
+            </h2>
+            <p className="text-xs sm:text-sm text-[#7D5B6A] dark:text-[#D1B5C3] mt-2 sm:mt-2.5 leading-relaxed max-w-xl">
+              See exactly what a passing submission looks, sounds, and frames like before you record.
+            </p>
+            <div className="mt-5 sm:mt-6">
+              <span className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-[#721C38] hover:bg-[#5C152D] text-white text-xs sm:text-sm font-semibold transition-all shadow-sm group-hover:shadow-md">
+                <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-white text-white" />
+                <span>Play Sample Now</span>
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-neutral-300 dark:text-neutral-400 font-medium">
-              See exactly what a passing page-turning submission looks, sounds, and frames like before you record.
-            </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
-          <span className="px-5 py-2.5 bg-[#7b1e4b] hover:bg-[#68173e] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm rounded-full">
-            <Play className="w-3.5 h-3.5 fill-white" />
-            Play Sample Now
-          </span>
-        </div>
-      </button>
+      </div>
 
       {/* === OFFICIAL SAMPLE MODAL === */}
       {isOpen && (

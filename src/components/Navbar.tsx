@@ -418,14 +418,15 @@ export default function Navbar() {
                   <NextLink
                     key={link.href}
                     href={link.href}
-                    className={`flex items-center gap-1.5 py-3 transition-colors shrink-0 ${isActive
+                    className={`flex items-center gap-1.5 py-3 transition-colors shrink-0 ${
+                      isActive
                         ? 'border-b-2 border-[#BE185D] text-neutral-900 dark:text-white font-bold'
                         : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
-                      }`}
+                    }`}
                   >
                     <span>{link.label}</span>
                     {link.label === 'Submissions' && submissionCount !== null && submissionCount > 0 && (
-                      <span className="px-1.5 py-0.2 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] font-semibold text-neutral-600 dark:text-neutral-400">
+                      <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] font-semibold text-neutral-600 dark:text-neutral-400">
                         {submissionCount}
                       </span>
                     )}
