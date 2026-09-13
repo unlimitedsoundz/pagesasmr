@@ -85,11 +85,21 @@ export default function CreatorSettingsPage() {
       })
       .catch((err) => console.error('Failed to load profile', err))
       .finally(() => setLoading(false));
+    // Listen to theme-change event from Navbar ThemeToggle
+    const handleThemeChange = (e: CustomEvent<{ theme: 'light' | 'dark' }>) => {
+      setIsDark(e.detail.theme === 'dark');
+    };
+    window.addEventListener('theme-change' as any, handleThemeChange);
+
+    return () => {
+      window.removeEventListener('theme-change' as any, handleThemeChange);
+    };
   }, []);
 
-  // Theme toggle function
+  // Theme toggle function with event dispatch
   const setThemeMode = (dark: boolean) => {
     setIsDark(dark);
+    const mode = dark ? 'dark' : 'light';
     if (dark) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -97,6 +107,73 @@ export default function CreatorSettingsPage() {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
+    window.dispatchEvent(
+      new CustomEvent('theme-change', { detail: { theme: mode } })
+    );
+  };
+
+  // Immediate toggle helpers for notification switches
+  const toggleSubmissionReviews = () => {
+    setSubmissionReviews((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(
+          'pinkroom_notif_prefs',
+          JSON.stringify({
+            submissionReviews: next,
+            payoutUpdates,
+            recordingReminders,
+          })
+        );
+      } catch {}
+      toast.success(
+        next ? 'Submission review notifications enabled.' : 'Submission review notifications disabled.',
+        'Notification preference updated'
+      );
+      return next;
+    });
+  };
+
+  const togglePayoutUpdates = () => {
+    setPayoutUpdates((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(
+          'pinkroom_notif_prefs',
+          JSON.stringify({
+            submissionReviews,
+            payoutUpdates: next,
+            recordingReminders,
+          })
+        );
+      } catch {}
+      toast.success(
+        next ? 'Payout update notifications enabled.' : 'Payout update notifications disabled.',
+        'Notification preference updated'
+      );
+      return next;
+    });
+  };
+
+  const toggleRecordingReminders = () => {
+    setRecordingReminders((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(
+          'pinkroom_notif_prefs',
+          JSON.stringify({
+            submissionReviews,
+            payoutUpdates,
+            recordingReminders: next,
+          })
+        );
+      } catch {}
+      toast.success(
+        next ? 'Recording reminders enabled.' : 'Recording reminders disabled.',
+        'Notification preference updated'
+      );
+      return next;
+    });
   };
 
   const handleSaveProfile = async () => {
@@ -373,9 +450,12 @@ export default function CreatorSettingsPage() {
               {/* Toggle Rows */}
               <div className="divide-y divide-neutral-100 dark:divide-neutral-800 pt-1">
                 {/* Toggle 1: Submission reviews */}
-                <div className="py-4 flex items-center justify-between gap-4">
+                <div
+                  onClick={toggleSubmissionReviews}
+                  className="py-4 flex items-center justify-between gap-4 cursor-pointer select-none group"
+                >
                   <div className="space-y-0.5">
-                    <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    <div className="text-xs font-semibold text-neutral-900 dark:text-white group-hover:text-[#7B1E4B] dark:group-hover:text-[#F472B6] transition-colors">
                       Submission reviews
                     </div>
                     <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
@@ -387,23 +467,34 @@ export default function CreatorSettingsPage() {
                     type="button"
                     role="switch"
                     aria-checked={submissionReviews}
-                    onClick={() => setSubmissionReviews((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleSubmissionReviews();
+                    }}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E4B] ${
                       submissionReviews ? 'bg-[#7B1E4B]' : 'bg-neutral-200 dark:bg-neutral-700'
                     }`}
+                    style={{
+                      backgroundColor: submissionReviews ? '#7B1E4B' : undefined,
+                    }}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                        submissionReviews ? 'translate-x-5' : 'translate-x-0'
-                      }`}
+                      aria-hidden="true"
+                      className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out"
+                      style={{
+                        transform: submissionReviews ? 'translateX(20px)' : 'translateX(0px)',
+                      }}
                     />
                   </button>
                 </div>
 
                 {/* Toggle 2: Payout updates */}
-                <div className="py-4 flex items-center justify-between gap-4">
+                <div
+                  onClick={togglePayoutUpdates}
+                  className="py-4 flex items-center justify-between gap-4 cursor-pointer select-none group"
+                >
                   <div className="space-y-0.5">
-                    <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    <div className="text-xs font-semibold text-neutral-900 dark:text-white group-hover:text-[#7B1E4B] dark:group-hover:text-[#F472B6] transition-colors">
                       Payout updates
                     </div>
                     <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
@@ -415,23 +506,34 @@ export default function CreatorSettingsPage() {
                     type="button"
                     role="switch"
                     aria-checked={payoutUpdates}
-                    onClick={() => setPayoutUpdates((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePayoutUpdates();
+                    }}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E4B] ${
                       payoutUpdates ? 'bg-[#7B1E4B]' : 'bg-neutral-200 dark:bg-neutral-700'
                     }`}
+                    style={{
+                      backgroundColor: payoutUpdates ? '#7B1E4B' : undefined,
+                    }}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                        payoutUpdates ? 'translate-x-5' : 'translate-x-0'
-                      }`}
+                      aria-hidden="true"
+                      className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out"
+                      style={{
+                        transform: payoutUpdates ? 'translateX(20px)' : 'translateX(0px)',
+                      }}
                     />
                   </button>
                 </div>
 
                 {/* Toggle 3: Recording reminders */}
-                <div className="py-4 flex items-center justify-between gap-4">
+                <div
+                  onClick={toggleRecordingReminders}
+                  className="py-4 flex items-center justify-between gap-4 cursor-pointer select-none group"
+                >
                   <div className="space-y-0.5">
-                    <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    <div className="text-xs font-semibold text-neutral-900 dark:text-white group-hover:text-[#7B1E4B] dark:group-hover:text-[#F472B6] transition-colors">
                       Recording reminders
                     </div>
                     <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
@@ -443,15 +545,23 @@ export default function CreatorSettingsPage() {
                     type="button"
                     role="switch"
                     aria-checked={recordingReminders}
-                    onClick={() => setRecordingReminders((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleRecordingReminders();
+                    }}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B1E4B] ${
                       recordingReminders ? 'bg-[#7B1E4B]' : 'bg-neutral-200 dark:bg-neutral-700'
                     }`}
+                    style={{
+                      backgroundColor: recordingReminders ? '#7B1E4B' : undefined,
+                    }}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                        recordingReminders ? 'translate-x-5' : 'translate-x-0'
-                      }`}
+                      aria-hidden="true"
+                      className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out"
+                      style={{
+                        transform: recordingReminders ? 'translateX(20px)' : 'translateX(0px)',
+                      }}
                     />
                   </button>
                 </div>
