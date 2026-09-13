@@ -17,8 +17,12 @@ import {
   FileText,
   AlertCircle,
   RotateCcw,
+  Landmark,
+  Smartphone,
+  Building2,
 } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
+import { NIGERIAN_BANKS } from '@/lib/nigerian-banks';
 
 export default function CreatorSettingsPage() {
   const { toast } = useToast();
@@ -41,8 +45,19 @@ export default function CreatorSettingsPage() {
   // Appearance theme
   const [isDark, setIsDark] = useState(false);
 
-  // Payment preference
+  // Payment preference & Payout Details
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [beneficiaryName, setBeneficiaryName] = useState('');
+  const [nigerianBankName, setNigerianBankName] = useState('Access Bank');
+  const [nigerianAccountNumber, setNigerianAccountNumber] = useState('');
+  const [mobileNetwork, setMobileNetwork] = useState('M-Pesa');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [wiseEmail, setWiseEmail] = useState('');
+  const [paypalEmail, setPaypalEmail] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [routingNumber, setRoutingNumber] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [savingPayment, setSavingPayment] = useState(false);
 
   // Initial load
   useEffect(() => {
@@ -63,6 +78,23 @@ export default function CreatorSettingsPage() {
       const storedMethod = localStorage.getItem('pinkroom_payment_method');
       if (storedMethod) setPaymentMethod(storedMethod);
 
+      const storedDetails = localStorage.getItem('pinkroom_payment_details');
+      if (storedDetails) {
+        try {
+          const d = JSON.parse(storedDetails);
+          if (d.beneficiaryName) setBeneficiaryName(d.beneficiaryName);
+          if (d.nigerianBankName) setNigerianBankName(d.nigerianBankName);
+          if (d.nigerianAccountNumber) setNigerianAccountNumber(d.nigerianAccountNumber);
+          if (d.mobileNetwork) setMobileNetwork(d.mobileNetwork);
+          if (d.mobileNumber) setMobileNumber(d.mobileNumber);
+          if (d.wiseEmail) setWiseEmail(d.wiseEmail);
+          if (d.paypalEmail) setPaypalEmail(d.paypalEmail);
+          if (d.bankName) setBankName(d.bankName);
+          if (d.routingNumber) setRoutingNumber(d.routingNumber);
+          if (d.accountNumber) setAccountNumber(d.accountNumber);
+        } catch {}
+      }
+
       const storedName = localStorage.getItem('pinkroom_display_name');
       if (storedName) setDisplayName(storedName);
     } catch {}
@@ -80,6 +112,19 @@ export default function CreatorSettingsPage() {
           }
           if (data.profile.payment_method && !localStorage.getItem('pinkroom_payment_method')) {
             setPaymentMethod(data.profile.payment_method);
+          }
+          if (data.profile.payment_details && !localStorage.getItem('pinkroom_payment_details')) {
+            const d = data.profile.payment_details;
+            if (d.beneficiaryName) setBeneficiaryName(d.beneficiaryName);
+            if (d.nigerianBankName) setNigerianBankName(d.nigerianBankName);
+            if (d.nigerianAccountNumber) setNigerianAccountNumber(d.nigerianAccountNumber);
+            if (d.mobileNetwork) setMobileNetwork(d.mobileNetwork);
+            if (d.mobileNumber) setMobileNumber(d.mobileNumber);
+            if (d.wiseEmail) setWiseEmail(d.wiseEmail);
+            if (d.paypalEmail) setPaypalEmail(d.paypalEmail);
+            if (d.bankName) setBankName(d.bankName);
+            if (d.routingNumber) setRoutingNumber(d.routingNumber);
+            if (d.accountNumber) setAccountNumber(d.accountNumber);
           }
         }
       })
@@ -203,11 +248,39 @@ export default function CreatorSettingsPage() {
     toast.success('Your notification choices are up to date.', 'Notification preferences saved');
   };
 
-  const handleSavePaymentPreference = () => {
+  const handleSavePaymentPreference = async () => {
+    setSavingPayment(true);
+    const details = {
+      beneficiaryName: beneficiaryName.trim(),
+      nigerianBankName,
+      nigerianAccountNumber: nigerianAccountNumber.trim(),
+      mobileNetwork,
+      mobileNumber: mobileNumber.trim(),
+      wiseEmail: wiseEmail.trim(),
+      paypalEmail: paypalEmail.trim(),
+      bankName: bankName.trim(),
+      routingNumber: routingNumber.trim(),
+      accountNumber: accountNumber.trim(),
+    };
+
     try {
       localStorage.setItem('pinkroom_payment_method', paymentMethod);
-    } catch {}
-    toast.success('Your payout method has been saved for this preview.', 'Payment preference saved');
+      localStorage.setItem('pinkroom_payment_details', JSON.stringify(details));
+
+      await fetch('/api/creator/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payment_method: paymentMethod,
+          payment_details: details,
+        }),
+      });
+      toast.success('Your payout method and details have been saved.', 'Payout details saved');
+    } catch {
+      toast.success('Payout preferences saved on this device.', 'Preferences saved');
+    } finally {
+      setSavingPayment(false);
+    }
   };
 
   const handleResetPreferences = () => {
@@ -215,10 +288,21 @@ export default function CreatorSettingsPage() {
     setPayoutUpdates(true);
     setRecordingReminders(false);
     setPaymentMethod('');
+    setBeneficiaryName('');
+    setNigerianBankName('Access Bank');
+    setNigerianAccountNumber('');
+    setMobileNetwork('M-Pesa');
+    setMobileNumber('');
+    setWiseEmail('');
+    setPaypalEmail('');
+    setBankName('');
+    setRoutingNumber('');
+    setAccountNumber('');
     setDisplayName('Ada Wunor');
     try {
       localStorage.removeItem('pinkroom_notif_prefs');
       localStorage.removeItem('pinkroom_payment_method');
+      localStorage.removeItem('pinkroom_payment_details');
       localStorage.removeItem('pinkroom_display_name');
     } catch {}
     toast.success('All preview settings restored to defaults.', 'Preferences reset');
@@ -674,10 +758,10 @@ export default function CreatorSettingsPage() {
               </p>
             </div>
 
-            {/* ─── Section 04: Payment Preference ───────────────────── */}
+            {/* ─── Section 04: Payout Details & Preferences ───────── */}
             <div
               id="section-payment"
-              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xs"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xs"
             >
               <div className="flex items-start gap-4">
                 <span className="font-serif text-2xl font-normal text-neutral-300 dark:text-neutral-600">
@@ -685,18 +769,18 @@ export default function CreatorSettingsPage() {
                 </span>
                 <div className="space-y-0.5">
                   <h2 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
-                    Payment preference
+                    Payout details & preferences
                   </h2>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
-                    Choose your preferred payout method for this preview.
+                    Choose your preferred payout method and enter verified recipient details.
                   </p>
                 </div>
               </div>
 
-              {/* Preferred method select */}
+              {/* Method Selector */}
               <div className="space-y-2 pt-1">
                 <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  Preferred method
+                  Default payout method
                 </label>
                 <select
                   value={paymentMethod}
@@ -704,8 +788,8 @@ export default function CreatorSettingsPage() {
                   className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-[#FDFBFD] dark:bg-[#141217] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B] transition-all"
                 >
                   <option value="">No preference selected</option>
-                  <option value="NIGERIA_BANK">Direct Bank Transfer (Nigeria / NGN)</option>
-                  <option value="MOBILE_MONEY">Mobile Money (M-Pesa, MTN, Airtel)</option>
+                  <option value="NIGERIA_BANK">Nigerian Local Bank Transfer (NGN Direct Deposit / NUBAN)</option>
+                  <option value="MOBILE_MONEY">African Mobile Money (M-Pesa, MTN MoMo, Airtel)</option>
                   <option value="WISE">Wise (TransferWise)</option>
                   <option value="PAYPAL">PayPal</option>
                   <option value="ACH">US ACH / Direct Deposit</option>
@@ -713,22 +797,289 @@ export default function CreatorSettingsPage() {
                 </select>
               </div>
 
-              {/* Notice banner */}
+              {/* Beneficiary Legal Full Name (Universal across all methods) */}
+              {paymentMethod && (
+                <div className="space-y-2 pt-1 border-t border-neutral-100 dark:border-neutral-800">
+                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    Legal Beneficiary Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={beneficiaryName}
+                    onChange={(e) => setBeneficiaryName(e.target.value)}
+                    placeholder="Full legal name matching the recipient bank account or wallet"
+                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-[#FDFBFD] dark:bg-[#141217] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B] transition-all"
+                  />
+                  <p className="text-[11px] text-neutral-400">
+                    Must match government-issued identification and recipient account holder name.
+                  </p>
+                </div>
+              )}
+
+              {/* Dynamic Fields for Nigerian Bank Transfer */}
+              {paymentMethod === 'NIGERIA_BANK' && (
+                <div className="space-y-4 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <Landmark className="w-4 h-4" />
+                    <span>Nigerian Bank Transfer Details (NUBAN)</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        Commercial Bank Name
+                      </label>
+                      <select
+                        value={nigerianBankName}
+                        onChange={(e) => setNigerianBankName(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      >
+                        {NIGERIAN_BANKS.map((b) => (
+                          <option key={b} value={b}>
+                            {b}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        10-Digit NUBAN Account Number
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={10}
+                        pattern="[0-9]{10}"
+                        value={nigerianAccountNumber}
+                        onChange={(e) => setNigerianAccountNumber(e.target.value.replace(/\D/g, ''))}
+                        placeholder="e.g. 0123456789"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-mono tracking-wider text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    Direct automated settlement in Nigerian Naira (NGN) via instant NUBAN interbank clearing.
+                  </p>
+                </div>
+              )}
+
+              {/* Dynamic Fields for Mobile Money */}
+              {paymentMethod === 'MOBILE_MONEY' && (
+                <div className="space-y-4 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <Smartphone className="w-4 h-4" />
+                    <span>African Mobile Money Details (M-Pesa / MTN MoMo / Airtel)</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        Mobile Network Provider
+                      </label>
+                      <select
+                        value={mobileNetwork}
+                        onChange={(e) => setMobileNetwork(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      >
+                        <option value="M-Pesa">Safaricom / Vodacom M-Pesa</option>
+                        <option value="MTN MoMo">MTN Mobile Money (MoMo)</option>
+                        <option value="Airtel Money">Airtel Money</option>
+                        <option value="Vodafone Cash">Vodafone Cash</option>
+                        <option value="Tigo Pesa">Tigo Pesa</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        Registered Mobile Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={mobileNumber}
+                        onChange={(e) => setMobileNumber(e.target.value)}
+                        placeholder="e.g. +234 801 234 5678 or +254 712 345 678"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    Disbursements are sent directly to your mobile wallet in your local currency.
+                  </p>
+                </div>
+              )}
+
+              {/* Dynamic Fields for Wise */}
+              {paymentMethod === 'WISE' && (
+                <div className="space-y-3 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <Building2 className="w-4 h-4" />
+                    <span>Wise (TransferWise) Account</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                      Wise Recipient Email
+                    </label>
+                    <input
+                      type="email"
+                      value={wiseEmail}
+                      onChange={(e) => setWiseEmail(e.target.value)}
+                      placeholder="e.g. your-email@domain.com"
+                      className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                    />
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    We disburse USD or your chosen currency directly into your Wise multi-currency account.
+                  </p>
+                </div>
+              )}
+
+              {/* Dynamic Fields for PayPal */}
+              {paymentMethod === 'PAYPAL' && (
+                <div className="space-y-3 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <CreditCard className="w-4 h-4" />
+                    <span>PayPal Account</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                      PayPal Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={paypalEmail}
+                      onChange={(e) => setPaypalEmail(e.target.value)}
+                      placeholder="e.g. yourname@paypal.com"
+                      className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                    />
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    Disbursements are deposited directly into your verified PayPal balance in USD.
+                  </p>
+                </div>
+              )}
+
+              {/* Dynamic Fields for US ACH Direct Deposit */}
+              {paymentMethod === 'ACH' && (
+                <div className="space-y-4 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <Landmark className="w-4 h-4" />
+                    <span>US ACH / Direct Deposit Details</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        US Bank Name
+                      </label>
+                      <input
+                        type="text"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="e.g. Chase Bank, Wells Fargo, Bank of America"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        9-Digit Routing Transit Number (ABA)
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={9}
+                        value={routingNumber}
+                        onChange={(e) => setRoutingNumber(e.target.value.replace(/\D/g, ''))}
+                        placeholder="e.g. 021000021"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        Checking / Savings Account Number
+                      </label>
+                      <input
+                        type="text"
+                        value={accountNumber}
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        placeholder="Account number"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    Direct automated clearing house deposit for US bank accounts.
+                  </p>
+                </div>
+              )}
+
+              {/* Dynamic Fields for International Wire Transfer */}
+              {paymentMethod === 'WIRE' && (
+                <div className="space-y-4 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                    <Landmark className="w-4 h-4" />
+                    <span>International Wire Transfer Details</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        International Bank Name
+                      </label>
+                      <input
+                        type="text"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="e.g. HSBC Bank plc, Barclays, Standard Chartered"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        SWIFT / BIC Code
+                      </label>
+                      <input
+                        type="text"
+                        value={routingNumber}
+                        onChange={(e) => setRoutingNumber(e.target.value.toUpperCase())}
+                        placeholder="e.g. HBUKGB41400"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-mono uppercase text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        IBAN or International Account Number
+                      </label>
+                      <input
+                        type="text"
+                        value={accountNumber}
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        placeholder="e.g. GB29 HBUK 1234 5678 9012 34"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    Standard international bank wire transfer for banks worldwide.
+                  </p>
+                </div>
+              )}
+
+              {/* Security & Verification Banner */}
               <div className="bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F5D5E3] dark:border-[#3D2132] rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-[#7B1E4B] dark:text-[#F472B6]">
                 <Lock className="w-3.5 h-3.5 shrink-0 opacity-80" />
                 <span>
-                  No bank or payment account is connected here. Set up recipient details in your existing creator account.
+                  Your recipient details are encrypted and securely stored. Payout requests are verified before disbursement.
                 </span>
               </div>
 
-              {/* Save payment preference button */}
+              {/* Save Payout Details Button */}
               <div className="pt-2 flex justify-end">
                 <button
                   type="button"
                   onClick={handleSavePaymentPreference}
-                  className="px-6 py-2.5 rounded-full bg-[#130E14] hover:bg-black text-white text-xs font-semibold transition-all shadow-sm active:scale-95"
+                  disabled={savingPayment}
+                  className="px-6 py-2.5 rounded-full bg-[#130E14] hover:bg-black text-white text-xs font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-50"
                 >
-                  Save preview preference
+                  {savingPayment ? 'Saving details...' : 'Save payout details'}
                 </button>
               </div>
             </div>

@@ -250,48 +250,48 @@ export default function CreatorPayoutsPage() {
           </div>
         </div>
 
-        {/* ─── Middle 3-Column Metric Cards ─────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        {/* ─── Middle 3-Column Metric Cards (Creator Dashboard Grid Style) ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 divide-y md:divide-y-0 md:divide-x divide-neutral-200/90 dark:divide-neutral-800 overflow-hidden">
           {/* Card 1: Reserved */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-xl p-5 space-y-2 shadow-2xs">
-            <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-              <span className="font-medium">Reserved in payout</span>
-              <Lock className="w-3.5 h-3.5 text-neutral-400" />
+          <div className="p-5 sm:p-6 space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <span>Reserved in payout</span>
+              <Lock className="w-4 h-4 text-neutral-400" />
             </div>
-            <div className="font-serif text-3xl font-normal text-neutral-900 dark:text-white leading-none">
+            <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
               ${reservedAmount.toFixed(2)}
             </div>
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Held while a payment is processing
-            </p>
+            </div>
           </div>
 
           {/* Card 2: Total Disbursed */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-xl p-5 space-y-2 shadow-2xs">
-            <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-              <span className="font-medium">Total disbursed</span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-neutral-400" />
+          <div className="p-5 sm:p-6 space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <span>Total disbursed</span>
+              <Wallet className="w-4 h-4 text-neutral-400" />
             </div>
-            <div className="font-serif text-3xl font-normal text-neutral-900 dark:text-white leading-none">
+            <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
               ${totalDisbursed.toFixed(2)}
             </div>
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Confirmed payments to date
-            </p>
+            </div>
           </div>
 
           {/* Card 3: Rate */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-xl p-5 space-y-2 shadow-2xs">
-            <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-              <span className="font-medium">Your locked-in rate</span>
-              <Video className="w-3.5 h-3.5 text-neutral-400" />
+          <div className="p-5 sm:p-6 space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <span>Your locked-in rate</span>
+              <Video className="w-4 h-4 text-neutral-400" />
             </div>
-            <div className="font-serif text-3xl font-normal text-neutral-900 dark:text-white leading-none">
+            <div className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
               $50.00
             </div>
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Per approved full video
-            </p>
+            </div>
           </div>
         </div>
 
