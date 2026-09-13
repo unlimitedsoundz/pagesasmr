@@ -1,0 +1,1234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-editorial: 'Buda', Georgia, serif;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bg-warm: #FCEEF3;
+  --text-charcoal: #1C1520;
+  --bg-surface: #FFFFFF;
+  --border-subtle: rgba(244, 114, 182, 0.2);
+  color-scheme: light;
+}
+
+html.dark {
+  --bg-warm: #17121A;
+  --text-charcoal: #FCEEF4;
+  --bg-surface: #221B27;
+  --border-subtle: rgba(244, 114, 182, 0.25);
+  color-scheme: dark;
+}
+
+body {
+  background-color: #FDF0F5;
+  color: #1C1520;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  min-height: 100%;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: #FDF0F5;
+  background-image:
+    radial-gradient(at 15% 15%, rgba(254, 205, 211, 0.6) 0px, transparent 55%),
+    radial-gradient(at 85% 10%, rgba(251, 207, 232, 0.65) 0px, transparent 55%),
+    radial-gradient(at 50% 50%, rgba(253, 242, 248, 0.75) 0px, transparent 65%),
+    radial-gradient(at 80% 85%, rgba(252, 231, 243, 0.7) 0px, transparent 55%),
+    radial-gradient(at 10% 90%, rgba(254, 215, 226, 0.55) 0px, transparent 50%);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.dark body {
+  background-color: #17121A !important;
+  color: #FCEEF4 !important;
+}
+
+.dark body::before {
+  background-color: #17121A !important;
+  background-image:
+    radial-gradient(at 15% 15%, rgba(68, 38, 72, 0.55) 0px, transparent 55%),
+    radial-gradient(at 85% 10%, rgba(85, 40, 75, 0.5) 0px, transparent 55%),
+    radial-gradient(at 50% 50%, rgba(28, 20, 32, 0.8) 0px, transparent 65%),
+    radial-gradient(at 80% 85%, rgba(70, 35, 65, 0.5) 0px, transparent 55%),
+    radial-gradient(at 10% 90%, rgba(55, 25, 50, 0.55) 0px, transparent 50%) !important;
+}
+
+/* Headings: deep rich charcoal in light mode, crisp blush ivory in dark mode */
+:where(h1, h2, h3, h4, h5, h6, .font-editorial, .font-serif) {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #1C1520;
+}
+
+.dark :where(h1, h2, h3, h4, h5, h6, .font-editorial) {
+  color: #FCEEF4;
+}
+
+/* Dark grey theme utility overrides */
+.dark .bg-white {
+  background-color: #1C1C21 !important;
+  color: #D2D2DE;
+}
+
+.dark .bg-ivory-50,
+.dark .bg-ivory-100,
+.dark .bg-neutral-50 {
+  background-color: #141417 !important;
+}
+
+.dark .bg-neutral-100 {
+  background-color: #202026 !important;
+}
+
+.dark .bg-neutral-200 {
+  background-color: #272730 !important;
+}
+
+.dark .border-neutral-200,
+.dark .border-neutral-300 {
+  border-color: #2E2E38 !important;
+}
+
+.dark .border-neutral-400 {
+  border-color: #3D3D4A !important;
+}
+
+.dark .border-black {
+  border-color: #585868 !important;
+}
+
+/* Global grey container & stroke system */
+.grey-container,
+.grey-card {
+  background-color: #F4F4F6 !important;
+  border: 1px solid #D4D4D8 !important;
+}
+
+.dark .grey-container,
+.dark .grey-card {
+  background-color: #1C1C21 !important;
+  border-color: #383842 !important;
+  color: #F0F0F6 !important;
+}
+
+/* Global dark-mode status banners default to sleek grey container & stroke */
+.dark .bg-emerald-50,
+.dark .bg-emerald-950\/40,
+.dark .bg-emerald-900\/60,
+.dark .bg-amber-50,
+.dark .bg-amber-950\/40 {
+  background-color: #1C1C21 !important;
+}
+
+.dark .border-emerald-200,
+.dark .border-emerald-300,
+.dark .border-emerald-700,
+.dark .border-emerald-800,
+.dark .border-amber-200,
+.dark .border-amber-300,
+.dark .border-amber-700,
+.dark .border-amber-800 {
+  border-color: #383842 !important;
+}
+
+.dark .text-neutral-900,
+.dark .text-black {
+  color: #F0F0F6 !important;
+}
+
+.dark .text-neutral-800 {
+  color: #D2D2DE !important;
+}
+
+.dark .text-neutral-700,
+.dark .text-neutral-600 {
+  color: #A8A8B8 !important;
+}
+
+.dark .text-neutral-500 {
+  color: #808092 !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #18181D !important;
+  border-color: #2E2E38 !important;
+  color: #F0F0F6 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #808092 !important;
+}
+
+/* ========================================================
+   MŌDO PASTEL BLUSH DESIGN SYSTEM (DRIBBBLE-INSPIRED)
+   Soft, pillowy cards, borderless strokes, and round edges
+   ======================================================== */
+
+/* Clean, modern curves across cards & containers */
+.rounded-3xl,
+[class*="rounded-3xl"] {
+  border-radius: 18px !important;
+}
+
+.rounded-2xl,
+[class*="rounded-2xl"],
+.card {
+  border-radius: 14px !important;
+}
+
+.rounded-xl,
+[class*="rounded-xl"] {
+  border-radius: 10px !important;
+}
+
+.rounded-lg,
+[class*="rounded-lg"] {
+  border-radius: 8px !important;
+}
+
+.rounded-md,
+[class*="rounded-md"] {
+  border-radius: 6px !important;
+}
+
+.rounded-full,
+[class*="rounded-full"] {
+  border-radius: 9999px !important;
+}
+
+/* Base refined edges for general buttons, form controls, and interactive elements */
+button:not(.notification-card):not([data-notification-card]):not(.chat-conversation-item):not([data-chat-conversation]):not([data-chat-item]):not(.chat-bubble):not([data-message-bubble]):not(.admin-card):not([data-admin-card]):not(.admin-module-card):not([data-admin-module-card]):not(.rounded-none):not([class*="rounded-none"]):not(.rounded-full):not([class*="rounded-full"]):not(.official-sample-banner):not([data-official-sample-banner]),
+input[type="button"]:not(.notification-card):not([data-chat-input]):not(.rounded-none):not([class*="rounded-none"]):not(.rounded-full):not([class*="rounded-full"]),
+input[type="submit"]:not(.notification-card):not(.rounded-none):not([class*="rounded-none"]):not(.rounded-full):not([class*="rounded-full"]),
+input[type="reset"]:not(.notification-card):not(.rounded-none):not([class*="rounded-none"]):not(.rounded-full):not([class*="rounded-full"]),
+[role="button"]:not(.notification-card):not([data-notification-card]):not(.chat-conversation-item):not([data-chat-conversation]):not(.admin-card):not([data-admin-card]):not(.rounded-none):not([class*="rounded-none"]):not(.rounded-full):not([class*="rounded-full"]):not(.official-sample-banner):not([data-official-sample-banner]),
+.btn,
+.button,
+a[class*="px-"][class*="py-"]:not(.notification-card):not([data-notification-card]):not(.chat-conversation-item):not(.admin-card):not([data-admin-card]):not(.admin-module-card):not([data-admin-module-card]):not(.rounded-none):not([class*="rounded-none"]):not(.rounded-full):not([class*="rounded-full"]) {
+  border-radius: 8px !important;
+}
+
+/* ========================================================
+   AUTHENTIC GLASSMORPHISM SYSTEM (MŌDO DRIBBBLE STYLE)
+   Frosted milky pastel translucency with soft ambient glow
+   ======================================================== */
+
+/* Clean solid cards for all dashboard surfaces */
+.bg-white:not(header):not(header *):not([role="dialog"]):not([role="dialog"] *):not([aria-modal="true"]):not([aria-modal="true"] *):not(.modal-container):not(.modal-container *):not(.modal-content):not(.modal-content *):not(.modal-card):not(.modal-card *):not(.modal-dialog):not(.modal-dialog *):not([data-modal-card]):not([data-modal-card] *):not(.notification-drawer):not(.notification-drawer *):not(.chat-container):not(.chat-container *),
+.glass-card,
+.card:not(header):not([role="dialog"] *):not(.modal-dialog):not([data-modal-card]) {
+  background-color: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(244, 114, 182, 0.2) !important;
+  box-shadow: 0 4px 12px -2px rgba(244, 114, 182, 0.08) !important;
+}
+
+/* Remove hover shadow effect */
+.bg-white:hover,
+.card:hover,
+.glass-card:hover,
+button:hover,
+a:hover {
+  box-shadow: none !important;
+}
+
+/* Solid sub-modules, stat boxes, and pills */
+.bg-neutral-50:not(header *):not([role="dialog"] *):not([aria-modal="true"] *):not(.modal-container *):not(.modal-dialog *),
+.bg-neutral-100:not(header *):not([role="dialog"] *):not([aria-modal="true"] *):not(.modal-container *):not(.modal-dialog *) {
+  background-color: #FAFAFA !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(244, 114, 182, 0.18) !important;
+}
+
+/* Dark mode solid cards */
+.dark .bg-white:not(header):not(header *):not([role="dialog"]):not([role="dialog"] *):not([aria-modal="true"]):not([aria-modal="true"] *):not(.modal-container):not(.modal-container *):not(.modal-content):not(.modal-content *):not(.modal-card):not(.modal-card *):not(.modal-dialog):not(.modal-dialog *):not([data-modal-card]):not([data-modal-card] *):not(.notification-drawer):not(.notification-drawer *):not(.chat-container):not(.chat-container *),
+.dark .glass-card,
+.dark .card:not(header):not([role="dialog"] *):not(.modal-dialog):not([data-modal-card]) {
+  background-color: #1E1722 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(244, 114, 182, 0.22) !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.45) !important;
+}
+
+.dark .bg-neutral-50:not(header *):not([role="dialog"] *):not([aria-modal="true"] *):not(.modal-container *):not(.modal-dialog *),
+.dark .bg-neutral-100:not(header *):not([role="dialog"] *):not([aria-modal="true"] *):not(.modal-container *):not(.modal-dialog *) {
+  background-color: #281E2E !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(244, 114, 182, 0.15) !important;
+}
+
+/* Soften all dark borders to pastel rose tints */
+.border-neutral-200,
+.border-neutral-300,
+.border-gray-200,
+.border-zinc-200 {
+  border-color: rgba(244, 114, 182, 0.2) !important;
+}
+
+.border-black {
+  border-color: #1C1520 !important;
+}
+
+/* Form inputs with solid opaque styling */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background-color: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(244, 114, 182, 0.3) !important;
+  color: #1C1520 !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #19131C !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(244, 114, 182, 0.25) !important;
+  color: #FCEEF4 !important;
+}
+
+/* Exceptions: Loading Spinners must be circular */
+.animate-spin:not(svg),
+[class*="animate-spin"]:not(svg),
+.loading-spinner,
+.spinner {
+  border-radius: 9999px !important;
+}
+
+/* Exceptions: Notification badges must be circular */
+[data-badge],
+[data-badge] * {
+  border-radius: 9999px !important;
+}
+
+/* Exceptions: Avatars and profile pictures must be circular */
+[data-avatar],
+[data-avatar] *,
+[data-avatar] img,
+.avatar,
+.avatar *,
+.avatar img,
+img[alt*="avatar" i],
+img[alt*="profile" i],
+img[src*="/avatars/"] {
+  border-radius: 9999px !important;
+}
+
+/* Chat message bubbles: clean square edges (no rounded edges) */
+.chat-bubble,
+[data-message-bubble],
+[data-chat-bubble],
+[data-message-bubble="user"],
+[data-message-bubble="admin"],
+[data-message-bubble="other"] {
+  border-radius: 0px !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EFEA;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #141417;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D5CCC0;
+  border-radius: 0px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #2E2E38;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B5A898;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3D3D4A;
+}
+
+/* Safe area insets for mobile devices */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* ========================================================
+   ADMIN PAGE CARDS (3px ROUNDED EDGES)
+   Sharp, crisp 3px edges specifically for admin page cards & panels
+   ======================================================== */
+.admin-page-container .bg-white,
+.admin-page-container .card,
+.admin-page-container .glass-card,
+.admin-page-container [class*="rounded-xl"],
+.admin-page-container [class*="rounded-2xl"],
+.admin-page-container [class*="rounded-3xl"],
+.admin-page-container div[class*="rounded-lg"],
+.admin-page-container a.bg-white,
+.admin-page-container a[class*="rounded-xl"],
+.admin-page-container a[class*="rounded-2xl"],
+.admin-page-container a[class*="p-6"],
+.admin-page-container a[class*="p-5"],
+.admin-page-container div[class*="bg-neutral-50"],
+.admin-page-container div[class*="bg-neutral-100"] {
+  border-radius: 3px !important;
+}
+
+/* Ensure inner clipped elements and overflow wrappers respect 3px boundary */
+.admin-page-container [class*="overflow-hidden"] {
+  border-radius: 3px !important;
+}
+
+/* Maintain circular shape for status indicator dots, avatars, and loading spinners */
+.admin-page-container [class*="animate-spin"],
+.admin-page-container .animate-spin,
+.admin-page-container [class*="rounded-full"],
+.admin-page-container span[class*="rounded-full"],
+.admin-page-container [class*="w-2"][class*="h-2"] {
+  border-radius: 9999px !important;
+}
+
+/* ========================================================
+   NOTIFICATION DRAWER & NOTIFICATION CARDS (NO ROUNDED EDGES)
+   Sharp, square edges with no rounded corners for notification drawer,
+   dropdown panels, notification item cards, and notification bars.
+   ======================================================== */
+.notification-bar,
+.notification-drawer,
+[data-notification-drawer],
+.notification-drawer *,
+[data-notification-drawer] *,
+.notification-card,
+[data-notification-card],
+a.notification-card,
+a[data-notification-card],
+a[class*="notification-card"],
+.notification-drawer a,
+[data-notification-drawer] a,
+.notification-drawer div,
+[data-notification-drawer] div,
+.notification-drawer button,
+[data-notification-drawer] button {
+  border-radius: 0px !important;
+}
+
+/* Maintain circular indicator dots and badges inside notification drawer */
+.notification-drawer [data-badge],
+[data-notification-drawer] [data-badge],
+.notification-drawer span[class*="rounded-full"],
+[data-notification-drawer] span[class*="rounded-full"],
+.notification-drawer span[class*="w-1.5"],
+[data-notification-drawer] span[class*="w-1.5"],
+.notification-drawer span[class*="w-2"],
+[data-notification-drawer] span[class*="w-2"],
+.notification-card span[class*="rounded-full"],
+[data-notification-card] span[class*="rounded-full"],
+.notification-card span[class*="w-1.5"],
+[data-notification-card] span[class*="w-1.5"],
+.notification-card span[class*="w-2"],
+[data-notification-card] span[class*="w-2"] {
+  border-radius: 9999px !important;
+}
+
+/* ========================================================
+   CHAT MESSAGE LIST & CONVERSATION SIDEBAR (NO ROUNDED EDGES)
+   Sharp, square edges with no rounded corners for chat message list,
+   conversation list items, message bubbles, inputs, and send buttons.
+   ======================================================== */
+.chat-container,
+[data-chat-container],
+.chat-container *,
+[data-chat-container] *,
+.chat-conversation-item,
+[data-chat-conversation],
+button.chat-conversation-item,
+button[data-chat-conversation],
+.chat-container button,
+[data-chat-container] button,
+.chat-bubble,
+[data-message-bubble],
+[data-chat-bubble],
+div.chat-bubble,
+div[data-message-bubble],
+div[data-chat-bubble],
+.chat-input,
+[data-chat-input],
+.chat-container input,
+[data-chat-container] input,
+.chat-container form,
+[data-chat-container] form {
+  border-radius: 0px !important;
+}
+
+/* Maintain circular shape for user avatars and unread counter badges inside chat */
+.chat-container [data-avatar],
+.chat-container [data-avatar] *,
+.chat-container .avatar,
+.chat-container .avatar *,
+.chat-container [class*="w-9"][class*="h-9"],
+.chat-container span[class*="rounded-full"],
+.chat-container div[class*="rounded-full"],
+[data-chat-container] [data-avatar],
+[data-chat-container] [data-avatar] *,
+[data-chat-container] span[class*="rounded-full"],
+[data-chat-container] div[class*="rounded-full"],
+.chat-conversation-item span[class*="rounded-full"],
+[data-chat-conversation] span[class*="rounded-full"] {
+  border-radius: 9999px !important;
+}
+
+/* ========================================================
+   ADMIN DASHBOARD & MODULE CARDS (NO ROUNDED EDGES)
+   Sharp, square edges with zero border-radius for admin modules,
+   cards, tables, and metric blocks.
+   ======================================================== */
+.admin-card,
+[data-admin-card],
+.admin-module-card,
+[data-admin-module-card],
+.admin-container,
+[data-admin-container],
+a.admin-module-card,
+a[data-admin-card],
+div.admin-card,
+div[data-admin-card] {
+  border-radius: 0px !important;
+}
+
+/* ========================================================
+   OFFICIAL SAMPLE GUIDELINE BANNER & COMPONENT (ROUNDED EDGES)
+   Allows rounded-2xl banner container and rounded-full play buttons & pills.
+   ======================================================== */
+.official-sample-banner,
+button.official-sample-banner,
+[data-official-sample-banner] {
+  border-radius: 16px !important;
+}
+
+.official-sample-banner .rounded-full,
+[data-official-sample-banner] .rounded-full,
+.official-sample-banner span.rounded-full,
+[data-official-sample-banner] span.rounded-full,
+.official-sample-banner button,
+[data-official-sample-banner] button {
+  border-radius: 9999px !important;
+}
+
+/* ========================================================
+   HIGH-PERFORMANCE MOBILE SCROLLING OPTIMIZATIONS
+   Eliminates touch lag, stutter, horizontal overflow, and backdrop-filter offscreen churn
+   ======================================================== */
+@media (max-width: 768px),
+(pointer: coarse) {
+
+  html,
+  body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Disable heavy multi-gradient repaints behind scrolling content on mobile */
+  body::before {
+    background-image: none !important;
+    background-color: #FDF0F5 !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  .dark body::before {
+    background-image: none !important;
+    background-color: #17121A !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  /* Bypass stacked backdrop filters on in-flow cards to restore 60/120fps GPU scroll */
+  .bg-white,
+  .card,
+  .glass-card,
+  .bg-neutral-50,
+  .bg-neutral-100,
+  input,
+  select,
+  textarea {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .bg-white,
+  .card,
+  .glass-card {
+    background-color: #FFFFFF !important;
+  }
+
+  .dark .bg-white,
+  .dark .card,
+  .dark .glass-card {
+    background-color: #1C1722 !important;
+  }
+
+  .bg-neutral-50,
+  .bg-neutral-100 {
+    background-color: #FAF5F8 !important;
+  }
+
+  .dark .bg-neutral-50,
+  .dark .bg-neutral-100 {
+    background-color: #261E2C !important;
+  }
+
+  /* Hardware acceleration for fixed top & bottom navigation */
+  header,
+  .safe-bottom,
+  nav[class*="fixed"] {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* ========================================================
+     MODAL MOBILE HORIZONTAL OVERFLOW PREVENTION & MOMENTUM SCROLL
+     ======================================================== */
+  [role="dialog"],
+  [aria-modal="true"],
+  .modal-container,
+  .modal-dialog,
+  div[class*="fixed"][class*="inset-0"] {
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+  }
+
+  [role="dialog"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+  [aria-modal="true"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+  .modal-card,
+  .modal-content,
+  div[class*="fixed"][class*="inset-0"]>div:not([class*="aspect-video"]):not([class*="fixed"]) {
+    max-width: calc(100vw - 24px) !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    transform: translateZ(0);
+  }
+
+  /* Inner scrollable bodies inside modals */
+  [role="dialog"] form,
+  [role="dialog"] [class*="overflow-y-auto"],
+  [aria-modal="true"] form,
+  [aria-modal="true"] [class*="overflow-y-auto"],
+  div[class*="fixed"][class*="inset-0"] form,
+  div[class*="fixed"][class*="inset-0"] [class*="overflow-y-auto"] {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+  }
+
+  /* Ensure inputs, textareas, buttons, labels inside modals never exceed width on mobile */
+  [role="dialog"] input,
+  [role="dialog"] textarea,
+  [role="dialog"] select,
+  [role="dialog"] label,
+  [role="dialog"] p,
+  [role="dialog"] div,
+  [aria-modal="true"] input,
+  [aria-modal="true"] textarea,
+  [aria-modal="true"] select,
+  [aria-modal="true"] label,
+  [aria-modal="true"] p,
+  [aria-modal="true"] div,
+  div[class*="fixed"][class*="inset-0"] input,
+  div[class*="fixed"][class*="inset-0"] textarea,
+  div[class*="fixed"][class*="inset-0"] select {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+  }
+
+  [role="dialog"] input[type="file"],
+  [aria-modal="true"] input[type="file"],
+  div[class*="fixed"][class*="inset-0"] input[type="file"] {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+/* Smooth anchor scrolling (desktop fine pointer only, avoids touch lag on mobile) */
+@media (prefers-reduced-motion: no-preference) and (min-width: 769px) and (pointer: fine) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Scroll reveal animations */
+.js-ready .reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.js-ready .reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger utilities for grids and lists */
+.js-ready .reveal-delay-1 {
+  transition-delay: 0.08s;
+}
+
+.js-ready .reveal-delay-2 {
+  transition-delay: 0.16s;
+}
+
+.js-ready .reveal-delay-3 {
+  transition-delay: 0.24s;
+}
+
+.js-ready .reveal-delay-4 {
+  transition-delay: 0.32s;
+}
+
+/* Scale reveal variant */
+.js-ready .reveal-scale {
+  opacity: 0;
+  transform: scale(0.97) translateY(18px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.js-ready .reveal-scale.is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .js-ready .reveal-on-scroll,
+  .js-ready .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Remove drop shadow & hover shadow effects on headers and navbars */
+header,
+nav,
+header:hover,
+nav:hover,
+header *,
+nav * {
+  box-shadow: none !important;
+}
+
+/* ========================================================
+   1. NAVIGATION BAR NOT TRANSPARENT
+   Strict opaque background in both light and dark modes
+   ======================================================== */
+header,
+header.sticky,
+header.bg-white,
+header[class*="bg-white"],
+header nav,
+header .bg-white,
+nav[class*="sticky"] {
+  background-color: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+.dark header,
+.dark header.sticky,
+.dark header[class*="bg-"],
+.dark header nav,
+.dark nav[class*="sticky"] {
+  background-color: #161619 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Mobile drawer and notification dropdown panels strictly opaque */
+header .notification-drawer,
+header [data-notification-drawer],
+header .chat-container,
+[data-chat-container] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+/* ========================================================
+   2. ALL POP UP MODAL BG COLOUR: #fff9fb (SOLID, NO GLASSMORPHISM)
+   Pop up modals are solid #fff9fb with NO glassmorphism, NO transparency
+   ======================================================== */
+[role="dialog"],
+[aria-modal="true"],
+dialog,
+.modal,
+div[class*="fixed"][class*="inset-0"],
+div[class*="fixed"][class*="inset-x-0"][class*="inset-y-0"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Modal Window Card Containers */
+[role="dialog"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+[aria-modal="true"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+dialog>div:not([class*="aspect-video"]):not([class*="fixed"]),
+.modal-container,
+.modal-content,
+.modal-card,
+.modal-dialog,
+.modal-box,
+[data-modal-container],
+[data-modal-card],
+[data-modal],
+div[class*="fixed"][class*="inset-0"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+div[class*="fixed"][class*="inset-0"]>div>div:not([class*="aspect-video"]):not([class*="fixed"]),
+.dark [role="dialog"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+.dark [aria-modal="true"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+.dark dialog>div:not([class*="aspect-video"]):not([class*="fixed"]),
+.dark .modal-container,
+.dark .modal-content,
+.dark .modal-card,
+.dark .modal-dialog,
+.dark .modal-box,
+.dark [data-modal-container],
+.dark [data-modal-card],
+.dark [data-modal],
+.dark div[class*="fixed"][class*="inset-0"]>div:not([class*="aspect-video"]):not([class*="fixed"]),
+.dark div[class*="fixed"][class*="inset-0"]>div>div:not([class*="aspect-video"]):not([class*="fixed"]) {
+  background-color: #fff9fb !important;
+  background: #fff9fb !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  border-color: #f2e3e8 !important;
+  color: #1A1A1A !important;
+}
+
+/* Any white or dark background classes inside any popup modal */
+[role="dialog"] .bg-white,
+[aria-modal="true"] .bg-white,
+dialog .bg-white,
+.modal-container .bg-white,
+.modal-content .bg-white,
+.modal-card .bg-white,
+.modal-dialog .bg-white,
+.modal-box .bg-white,
+[data-modal-card] .bg-white,
+div[class*="fixed"][class*="inset-0"] .bg-white,
+div[class*="fixed"][class*="inset-0"] form,
+div[class*="fixed"][class*="inset-0"] [class*="bg-[#FAF9F6]"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-[#faf9f6]"],
+.dark [role="dialog"] .bg-white,
+.dark [aria-modal="true"] .bg-white,
+.dark dialog .bg-white,
+.dark .modal-container .bg-white,
+.dark .modal-content .bg-white,
+.dark .modal-card .bg-white,
+.dark .modal-dialog .bg-white,
+.dark .modal-box .bg-white,
+.dark [data-modal-card] .bg-white,
+.dark div[class*="fixed"][class*="inset-0"] .bg-white,
+.dark div[class*="fixed"][class*="inset-0"] form,
+.dark [role="dialog"] [class*="dark:bg-neutral-900"],
+.dark [aria-modal="true"] [class*="dark:bg-neutral-900"],
+.dark [role="dialog"] [class*="dark:bg-neutral-800"],
+.dark [aria-modal="true"] [class*="dark:bg-neutral-800"],
+.dark div[class*="fixed"][class*="inset-0"]>div[class*="dark:bg-neutral-900"],
+.dark div[class*="fixed"][class*="inset-0"]>div[class*="dark:bg-[#161619]"],
+.dark div[class*="fixed"][class*="inset-0"]>div[class*="dark:bg-neutral-800"] {
+  background-color: #fff9fb !important;
+  background: #fff9fb !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  color: #1A1A1A !important;
+}
+
+/* ========================================================
+   3. INNER SUMMARY STRIPS & CARDS IN MODALS: #f8e2ec, NO BORDER STROKE
+   ======================================================== */
+div[class*="fixed"][class*="inset-0"] [class*="grid"][class*="bg-neutral-"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-neutral-50"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-neutral-100"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-[#f8e2ec]"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-[#FDF2F4]"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-[#fdf2f6]"],
+div[class*="fixed"][class*="inset-0"] [class*="bg-[#F5F3ED]"],
+[role="dialog"] [class*="grid"][class*="bg-neutral-"],
+[role="dialog"] [class*="bg-neutral-50"],
+[role="dialog"] [class*="bg-neutral-100"],
+[role="dialog"] [class*="bg-[#f8e2ec]"],
+[role="dialog"] [class*="bg-[#FDF2F4]"],
+[role="dialog"] [class*="bg-[#fdf2f6]"],
+[role="dialog"] [class*="bg-[#F5F3ED]"],
+[aria-modal="true"] [class*="grid"][class*="bg-neutral-"],
+[aria-modal="true"] [class*="bg-neutral-50"],
+[aria-modal="true"] [class*="bg-neutral-100"],
+[aria-modal="true"] [class*="bg-[#f8e2ec]"],
+[aria-modal="true"] [class*="bg-[#FDF2F4]"],
+[aria-modal="true"] [class*="bg-[#fdf2f6]"],
+[aria-modal="true"] [class*="bg-[#F5F3ED]"],
+.dark div[class*="fixed"][class*="inset-0"] [class*="dark:bg-neutral-800"],
+.dark div[class*="fixed"][class*="inset-0"] [class*="dark:bg-[#22131A]"],
+.dark [role="dialog"] [class*="dark:bg-neutral-800"],
+.dark [role="dialog"] [class*="dark:bg-[#22131A]"],
+.dark [aria-modal="true"] [class*="dark:bg-neutral-800"],
+.dark [aria-modal="true"] [class*="dark:bg-[#22131A]"] {
+  background-color: #f8e2ec !important;
+  background: #f8e2ec !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Zero glassmorphism on all modal overlays and contents */
+div[class*="fixed"][class*="inset-0"],
+div[class*="fixed"][class*="inset-0"] *,
+[role="dialog"],
+[role="dialog"] *,
+[aria-modal="true"],
+[aria-modal="true"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Ensure inputs, selects, textareas inside modals are solid, non-transparent, no glassmorphism */
+[role="dialog"] input,
+[role="dialog"] select,
+[role="dialog"] textarea,
+[aria-modal="true"] input,
+[aria-modal="true"] select,
+[aria-modal="true"] textarea,
+.modal-container input,
+.modal-container select,
+.modal-container textarea,
+div[class*="fixed"][class*="inset-0"] input,
+div[class*="fixed"][class*="inset-0"] select,
+div[class*="fixed"][class*="inset-0"] textarea,
+.dark [role="dialog"] input,
+.dark [role="dialog"] select,
+.dark [role="dialog"] textarea,
+.dark [aria-modal="true"] input,
+.dark [aria-modal="true"] select,
+.dark [aria-modal="true"] textarea,
+.dark div[class*="fixed"][class*="inset-0"] input,
+.dark div[class*="fixed"][class*="inset-0"] select,
+.dark div[class*="fixed"][class*="inset-0"] textarea {
+  background-color: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  border: 1px solid #D1D5DB !important;
+  color: #111827 !important;
+}
+
+/* Ensure headings, labels, texts inside off-white modals remain dark and readable in dark mode */
+.dark [role="dialog"] h1,
+.dark [role="dialog"] h2,
+.dark [role="dialog"] h3,
+.dark [role="dialog"] h4,
+.dark [role="dialog"] h5,
+.dark [role="dialog"] h6,
+.dark [role="dialog"] label,
+.dark [role="dialog"] p:not(.text-white),
+.dark [role="dialog"] svg:not(.text-white),
+.dark [aria-modal="true"] h1,
+.dark [aria-modal="true"] h2,
+.dark [aria-modal="true"] h3,
+.dark [aria-modal="true"] h4,
+.dark [aria-modal="true"] h5,
+.dark [aria-modal="true"] h6,
+.dark [aria-modal="true"] label,
+.dark [aria-modal="true"] p:not(.text-white),
+.dark [aria-modal="true"] svg:not(.text-white),
+.dark div[class*="fixed"][class*="inset-0"]>div h1,
+.dark div[class*="fixed"][class*="inset-0"]>div h2,
+.dark div[class*="fixed"][class*="inset-0"]>div h3,
+.dark div[class*="fixed"][class*="inset-0"]>div h4,
+.dark div[class*="fixed"][class*="inset-0"]>div label,
+.dark div[class*="fixed"][class*="inset-0"]>div p:not(.text-white),
+.dark [role="dialog"] .text-black,
+.dark [role="dialog"] [class*="text-black"],
+.dark [role="dialog"] .text-neutral-900,
+.dark [role="dialog"] .text-neutral-800,
+.dark [role="dialog"] .text-neutral-700,
+.dark [aria-modal="true"] .text-black,
+.dark [aria-modal="true"] [class*="text-black"],
+.dark [aria-modal="true"] .text-neutral-900,
+.dark [aria-modal="true"] .text-neutral-800,
+.dark [aria-modal="true"] .text-neutral-700,
+.dark div[class*="fixed"][class*="inset-0"]>div .text-black,
+.dark div[class*="fixed"][class*="inset-0"]>div .text-neutral-900,
+.dark div[class*="fixed"][class*="inset-0"]>div .text-neutral-800 {
+  color: #1A1A1A !important;
+}
+
+.dark [role="dialog"] .text-neutral-500,
+.dark [role="dialog"] .text-neutral-600,
+.dark [aria-modal="true"] .text-neutral-500,
+.dark [aria-modal="true"] .text-neutral-600,
+.dark div[class*="fixed"][class*="inset-0"]>div .text-neutral-500,
+.dark div[class*="fixed"][class*="inset-0"]>div .text-neutral-600 {
+  color: #6B7280 !important;
+}
+
+/* Ensure modal buttons maintain proper contrast in modals */
+[role="dialog"] button.bg-black,
+[aria-modal="true"] button.bg-black,
+div[class*="fixed"][class*="inset-0"]>div button.bg-black,
+.dark [role="dialog"] button.bg-black,
+.dark [aria-modal="true"] button.bg-black,
+.dark div[class*="fixed"][class*="inset-0"]>div button.bg-black {
+  background-color: #111827 !important;
+  color: #FFFFFF !important;
+}
+
+/* ========================================================
+   3. NO BLACK TEXTS OR ELEMENTS IN DARKMODE ON DARK BG
+   Strict typography and UI element safety in dark mode
+   ======================================================== */
+.dark .text-black,
+.dark [class*="text-black"],
+.dark .text-neutral-950,
+.dark .text-neutral-900,
+.dark .text-neutral-800,
+.dark .text-neutral-700,
+.dark .text-charcoal-900,
+.dark .text-charcoal-800,
+.dark .text-charcoal-700,
+.dark .text-charcoal-600,
+.dark .text-charcoal,
+.dark [class*="text-charcoal"] {
+  color: #FCEEF4 !important;
+}
+
+.dark .text-neutral-600,
+.dark .text-neutral-500,
+.dark .text-neutral-400 {
+  color: #C8C8D8 !important;
+}
+
+.dark svg.text-black,
+.dark svg[class*="text-black"],
+.dark svg.text-neutral-900,
+.dark svg.text-neutral-800,
+.dark svg.text-neutral-700,
+.dark svg.text-charcoal {
+  color: #FCEEF4 !important;
+  stroke: currentColor !important;
+}
+
+/* Eliminate black UI elements on dark backgrounds */
+.dark .bg-black:not(video):not([data-allow-black]):not(svg) {
+  background-color: #2E2736 !important;
+  color: #FCEEF4 !important;
+  border-color: rgba(244, 114, 182, 0.3) !important;
+}
+
+.dark button.bg-black,
+.dark a.bg-black,
+.dark input[type="submit"].bg-black {
+  background-color: #FCEEF4 !important;
+  color: #1C1520 !important;
+}
+
+.dark button.bg-black:hover,
+.dark a.bg-black:hover {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.dark [class*="h-full"].bg-black,
+.dark .bg-black[class*="h-full"] {
+  background-color: #F472B6 !important;
+}
+
+.dark span.bg-black,
+.dark div.bg-black[class*="rounded-full"][class*="w-2"],
+.dark div.bg-black[class*="rounded-full"][class*="w-1.5"] {
+  background-color: #F472B6 !important;
+}
+
+/* ========================================================
+   GLOBAL PINK PALETTE, BORDERLESS BUTTONS, PILLS & BADGES
+   FORCE OVERRIDE FOR ALL BUTTONS, PILLS & BADGES ACROSS THE APP
+   ======================================================== */
+
+/* 1. FORCE ALL BUTTONS, ACTION LINKS & CTAs TO PINK PILLS WITH ZERO BORDER */
+button:not(.chat-bubble):not([data-message-bubble]):not(.notification-card):not(.animate-spin),
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+[role="button"]:not(.chat-bubble),
+.btn,
+.button,
+a[class*="px-"][class*="py-"]:not(.notification-card) {
+  border-radius: 9999px !important;
+  border: 0 !important;
+  border-style: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+}
+
+/* Primary Action Buttons (black, dark, pink, plum fills) -> #7B1E4B Plum Fill + White Text */
+button[class*="bg-[#7B1E4B]"],
+button[class*="bg-[#7b1e4b]"],
+button[class*="bg-black"],
+button[class*="bg-neutral-900"],
+button[class*="bg-neutral-800"],
+input[type="submit"],
+a[class*="px-"][class*="py-"][class*="bg-black"],
+a[class*="px-"][class*="py-"][class*="bg-[#18151A]"],
+a[class*="px-"][class*="py-"][class*="bg-[#7B1E4B]"],
+a[class*="px-"][class*="py-"][class*="bg-[#7b1e4b]"] {
+  background-color: #7B1E4B !important;
+  background: #7B1E4B !important;
+  color: #FFFFFF !important;
+  border: 0 !important;
+  border-radius: 9999px !important;
+}
+
+button[class*="bg-[#7B1E4B]"]:hover,
+button[class*="bg-[#7b1e4b]"]:hover,
+button[class*="bg-black"]:hover,
+a[class*="px-"][class*="py-"][class*="bg-black"]:hover,
+a[class*="px-"][class*="py-"][class*="bg-[#7B1E4B]"]:hover {
+  background-color: #63183C !important;
+  background: #63183C !important;
+  color: #FFFFFF !important;
+}
+
+/* Secondary Buttons, Badges, Pills & Status Tags -> #FDF2F4 Soft Pink Fill + #7B1E4B Plum Text */
+.status-badge,
+[class*="StatusBadge"],
+.pill-badge,
+.pill,
+[class*="bg-[#FDF2F4]"],
+[class*="bg-[#fdf2f4]"] {
+  background-color: #FDF2F4 !important;
+  color: #7B1E4B !important;
+  border: 0 !important;
+  border-style: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  border-radius: 9999px !important;
+}
+
+.status-badge *,
+[class*="StatusBadge"] *,
+.pill-badge *,
+.pill *,
+[class*="bg-[#FDF2F4]"] *,
+[class*="bg-[#fdf2f4]"] * {
+  color: #7B1E4B !important;
+}
+
+/* Completed / Paid / Primary Fill Pill Exception (Solid #7B1E4B Plum, NO glassmorphism) */
+[class*="bg-[#7B1E4B]"],
+[class*="bg-[#7b1e4b]"] {
+  background-color: #7B1E4B !important;
+  background: #7B1E4B !important;
+  color: #FFFFFF !important;
+  border: 0 !important;
+  border-style: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  border-radius: 9999px !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Ensure children inside plum containers get white text UNLESS they have an explicit white background */
+[class*="bg-[#7B1E4B]"] *:not([class*="bg-white"]):not([class*="bg-[#FDF2F4]"]):not([class*="bg-[#fdf2f4]"]),
+[class*="bg-[#7b1e4b]"] *:not([class*="bg-white"]):not([class*="bg-[#FDF2F4]"]):not([class*="bg-[#fdf2f4]"]) {
+  color: #FFFFFF !important;
+}
+
+/* White element exceptions inside plum containers MUST have plum text */
+[class*="bg-[#7B1E4B]"] [class*="bg-white"],
+[class*="bg-[#7b1e4b]"] [class*="bg-white"] {
+  background-color: #FFFFFF !important;
+  color: #7B1E4B !important;
+}
+
+[class*="bg-[#7B1E4B]"] [class*="bg-white"] *,
+[class*="bg-[#7b1e4b]"] [class*="bg-white"] * {
+  color: #7B1E4B !important;
+}
+
+/* Admin container buttons and pills override */
+.admin-page-container button,
+.admin-page-container [role="button"],
+.admin-page-container a[class*="px-"],
+.admin-page-container .rounded-full,
+.admin-page-container [class*="rounded-full"],
+.admin-page-container span[class*="rounded-full"],
+.admin-page-container div[class*="rounded-full"] {
+  border-radius: 9999px !important;
+  border: 0 !important;
+  border-style: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+}

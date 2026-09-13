@@ -1,0 +1,25 @@
+export const NIGERIAN_BANKS = [
+  'Access Bank',
+  'Zenith Bank',
+  'Guaranty Trust Bank (GTBank)',
+  'First Bank of Nigeria',
+  'United Bank for Africa (UBA)',
+  'Kuda Bank',
+  'OPay',
+  'Palmpay',
+  'Moniepoint',
+  'Stanbic IBTC Bank',
+  'Fidelity Bank',
+  'First City Monument Bank (FCMB)',
+  'Union Bank of Nigeria',
+  'Sterling Bank',
+  'Wema Bank (ALAT)',
+  'Polaris Bank',
+  'Ecobank Nigeria',
+  'Keystone Bank',
+  'Jaiz Bank',
+  'Taj Bank',
+  'Other Nigerian Commercial Bank',
+] as const;
+
+export type NigerianBankName = (typeof NIGERIAN_BANKS)[number];

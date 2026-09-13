@@ -1,0 +1,63 @@
+export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireUser } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { PaymentMethodType } from '@/types';
+import { getLocalCurrency, formatLocalFx } from '@/lib/currency';
+
+export async function GET(req: NextRequest) {
+  try {
+    const user = await requireUser();
+    const { searchParams } = new URL(req.url);
+    const status = (searchParams.get('status') as any) || undefined;
+
+    let creatorId = searchParams.get('creatorId') || undefined;
+    if (user.role !== 'ADMIN') {
+      creatorId = user.id;
+    }
+
+    const payouts = db.getPayoutRequests({ creatorId, status });
+    return NextResponse.json({ payouts });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Unauthorized' }, { status: 401 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const user = await requireUser();
+    const body = await req.json().catch(() => ({}));
+    let { paymentMethod, paymentDestination } = body;
+
+    const profile = await db.getProfileByIdAsync(user.id);
+
+    if (!paymentMethod && profile?.payment_method) {
+      paymentMethod = profile.payment_method;
+    }
+
+    const payout = db.requestPayout(
+      user.id,
+      paymentMethod as PaymentMethodType | undefined,
+      paymentDestination || undefined
+    );
+
+    if (paymentMethod && profile && profile.payment_method !== paymentMethod) {
+      db.updateProfile(user.id, { payment_method: paymentMethod as PaymentMethodType });
+    }
+
+    const currency = getLocalCurrency(profile?.country, payout.payment_method);
+    const localFx = formatLocalFx(payout.amount_usd, currency);
+    const fxNotice = currency.code !== 'USD' ? ` (${localFx})` : '';
+
+    db.notifyAdmins({
+      title: 'New Payout Request Received',
+      message: `${user.display_name} requested payout of $${payout.amount_usd.toFixed(2)} USD${fxNotice} (${payout.video_count} videos via ${payout.payment_method}). Estimated bank processing: 3 working days.`,
+      type: 'PAYOUT',
+      link: '/admin/payouts',
+    });
+
+    return NextResponse.json({ success: true, payout });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Payout request failed' }, { status: 400 });
+  }
+}
