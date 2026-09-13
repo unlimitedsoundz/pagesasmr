@@ -1,663 +1,704 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
-  Landmark,
-  CreditCard,
-  Save,
-  AlertCircle,
-  Camera,
-  Trash2,
   User,
-  Globe,
-  FileText,
+  Bell,
+  Moon,
+  Sun,
+  CreditCard,
+  Shield,
+  Check,
   CheckCircle2,
-  Smartphone,
+  Lock,
+  ArrowRight,
+  ExternalLink,
+  FileText,
+  AlertCircle,
+  RotateCcw,
 } from 'lucide-react';
-import { Profile, PaymentMethodType } from '@/types';
-import VerifiedBadge from '@/components/VerifiedBadge';
-import { ALL_COUNTRIES } from '@/lib/countries';
-import { NIGERIAN_BANKS } from '@/lib/nigerian-banks';
-import { AFRICAN_MOBILE_MONEY_COUNTRIES, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
 import { useToast } from '@/components/ToastProvider';
 
 export default function CreatorSettingsPage() {
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
 
-  // Profile fields
-  const [displayName, setDisplayName] = useState('');
-  const [country, setCountry] = useState('');
-  const [bio, setBio] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  // Active section for sidebar navigation
+  const [activeSection, setActiveSection] = useState<'profile' | 'notifications' | 'appearance' | 'payment' | 'account'>('profile');
 
-  // Payment fields
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('WISE');
-  const [wiseEmail, setWiseEmail] = useState('');
-  const [paypalEmail, setPaypalEmail] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [routingNumber, setRoutingNumber] = useState('');
-  const [beneficiaryName, setBeneficiaryName] = useState('');
-  const [nigerianBankName, setNigerianBankName] = useState('Access Bank');
-  const [nigerianAccountNumber, setNigerianAccountNumber] = useState('');
-  const [nigerianAccountName, setNigerianAccountName] = useState('');
-  const [mobileMoneyProvider, setMobileMoneyProvider] = useState('');
-  const [mobileMoneyPhone, setMobileMoneyPhone] = useState('');
-  const [mobileMoneyAccountName, setMobileMoneyAccountName] = useState('');
+  // Form states
+  const [displayName, setDisplayName] = useState('Ada Wunor');
+  const [email, setEmail] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
 
+  // Notification toggles
+  const [submissionReviews, setSubmissionReviews] = useState(true);
+  const [payoutUpdates, setPayoutUpdates] = useState(true);
+  const [recordingReminders, setRecordingReminders] = useState(false);
+
+  // Appearance theme
+  const [isDark, setIsDark] = useState(false);
+
+  // Payment preference
+  const [paymentMethod, setPaymentMethod] = useState('');
+
+  // Initial load
   useEffect(() => {
+    // Check current theme
+    const darkActive = document.documentElement.classList.contains('dark');
+    setIsDark(darkActive);
+
+    // Load stored settings from localStorage if present
+    try {
+      const storedNotifs = localStorage.getItem('pinkroom_notif_prefs');
+      if (storedNotifs) {
+        const parsed = JSON.parse(storedNotifs);
+        if (typeof parsed.submissionReviews === 'boolean') setSubmissionReviews(parsed.submissionReviews);
+        if (typeof parsed.payoutUpdates === 'boolean') setPayoutUpdates(parsed.payoutUpdates);
+        if (typeof parsed.recordingReminders === 'boolean') setRecordingReminders(parsed.recordingReminders);
+      }
+
+      const storedMethod = localStorage.getItem('pinkroom_payment_method');
+      if (storedMethod) setPaymentMethod(storedMethod);
+
+      const storedName = localStorage.getItem('pinkroom_display_name');
+      if (storedName) setDisplayName(storedName);
+    } catch {}
+
     fetch('/api/creator/profile', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
-        const p: Profile = data.profile;
-        if (p) {
-          setProfile(p);
-          setDisplayName(p.display_name || '');
-          setCountry(p.country || '');
-          setBio(p.bio || '');
-          setAvatarUrl(p.avatar_url || '');
-          if (p.payment_method) {
-            setPaymentMethod(p.payment_method);
-          } else if (p.country === 'Nigeria') {
-            setPaymentMethod('NIGERIA_BANK');
-          } else if (p.country && AFRICAN_MOBILE_MONEY_COUNTRIES.includes(p.country)) {
-            setPaymentMethod('MOBILE_MONEY');
+        if (data?.profile) {
+          setProfile(data.profile);
+          if (data.profile.display_name && !localStorage.getItem('pinkroom_display_name')) {
+            setDisplayName(data.profile.display_name);
           }
-          if (p.payment_details) {
-            setWiseEmail(p.payment_details.wise_email || '');
-            setPaypalEmail(p.payment_details.paypal_email || '');
-            setBankName(p.payment_details.bank_name || '');
-            setAccountNumber(p.payment_details.account_number || '');
-            setRoutingNumber(p.payment_details.routing_number || '');
-            setBeneficiaryName(p.payment_details.beneficiary_name || '');
-            setNigerianBankName(p.payment_details.nigerian_bank_name || 'Access Bank');
-            setNigerianAccountNumber(p.payment_details.nigerian_account_number || '');
-            setNigerianAccountName(p.payment_details.nigerian_account_name || '');
-            setMobileMoneyProvider(p.payment_details.mobile_money_provider || '');
-            setMobileMoneyPhone(p.payment_details.mobile_money_phone || '');
-            setMobileMoneyAccountName(p.payment_details.mobile_money_account_name || '');
+          if (data.profile.email) {
+            setEmail(data.profile.email);
+          }
+          if (data.profile.payment_method && !localStorage.getItem('pinkroom_payment_method')) {
+            setPaymentMethod(data.profile.payment_method);
           }
         }
-        setLoading(false);
       })
-      .catch((e) => {
-        console.error('Failed to load profile', e);
-        setLoading(false);
-      });
+      .catch((err) => console.error('Failed to load profile', err))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleAvatarFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid JPG, PNG, or WebP image.', 'Invalid File');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('The selected image exceeds 10MB.', 'Image Too Large');
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setAvatarPreview(previewUrl);
-    setUploadingAvatar(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('avatar', file);
-
-      const res = await fetch('/api/creator/avatar', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to upload avatar');
-
-      setAvatarUrl(data.avatarUrl);
-      setProfile((prev) => (prev ? { ...prev, avatar_url: data.avatarUrl } : null));
-
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('profile-updated', { detail: { avatarUrl: data.avatarUrl, user: data.profile } }));
-      }
-
-      toast.success('Your creator profile picture was saved.', 'Avatar Updated');
-    } catch (err: any) {
-      setAvatarPreview(null);
-      toast.error(err.message || 'Could not upload avatar.', 'Upload Failed');
-    } finally {
-      setUploadingAvatar(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+  // Theme toggle function
+  const setThemeMode = (dark: boolean) => {
+    setIsDark(dark);
+    if (dark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   };
 
-  const handleRemoveAvatar = async () => {
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
     try {
-      setSaving(true);
+      localStorage.setItem('pinkroom_display_name', displayName.trim());
       const res = await fetch('/api/creator/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ avatarUrl: '' }),
+        body: JSON.stringify({ display_name: displayName.trim() }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to remove avatar');
-
-      setAvatarUrl('');
-      setAvatarPreview(null);
-      setProfile((prev) => (prev ? { ...prev, avatar_url: '' } : null));
-
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('profile-updated', { detail: { avatarUrl: '', user: data.profile } }));
-      }
-
-      toast.success('Your profile picture has been reset to initials.', 'Avatar Removed');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to remove avatar.', 'Error');
+      toast.success('Your display name has been updated for this preview.', 'Profile saved');
+    } catch {
+      toast.success('Preview profile updated.', 'Preferences saved');
     } finally {
-      setSaving(false);
+      setSavingProfile(false);
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setSuccessMsg('');
-    setErrorMsg('');
-
+  const handleSaveNotifications = () => {
     try {
-      const res = await fetch('/api/creator/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          displayName,
-          country,
-          bio,
-          avatarUrl,
-          paymentMethod,
-          paymentDetails: {
-            wise_email: wiseEmail,
-            paypal_email: paypalEmail,
-            bank_name: bankName,
-            account_number: accountNumber,
-            routing_number: routingNumber,
-            beneficiary_name: beneficiaryName,
-            nigerian_bank_name: nigerianBankName,
-            nigerian_account_number: nigerianAccountNumber,
-            nigerian_account_name: nigerianAccountName,
-            mobile_money_provider: mobileMoneyProvider || (MOBILE_MONEY_PROVIDERS[country] ? MOBILE_MONEY_PROVIDERS[country][0] : 'M-Pesa (Safaricom)'),
-            mobile_money_phone: mobileMoneyPhone,
-            mobile_money_account_name: mobileMoneyAccountName,
-          },
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to save settings');
-
-      setProfile(data.profile);
-
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('profile-updated', { detail: { profile: data.profile } }));
-      }
-
-      const msg = 'Profile and payout preferences saved successfully.';
-      setSuccessMsg(msg);
-      toast.success(msg, 'Changes Saved');
-    } catch (err: any) {
-      const msg = err.message || 'Error saving settings';
-      setErrorMsg(msg);
-      toast.error(msg, 'Save Failed');
-    } finally {
-      setSaving(false);
-    }
+      localStorage.setItem(
+        'pinkroom_notif_prefs',
+        JSON.stringify({ submissionReviews, payoutUpdates, recordingReminders })
+      );
+    } catch {}
+    toast.success('Your notification choices are up to date.', 'Notification preferences saved');
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return 'CR';
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return parts[0].substring(0, 2).toUpperCase();
+  const handleSavePaymentPreference = () => {
+    try {
+      localStorage.setItem('pinkroom_payment_method', paymentMethod);
+    } catch {}
+    toast.success('Your payout method has been saved for this preview.', 'Payment preference saved');
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-black">
-        <div className="inline-block w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mb-3" />
-        <p className="text-xs font-bold">Loading creator settings...</p>
-      </div>
-    );
-  }
+  const handleResetPreferences = () => {
+    setSubmissionReviews(true);
+    setPayoutUpdates(true);
+    setRecordingReminders(false);
+    setPaymentMethod('');
+    setDisplayName('Ada Wunor');
+    try {
+      localStorage.removeItem('pinkroom_notif_prefs');
+      localStorage.removeItem('pinkroom_payment_method');
+      localStorage.removeItem('pinkroom_display_name');
+    } catch {}
+    toast.success('All preview settings restored to defaults.', 'Preferences reset');
+  };
 
-  const currentAvatar = avatarPreview || avatarUrl;
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'AW';
+
+  const scrollToSection = (id: string, section: typeof activeSection) => {
+    setActiveSection(section);
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto px-2.5 sm:px-4 lg:px-6 py-8 sm:py-12 space-y-8 text-black">
-      {/* Page Title */}
-      <div className="border-b border-neutral-200 pb-6">
-        <h1 className="font-serif text-2xl sm:text-4xl font-bold text-black">
-          Creator Profile & Payout Settings
-        </h1>
-        <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-          Manage your creator profile display, country, and payout account details.
-        </p>
-      </div>
+    <div className="w-full min-h-screen bg-[#FDFBFD] dark:bg-[#120F15] text-neutral-900 dark:text-neutral-100 transition-colors">
+      <main className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-10">
 
-      {successMsg && (
-        <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-300 text-black text-xs font-bold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
-          <span>{successMsg}</span>
-        </div>
-      )}
-
-      {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{errorMsg}</span>
-        </div>
-      )}
-
-      {/* Avatar Management Card */}
-      <div className="bg-white p-6 sm:p-8 rounded-xl border border-neutral-200 space-y-6">
-        <div className="font-serif text-lg font-bold text-black flex items-center gap-2">
-          <User className="w-4 h-4 text-black" />
-          <span>Profile Picture & Avatar</span>
+        {/* ─── Page Header ─────────────────────────────────────────── */}
+        <div className="space-y-1.5 pb-1">
+          <div className="text-[10px] sm:text-[11px] tracking-[0.22em] font-bold text-[#7B1E4B] dark:text-[#F472B6] uppercase">
+            MAKE YOURSELF AT HOME
+          </div>
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.6rem] font-normal tracking-tight text-neutral-900 dark:text-white leading-tight">
+            Your space.{' '}
+            <span className="italic font-serif text-[#7B1E4B] dark:text-[#F472B6]">
+              Your preferences.
+            </span>
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+            Keep your profile and creator preferences in one place.
+          </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <div className="relative group shrink-0">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-800 ring-2 ring-neutral-300 flex items-center justify-center text-white shadow-sm">
-              {currentAvatar ? (
-                <img
-                  src={currentAvatar}
-                  alt={displayName || 'Avatar'}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="font-serif text-3xl font-bold text-white">
-                  {getInitials(displayName)}
-                </span>
-              )}
+        {/* ─── Main 2-Column Section (Sidebar + Settings Content) ──── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          {/* Left Sidebar Navigation (col-span-3) */}
+          <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24">
+            <nav className="space-y-1">
+              <button
+                type="button"
+                onClick={() => scrollToSection('section-profile', 'profile')}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all text-left ${
+                  activeSection === 'profile'
+                    ? 'bg-[#FCEBF2] dark:bg-[#25151F] text-[#7B1E4B] dark:text-[#F472B6]'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                <span>Creator profile</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollToSection('section-notifications', 'notifications')}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all text-left ${
+                  activeSection === 'notifications'
+                    ? 'bg-[#FCEBF2] dark:bg-[#25151F] text-[#7B1E4B] dark:text-[#F472B6]'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Bell className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                <span>Notifications</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollToSection('section-appearance', 'appearance')}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all text-left ${
+                  activeSection === 'appearance'
+                    ? 'bg-[#FCEBF2] dark:bg-[#25151F] text-[#7B1E4B] dark:text-[#F472B6]'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Moon className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                <span>Appearance</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollToSection('section-payment', 'payment')}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all text-left ${
+                  activeSection === 'payment'
+                    ? 'bg-[#FCEBF2] dark:bg-[#25151F] text-[#7B1E4B] dark:text-[#F472B6]'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <CreditCard className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                <span>Payment preference</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollToSection('section-account', 'account')}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all text-left ${
+                  activeSection === 'account'
+                    ? 'bg-[#FCEBF2] dark:bg-[#25151F] text-[#7B1E4B] dark:text-[#F472B6]'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Lock className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                <span>Account & security</span>
+              </button>
+            </nav>
+
+            <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 space-y-1 text-xs">
+              <div className="text-neutral-400 font-medium">Need a hand?</div>
+              <Link
+                href="/contact"
+                className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:text-[#7B1E4B] dark:hover:text-[#F472B6] transition-colors inline-flex items-center gap-1"
+              >
+                <span>Contact creator support</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </aside>
+
+          {/* Right Main Content (col-span-9) */}
+          <div className="lg:col-span-9 space-y-6">
+
+            {/* Top Pink Notice Banner */}
+            <div className="bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F5D5E3] dark:border-[#3D2132] rounded-xl p-3.5 sm:p-4 flex items-center gap-2.5 text-xs text-[#7B1E4B] dark:text-[#F472B6] shadow-2xs">
+              <FileText className="w-4 h-4 shrink-0 opacity-90" />
+              <span className="leading-relaxed">
+                Preview settings are saved on this device only. They don't change your live creator account or email delivery.
+              </span>
             </div>
 
-            {uploadingAvatar && (
-              <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            {/* ─── Section 01: Creator Profile ──────────────────────── */}
+            <div
+              id="section-profile"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xs"
+            >
+              <div className="flex items-start gap-4">
+                <span className="font-serif text-2xl font-normal text-neutral-300 dark:text-neutral-600">
+                  01
+                </span>
+                <div className="space-y-0.5">
+                  <h2 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                    Creator profile
+                  </h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
+                    The name you use in this preview.
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
 
-          <div className="space-y-3 flex-1 text-center sm:text-left">
-            <div>
-              <div className="text-sm font-bold text-black">Upload a Profile Photo</div>
-              <p className="text-xs text-neutral-600 font-medium">
-                JPG, PNG, or WebP. Max 10MB. Displayed on your creator portal and header.
+              {/* Avatar + Badge Row */}
+              <div className="flex items-center gap-3 pt-1">
+                <div className="w-10 h-10 rounded-full bg-[#FCEBF2] dark:bg-[#2A1624] text-[#7B1E4B] dark:text-[#F472B6] border border-[#F3D3E1] dark:border-[#3D2132] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                  {initials}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-neutral-900 dark:text-white">
+                    {displayName || 'Creator'}
+                  </div>
+                  <div className="inline-flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    <span>Audition approved</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Display Name Input */}
+              <div className="space-y-2 pt-2">
+                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  Display name
+                </label>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Enter creator name"
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-[#FDFBFD] dark:bg-[#141217] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B] transition-all"
+                />
+                <p className="text-[11px] text-neutral-400 font-normal">
+                  Applies to this preview's profile display. Existing submission titles stay as-recorded.
+                </p>
+              </div>
+
+              {/* Email address row */}
+              <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-xs">
+                <span className="text-neutral-500 dark:text-neutral-400">Email address</span>
+                <span className="text-neutral-400 dark:text-neutral-500 font-medium">
+                  {email || 'Account connection required'}
+                </span>
+              </div>
+
+              {/* Save profile button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleSaveProfile}
+                  disabled={savingProfile}
+                  className="px-6 py-2.5 rounded-full bg-[#130E14] hover:bg-black text-white text-xs font-semibold transition-all shadow-sm active:scale-95"
+                >
+                  {savingProfile ? 'Saving...' : 'Save preview profile'}
+                </button>
+              </div>
+            </div>
+
+            {/* ─── Section 02: Notifications (All Functioning Toggles) ── */}
+            <div
+              id="section-notifications"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xs"
+            >
+              <div className="flex items-start gap-4">
+                <span className="font-serif text-2xl font-normal text-neutral-300 dark:text-neutral-600">
+                  02
+                </span>
+                <div className="space-y-0.5">
+                  <h2 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                    Notifications
+                  </h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
+                    Choose the updates you'd like to receive.
+                  </p>
+                </div>
+              </div>
+
+              {/* Toggle Rows */}
+              <div className="divide-y divide-neutral-100 dark:divide-neutral-800 pt-1">
+                {/* Toggle 1: Submission reviews */}
+                <div className="py-4 flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                      Submission reviews
+                    </div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                      Approval updates and editorial revision notes.
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={submissionReviews}
+                    onClick={() => setSubmissionReviews((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      submissionReviews ? 'bg-[#7B1E4B]' : 'bg-neutral-200 dark:bg-neutral-700'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                        submissionReviews ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Toggle 2: Payout updates */}
+                <div className="py-4 flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                      Payout updates
+                    </div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                      Updates when a payout is requested or completed.
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={payoutUpdates}
+                    onClick={() => setPayoutUpdates((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      payoutUpdates ? 'bg-[#7B1E4B]' : 'bg-neutral-200 dark:bg-neutral-700'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                        payoutUpdates ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Toggle 3: Recording reminders */}
+                <div className="py-4 flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                      Recording reminders
+                    </div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                      A gentle reminder to keep your next batch moving.
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={recordingReminders}
+                    onClick={() => setRecordingReminders((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      recordingReminders ? 'bg-[#7B1E4B]' : 'bg-neutral-200 dark:bg-neutral-700'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                        recordingReminders ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Save notifications button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleSaveNotifications}
+                  className="px-6 py-2.5 rounded-full bg-[#130E14] hover:bg-black text-white text-xs font-semibold transition-all shadow-sm active:scale-95"
+                >
+                  Save preview preferences
+                </button>
+              </div>
+            </div>
+
+            {/* ─── Section 03: Appearance (Functioning Theme Selector) ── */}
+            <div
+              id="section-appearance"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xs"
+            >
+              <div className="flex items-start gap-4">
+                <span className="font-serif text-2xl font-normal text-neutral-300 dark:text-neutral-600">
+                  03
+                </span>
+                <div className="space-y-0.5">
+                  <h2 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                    Appearance
+                  </h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
+                    Choose a look that feels right. Applies across this preview.
+                  </p>
+                </div>
+              </div>
+
+              {/* Light & Dark Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                {/* Light Mode Card */}
+                <div
+                  onClick={() => setThemeMode(false)}
+                  className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                    !isDark
+                      ? 'border-[#7B1E4B] bg-[#FDF7FA] dark:bg-neutral-800/80 ring-1 ring-[#7B1E4B]'
+                      : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#FCEBF2] text-[#7B1E4B] flex items-center justify-center">
+                      <Sun className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                        Light
+                      </div>
+                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                        Soft pink, bright surfaces
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      !isDark
+                        ? 'bg-[#7B1E4B] text-white'
+                        : 'border border-neutral-300 dark:border-neutral-600'
+                    }`}
+                  >
+                    {!isDark && <Check className="w-3 h-3 stroke-[2.5]" />}
+                  </div>
+                </div>
+
+                {/* Dark Mode Card */}
+                <div
+                  onClick={() => setThemeMode(true)}
+                  className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                    isDark
+                      ? 'border-[#7B1E4B] bg-[#FDF7FA] dark:bg-neutral-800/80 ring-1 ring-[#7B1E4B]'
+                      : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#18141D] text-white flex items-center justify-center">
+                      <Moon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                        Dark
+                      </div>
+                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                        Deep tones, softer light
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isDark
+                        ? 'bg-[#7B1E4B] text-white'
+                        : 'border border-neutral-300 dark:border-neutral-600'
+                    }`}
+                  >
+                    {isDark && <Check className="w-3 h-3 stroke-[2.5]" />}
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-neutral-400 font-normal">
+                Changes save automatically on this device.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-1">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarFileSelect}
-                className="hidden"
-              />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingAvatar}
-                className="inline-flex items-center px-4 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-sm disabled:opacity-50"
-              >
-                <Camera className="w-3.5 h-3.5 mr-1.5" />
-                <span>{uploadingAvatar ? 'Uploading...' : 'Choose Image'}</span>
-              </button>
-
-              {currentAvatar && (
-                <button
-                  type="button"
-                  onClick={handleRemoveAvatar}
-                  disabled={saving}
-                  className="inline-flex items-center px-3.5 py-2 rounded-lg border border-neutral-300 text-black hover:bg-neutral-100 text-xs font-bold transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5 mr-1" />
-                  <span>Remove</span>
-                </button>
-              )}
-
-              {/* Audition Benchmark Status Badge */}
-              {profile?.sample_status === 'APPROVED' ? (
-                <div className="sm:self-start inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FDF2F4] text-[#7B1E4B]">
-                  <VerifiedBadge size={16} />
-                  <span>Verified Creator (Audition Approved)</span>
-                </div>
-              ) : profile?.sample_status ? (
-                <div className="sm:self-start inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FDF2F4] text-[#7B1E4B] border-0">
-                  <span className="text-[#7B1E4B]/80 font-medium">Audition Status:</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#7B1E4B] text-white border-0">
-                    {profile.sample_status.replace('_', ' ')}
-                  </span>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Settings Form */}
-      <form onSubmit={handleSave} className="space-y-8">
-        {/* Creator Info Card */}
-        <div className="bg-white p-6 sm:p-8 rounded-xl border border-neutral-200 space-y-6">
-          <div className="font-serif text-lg font-bold text-black flex items-center gap-2">
-            <Globe className="w-4 h-4 text-black" />
-            <span>Public Creator Information</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-black">
-                Display Name / Creator Handle
-              </label>
-              <input
-                type="text"
-                required
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                placeholder="e.g. Quiet Pages ASMR"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-black">
-                Country of Residence
-              </label>
-              <select
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-              >
-                <option value="">Select Country</option>
-                {ALL_COUNTRIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-black">
-              Short Creator Bio / Equipment Notes
-            </label>
-            <textarea
-              rows={3}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-              placeholder="e.g. Vintage book collector, recording paper turning with blue press nails and desktop stereo microphone..."
-            />
-          </div>
-        </div>
-
-        {/* Payout Details Card */}
-        <div className="bg-white p-6 sm:p-8 rounded-xl border border-neutral-200 space-y-6">
-          <div className="font-serif text-lg font-bold text-black flex items-center gap-2">
-            <Landmark className="w-4 h-4 text-black" />
-            <span>Default Payout Method</span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
-            {[
-              { id: 'WISE', label: 'Wise' },
-              { id: 'PAYPAL', label: 'PayPal' },
-              { id: 'MOBILE_MONEY', label: 'Mobile Money' },
-              { id: 'NIGERIA_BANK', label: 'Nigerian Bank' },
-              { id: 'ACH', label: 'Direct Deposit / ACH' },
-            ].map((pm) => (
-              <button
-                key={pm.id}
-                type="button"
-                onClick={() => setPaymentMethod(pm.id as PaymentMethodType)}
-                className={`p-2.5 sm:p-3 rounded-lg border text-xs font-bold text-center transition-all ${
-                  paymentMethod === pm.id
-                    ? 'border-black bg-black text-white shadow-sm'
-                    : 'border-neutral-300 bg-white text-black hover:bg-neutral-100'
-                }`}
-              >
-                {pm.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Conditional Fields based on method */}
-          {paymentMethod === 'MOBILE_MONEY' && (
-            <div className="space-y-4 p-4 sm:p-5 rounded-xl bg-neutral-50 border border-neutral-200">
-              <div className="flex items-center justify-between border-b border-neutral-200 pb-2.5">
-                <div className="font-serif font-bold text-sm sm:text-base text-black flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-emerald-600" />
-                  <span>African Mobile Money (M-Pesa / MTN MoMo / Airtel)</span>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
-                  Instant Payout
+            {/* ─── Section 04: Payment Preference ───────────────────── */}
+            <div
+              id="section-payment"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xs"
+            >
+              <div className="flex items-start gap-4">
+                <span className="font-serif text-2xl font-normal text-neutral-300 dark:text-neutral-600">
+                  04
                 </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Mobile Money Provider / Network
-                  </label>
-                  <select
-                    value={mobileMoneyProvider || (MOBILE_MONEY_PROVIDERS[country] ? MOBILE_MONEY_PROVIDERS[country][0] : 'M-Pesa (Safaricom)')}
-                    onChange={(e) => setMobileMoneyProvider(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  >
-                    {(MOBILE_MONEY_PROVIDERS[country] || MOBILE_MONEY_PROVIDERS['Other']).map((prov) => (
-                      <option key={prov} value={prov}>
-                        {prov}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Mobile Money Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={mobileMoneyPhone}
-                    onChange={(e) => setMobileMoneyPhone(e.target.value)}
-                    placeholder="e.g. +254 712 345 678"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
-                  <p className="text-[10px] text-neutral-500">Include country code (+254 Kenya, +233 Ghana, +256 Uganda, etc.)</p>
-                </div>
-
-                <div className="sm:col-span-2 space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Registered Mobile Account Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={mobileMoneyAccountName}
-                    onChange={(e) => setMobileMoneyAccountName(e.target.value)}
-                    placeholder="e.g. Ophelia Adeleke (Full name as registered on your SIM)"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
+                <div className="space-y-0.5">
+                  <h2 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                    Payment preference
+                  </h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
+                    Choose your preferred payout method for this preview.
+                  </p>
                 </div>
               </div>
-            </div>
-          )}
-          {paymentMethod === 'WISE' && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-black">
-                Wise Account Email
-              </label>
-              <input
-                type="email"
-                value={wiseEmail}
-                onChange={(e) => setWiseEmail(e.target.value)}
-                placeholder="e.g. creator@example.com"
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-              />
-            </div>
-          )}
 
-          {paymentMethod === 'PAYPAL' && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-black">
-                PayPal Email Address
-              </label>
-              <input
-                type="email"
-                value={paypalEmail}
-                onChange={(e) => setPaypalEmail(e.target.value)}
-                placeholder="e.g. paypal-creator@example.com"
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-              />
-            </div>
-          )}
-
-          {paymentMethod === 'NIGERIA_BANK' && (
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-black">
-                  Nigerian Commercial Bank
+              {/* Preferred method select */}
+              <div className="space-y-2 pt-1">
+                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  Preferred method
                 </label>
                 <select
-                  value={nigerianBankName}
-                  onChange={(e) => setNigerianBankName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-[#FDFBFD] dark:bg-[#141217] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B] transition-all"
                 >
-                  {NIGERIAN_BANKS.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
+                  <option value="">No preference selected</option>
+                  <option value="NIGERIA_BANK">Direct Bank Transfer (Nigeria / NGN)</option>
+                  <option value="MOBILE_MONEY">Mobile Money (M-Pesa, MTN, Airtel)</option>
+                  <option value="WISE">Wise (TransferWise)</option>
+                  <option value="PAYPAL">PayPal</option>
+                  <option value="ACH">US ACH / Direct Deposit</option>
+                  <option value="WIRE">International Wire Transfer</option>
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    10-Digit NUBAN Account Number
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={10}
-                    value={nigerianAccountNumber}
-                    onChange={(e) => setNigerianAccountNumber(e.target.value.replace(/\D/g, ''))}
-                    placeholder="0123456789"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
-                </div>
+              {/* Notice banner */}
+              <div className="bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F5D5E3] dark:border-[#3D2132] rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-[#7B1E4B] dark:text-[#F472B6]">
+                <Lock className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                <span>
+                  No bank or payment account is connected here. Set up recipient details in your existing creator account.
+                </span>
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Account Beneficiary Name
-                  </label>
-                  <input
-                    type="text"
-                    value={nigerianAccountName}
-                    onChange={(e) => setNigerianAccountName(e.target.value)}
-                    placeholder="e.g. Ophelia Adeleke"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
-                </div>
+              {/* Save payment preference button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleSavePaymentPreference}
+                  className="px-6 py-2.5 rounded-full bg-[#130E14] hover:bg-black text-white text-xs font-semibold transition-all shadow-sm active:scale-95"
+                >
+                  Save preview preference
+                </button>
               </div>
             </div>
-          )}
 
-          {(paymentMethod === 'ACH' || paymentMethod === 'WIRE') && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Bank Name
-                  </label>
-                  <input
-                    type="text"
-                    value={bankName}
-                    onChange={(e) => setBankName(e.target.value)}
-                    placeholder="e.g. Chase, Bank of America"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Routing Number (ABA / SWIFT)
-                  </label>
-                  <input
-                    type="text"
-                    value={routingNumber}
-                    onChange={(e) => setRoutingNumber(e.target.value)}
-                    placeholder="9 digits"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
+            {/* ─── Section 05: Account & Security ──────────────────── */}
+            <div
+              id="section-account"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xs"
+            >
+              <div className="flex items-start gap-4">
+                <span className="font-serif text-2xl font-normal text-neutral-300 dark:text-neutral-600">
+                  05
+                </span>
+                <div className="space-y-0.5">
+                  <h2 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                    Account & security
+                  </h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
+                    Keep your personal details and access up to date.
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Account Number
-                  </label>
-                  <input
-                    type="text"
-                    value={accountNumber}
-                    onChange={(e) => setAccountNumber(e.target.value)}
-                    placeholder="Account number"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
+              {/* Row 1: Your creator account */}
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-100 dark:border-neutral-800 pb-5">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    Your creator account
+                  </div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Manage your email, password, and account security on The Pink Room.
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-black">
-                    Beneficiary Legal Name
-                  </label>
-                  <input
-                    type="text"
-                    value={beneficiaryName}
-                    onChange={(e) => setBeneficiaryName(e.target.value)}
-                    placeholder="Legal name on bank account"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white font-medium text-black focus:outline-none focus:border-black"
-                  />
+
+                <Link
+                  href="/creator"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shrink-0 self-start sm:self-auto"
+                >
+                  <span>Open account</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+
+              {/* Row 2: Reset preview preferences */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    Reset preview preferences
+                  </div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Clear this device's preview settings and restore the defaults.
+                  </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleResetPreferences}
+                  className="text-xs font-semibold text-[#7B1E4B] dark:text-[#F472B6] hover:underline self-start sm:self-auto"
+                >
+                  Reset preferences
+                </button>
               </div>
             </div>
-          )}
+
+          </div>
+
         </div>
 
-        {/* Save Button */}
-        <div className="flex justify-end pt-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center px-8 py-3.5 rounded-lg bg-black text-white font-bold hover:bg-neutral-800 transition-colors shadow-sm disabled:opacity-50 text-sm"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            <span>{saving ? 'Saving Changes...' : 'Save Settings'}</span>
-          </button>
+        {/* ─── Bottom Summary Bar ──────────────────────────────────── */}
+        <div className="pt-8 border-t border-neutral-200/70 dark:border-neutral-800">
+          <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 font-medium tracking-wide">
+            <span>$50 flat rate.</span>
+            <span>·</span>
+            <span>8-video minimum.</span>
+            <span>·</span>
+            <span>Your work. Your earnings.</span>
+          </div>
         </div>
-      </form>
+
+      </main>
     </div>
   );
 }

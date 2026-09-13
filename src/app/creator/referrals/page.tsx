@@ -139,10 +139,10 @@ export default function CreatorReferralsPage() {
             </div>
           </div>
           <Link
-            href="/creator/earnings-and-payments"
+            href="/creator/payouts"
             className="text-xs font-semibold text-[#8E2848] dark:text-pink-300 hover:underline flex items-center gap-1 shrink-0"
           >
-            <span>View Earnings Ledger</span>
+            <span>View Payouts Ledger</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
