@@ -5,13 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   FileText,
-  AlertCircle,
-  ArrowRight,
   Lock,
-  Download,
-  Calendar,
-  User,
-  Clock,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ExternalLink,
+  HelpCircle,
+  Video,
+  FileCheck2,
+  AlertCircle,
+  FileCode,
+  ShieldCheck,
 } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
 
@@ -20,428 +24,568 @@ export default function CreatorAgreementPage() {
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [agreementStatus, setAgreementStatus] = useState<{
+  const [agreementData, setAgreementData] = useState<{
     signed: boolean;
     signed_at: string | null;
     signature_name: string | null;
     creator_name?: string;
-    creator_email?: string;
   } | null>(null);
 
-  // Form State
-  const [signatureName, setSignatureName] = useState('');
-  const [confirmedAdult, setConfirmedAdult] = useState(false);
-  const [confirmedTerms, setConfirmedTerms] = useState(false);
-  const [confirmedOriginal, setConfirmedOriginal] = useState(false);
-  const [formError, setFormError] = useState('');
+  // Review checklist states
+  const [formatConfirmed, setFormatConfirmed] = useState(false);
+  const [termsConfirmed, setTermsConfirmed] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
-    fetch('/api/creator/agreement')
+    // Check localStorage for previously confirmed review
+    try {
+      const storedReview = localStorage.getItem('pinkroom_agreement_reviewed');
+      if (storedReview === 'true') {
+        setFormatConfirmed(true);
+        setTermsConfirmed(true);
+        setReviewSubmitted(true);
+      }
+    } catch {}
+
+    fetch('/api/creator/agreement', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
-        setAgreementStatus(data);
-        if (data.creator_name) {
-          setSignatureName(data.creator_name);
-        }
-        setLoading(false);
+        setAgreementData(data);
       })
-      .catch(() => {
-        setLoading(false);
-      });
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleSignAgreement = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError('');
+  const creatorName =
+    agreementData?.creator_name ||
+    agreementData?.signature_name ||
+    (typeof window !== 'undefined' ? localStorage.getItem('pinkroom_display_name') : null) ||
+    'Ada Wunor';
 
-    if (!signatureName.trim()) {
-      setFormError('Please enter your full legal name as your electronic signature.');
-      return;
-    }
+  const isSigned = agreementData?.signed;
+  const canConfirm = formatConfirmed && termsConfirmed;
 
-    if (!confirmedAdult || !confirmedTerms || !confirmedOriginal) {
-      setFormError('You must check all three declarations before executing this agreement.');
-      return;
-    }
-
-    setSubmitting(true);
+  const handleConfirmReview = () => {
+    if (!canConfirm) return;
+    setSubmittingReview(true);
     try {
-      const res = await fetch('/api/creator/agreement', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          signature_name: signatureName.trim(),
-          confirmed_adult: confirmedAdult,
-          confirmed_terms: confirmedTerms,
-          confirmed_original: confirmedOriginal,
-        }),
-      });
+      localStorage.setItem('pinkroom_agreement_reviewed', 'true');
+    } catch {}
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to sign agreement.');
-      }
-
-      setAgreementStatus({
-        signed: true,
-        signed_at: data.signed_at,
-        signature_name: data.signature_name,
-        creator_name: data.profile?.display_name || signatureName,
-        creator_email: data.profile?.email,
-      });
-
+    setTimeout(() => {
+      setReviewSubmitted(true);
+      setSubmittingReview(false);
       toast.success(
-        'You are now certified to create and upload videos to The Pink Room.',
-        'Agreement Signed Successfully'
+        'Review confirmed. You are ready to record and upload your video batch.',
+        'Terms review confirmed'
       );
-    } catch (err: any) {
-      setFormError(err.message || 'Error executing agreement.');
-      toast.error(err.message || 'Could not complete signature.', 'Signing Error');
-    } finally {
-      setSubmitting(false);
+    }, 400);
+  };
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-3 px-4">
-        <div className="w-8 h-8 border-2 border-neutral-800 dark:border-white border-t-transparent rounded-full animate-spin" />
-        <div className="text-xs text-neutral-600 dark:text-neutral-300 font-medium">Loading Creator Agreement...</div>
-      </div>
-    );
-  }
-
-  const isSigned = agreementStatus?.signed;
-
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-      {/* Page Header */}
-      <div className="space-y-2 text-center sm:text-left border-b border-neutral-200 dark:border-neutral-800 pb-6">
-        <h1 className="text-3xl sm:text-4xl font-bold font-serif text-neutral-900 dark:text-[#F0F0F6]">
-          Master Creator & Independent Contractor Agreement
-        </h1>
-        <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 max-w-2xl">
-          This legally binding agreement outlines production guidelines, content ownership, faceless privacy
-          guarantees, and guaranteed payouts ($50.00/approved video with $400.00 minimum disbursements).
-        </p>
-      </div>
+    <div className="w-full min-h-screen bg-[#FDFBFD] dark:bg-[#120F15] text-neutral-900 dark:text-neutral-100 transition-colors">
+      <main className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-10">
 
-      {/* Signed Status Banner (if already executed) */}
-      {isSigned && (
-        <div className="p-6 rounded-xl bg-neutral-100 dark:bg-[#1C1C21] border border-neutral-300 dark:border-[#383842] space-y-4 shadow-sm">
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-neutral-900 dark:text-[#F0F0F6]">
-              Agreement Executed & Active
-            </h3>
-            <p className="text-xs text-neutral-600 dark:text-neutral-400">
-              Electronically signed by{' '}
-              <strong className="font-semibold underline text-neutral-900 dark:text-white">
-                {agreementStatus?.signature_name || 'Creator'}
-              </strong>{' '}
-              on {agreementStatus?.signed_at ? new Date(agreementStatus.signed_at).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              }) : 'file'}.
-            </p>
-          </div>
-
-          <div className="pt-3 border-t border-neutral-200 dark:border-[#2E2E38] flex flex-wrap items-center justify-between gap-3">
-            <div className="text-[11px] text-neutral-600 dark:text-neutral-400">
-              Certificate ID: <code className="font-mono bg-neutral-200 dark:bg-[#2A2A33] px-1.5 py-0.5 rounded border border-neutral-300 dark:border-[#3E3E4D] text-neutral-800 dark:text-[#F0F0F6]">{agreementStatus?.signature_name?.toLowerCase().replace(/\s+/g, '-')}-cert</code>
+        {/* ─── Top Header ───────────────────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 pb-1">
+          <div className="space-y-1.5">
+            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.22em] text-[#9D174D] dark:text-pink-400 uppercase">
+              BEFORE YOU CREATE
             </div>
-            <Link
-              href="/creator/upload"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#7b1e4b] hover:bg-[#68173e] text-white text-xs font-bold transition-all shadow-sm"
-            >
-              <span>Proceed to Video Upload</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-neutral-900 dark:text-white">
+              Clear terms.{' '}
+              <span className="italic font-serif text-[#8E2848] dark:text-pink-400">
+                Confident creating.
+              </span>
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-normal">
+              Review the recording requirements and how your work earns.
+            </p>
           </div>
-        </div>
-      )}
 
-      {/* Agreement Terms Document View */}
-      <div className="bg-white dark:bg-[#1C1C21] rounded-2xl border border-neutral-200 dark:border-[#2E2E38] shadow-sm overflow-hidden">
-        {/* Document Header */}
-        <div className="bg-neutral-50 dark:bg-[#161619] px-6 py-4 border-b border-neutral-200 dark:border-[#2E2E38] flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
-              Document Ref: TPR-CREATOR-AGR-2026
-            </span>
-          </div>
-          <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
-            Effective Immediately Upon Electronic Execution
-          </span>
+          <Link
+            href="/creator/upload"
+            className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-2xs self-start sm:self-auto shrink-0"
+          >
+            <span>Back to upload</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        {/* Scrollable Terms Content */}
-        <div className="p-6 sm:p-8 space-y-8 text-xs sm:text-sm text-neutral-700 dark:text-[#D2D2DE] leading-relaxed max-h-[550px] overflow-y-auto">
-          {/* Preamble */}
-          <div className="space-y-2 border-b border-neutral-200 dark:border-neutral-800 pb-6">
-            <h2 className="text-base font-bold text-neutral-900 dark:text-[#F0F0F6] font-serif">
-              Preamble & Parties
-            </h2>
-            <p>
-              This Creator Agreement (&quot;Agreement&quot;) is made and entered into by and between{' '}
-              <strong>The Pink Room</strong> (&quot;Platform&quot;, &quot;Company&quot;, &quot;We&quot;) and the individual
-              accessing and executing this document (&quot;Creator&quot;, &quot;You&quot;). By electronically signing below,
-              you agree to all terms, policies, payment structures, and content standards established herein.
-            </p>
-          </div>
-
-          {/* Section 1 */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-[#F0F0F6] uppercase tracking-wide">
-              1. Independent Contractor Status
-            </h3>
-            <p>
-              Creator operates exclusively as an independent contractor and not as an employee, agent, partner, or
-              joint venturer of The Pink Room. Creator is solely responsible for determining the manner and means of
-              recording, subject only to Platform quality standards and technical specifications. Creator is solely
-              responsible for all local, state, and federal taxes arising from compensation received.
-            </p>
-          </div>
-
-          {/* Section 2 */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-[#F0F0F6] uppercase tracking-wide">
-              2. Content Production & Quality Standards
-            </h3>
-            <p>
-              All video submissions submitted through the Creator Portal must strictly satisfy the following minimum
-              criteria:
-            </p>
-            <ul className="list-disc pl-5 space-y-1.5 pt-1 text-neutral-600 dark:text-neutral-300">
-              <li>
-                <strong>Category Focus:</strong> Original faceless page-turning ASMR using long press-on nails, flipping from the edges of pages with 2 middle fingers like the sample.
-              </li>
-              <li>
-                <strong>Duration Requirement:</strong> Every submission must be at least <strong>three (3) full minutes</strong> (180 seconds)
-                of uninterrupted, continuous recording.
-              </li>
-              <li>
-                <strong>Audio Quality:</strong> Clean audio with crisp page-turning and nail sound acoustics without
-                distorting background static, blaring music, or third-party background voices.
-              </li>
-              <li>
-                <strong>Faceless Protection & Clothing:</strong> Full faces are strictly not required and discouraged for
-                creator anonymity. Appropriate attire (e.g., shorts, skirts, pants) must be maintained at all times.
-                Sexually explicit, naked, or pornographic content is strictly prohibited and results in immediate permanent bans.
-              </li>
-            </ul>
-          </div>
-
-          {/* Section 3 */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-[#F0F0F6] uppercase tracking-wide">
-              3. Compensation & Payout Structure
-            </h3>
-            <p>
-              The Pink Room guarantees a fixed-rate compensation model for content meeting our quality review:
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-2">
-              <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#161619] space-y-1">
-                <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
-                  USD $50.00 / Approved Video
-                </div>
-                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
-                  Credited to your creator ledger upon formal review and approval by platform administrators.
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#161619] space-y-1">
-                <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
-                  8 Approved Videos = $400.00 Payout
-                </div>
-                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
-                  Minimum withdrawal threshold is 8 approved videos ($400.00). Payments are disbursed via PayPal, Mobile Money, Local Bank Transfer, or Direct Deposit.
-                </p>
-              </div>
+        {/* ─── Top 3-Stat Metric Row (Creator Dashboard Connected Grid) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 divide-y md:divide-y-0 md:divide-x divide-neutral-200/90 dark:border-neutral-800 overflow-hidden shadow-2xs">
+          {/* Metric 1: Rate */}
+          <div className="p-5 sm:p-6 space-y-1.5">
+            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#9D174D] dark:text-pink-400 uppercase">
+              YOUR RATE
+            </div>
+            <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
+              <span>$50</span>
+              <span className="font-sans text-xs font-bold text-neutral-400 tracking-wider">USD</span>
+            </div>
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+              Per approved full video
             </div>
           </div>
 
-          {/* Section 4 */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-[#F0F0F6] uppercase tracking-wide">
-              4. Commercial Rights & Licensing
-            </h3>
-            <p>
-              Upon receipt of compensation, Creator grants The Pink Room a perpetual, worldwide, irrevocable,
-              exclusive commercial license to publish, stream, distribute, syndicate, and monetize the approved
-              video content across all media platforms. Creator retains moral rights and the right to remain completely
-              faceless and anonymous.
-            </p>
+          {/* Metric 2: Payout Minimum */}
+          <div className="p-5 sm:p-6 space-y-1.5">
+            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#9D174D] dark:text-pink-400 uppercase">
+              YOUR PAYOUT
+            </div>
+            <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
+              <span>8</span>
+              <span className="font-sans text-xs font-medium text-neutral-400">videos</span>
+            </div>
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+              $400 minimum · approved and unpaid
+            </div>
           </div>
 
-          {/* Section 5 */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-[#F0F0F6] uppercase tracking-wide">
-              5. Warranties & Originality
-            </h3>
-            <p>
-              Creator warrants that: (a) Creator is at least 18 years old; (b) Creator is the sole and original author
-              of all audio and video recorded; (c) the content contains zero copyrighted audio, third-party watermarks, or
-              unauthorized material; and (d) the content does not violate any law or third-party right.
-            </p>
-          </div>
-
-          {/* Section 6 */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-[#F0F0F6] uppercase tracking-wide">
-              6. Term & Termination
-            </h3>
-            <p>
-              This Agreement remains active until terminated by either party with written notice. Any approved videos
-              and disbursed payments prior to termination remain governed under the commercial license provisions in
-              Section 4.
-            </p>
+          {/* Metric 3: Recording Duration */}
+          <div className="p-5 sm:p-6 space-y-1.5">
+            <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] text-[#9D174D] dark:text-pink-400 uppercase">
+              YOUR RECORDING
+            </div>
+            <div className="font-serif text-3xl sm:text-4xl font-normal text-neutral-900 dark:text-white flex items-baseline gap-1.5">
+              <span>3:00</span>
+              <span className="font-sans text-xs font-medium text-neutral-400">minimum</span>
+            </div>
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+              Original, faceless ASMR
+            </div>
           </div>
         </div>
 
-        {/* Signing Area */}
-        {!isSigned ? (
-          <form onSubmit={handleSignAgreement} className="bg-neutral-50 dark:bg-[#161619] p-6 sm:p-8 border-t border-neutral-200 dark:border-[#2E2E38] space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-base font-bold text-neutral-900 dark:text-[#F0F0F6]">
-                Execute Agreement & Certify Creator Status
-              </h3>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400">
-                Please review each required certification below and enter your legal name to complete signature.
+        {/* ─── Main Two-Column Layout ───────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+
+          {/* ── Left Column: Agreement Content & Checklist (8 cols) ─── */}
+          <div className="lg:col-span-8 space-y-6">
+
+            {/* Document Container Card */}
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-8 shadow-2xs">
+
+              {/* Document Header */}
+              <div className="space-y-4 border-b border-neutral-100 dark:border-neutral-800 pb-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#FCEBF2] dark:bg-[#23151F] text-[#7B1E4B] dark:text-[#F472B6] flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 bg-[#FDFBFD] dark:bg-neutral-800">
+                    Terms summary · Preview
+                  </span>
+                </div>
+
+                <div>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
+                    Creator agreement
+                  </h2>
+                  <p className="text-xs text-neutral-400 font-medium mt-0.5">
+                    Thigh-flapping & gum-chewing
+                  </p>
+                </div>
+
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 font-normal leading-relaxed">
+                  A summary of the requirements shown in your creator dashboard. The full agreement and any signed acceptance record have not been connected to this preview.
+                </p>
+
+                {/* Jump Navigation Links */}
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-neutral-100 dark:border-neutral-800 text-[11px]">
+                  <span className="font-bold tracking-wider text-neutral-400 uppercase text-[10px]">
+                    IN THIS SUMMARY
+                  </span>
+                  <div className="flex items-center gap-3 sm:gap-4 font-semibold text-[#7B1E4B] dark:text-[#F472B6]">
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection('summary-recording')}
+                      className="hover:underline transition-all"
+                    >
+                      Recording
+                    </button>
+                    <span className="text-neutral-300 dark:text-neutral-700">·</span>
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection('summary-review')}
+                      className="hover:underline transition-all"
+                    >
+                      Review
+                    </button>
+                    <span className="text-neutral-300 dark:text-neutral-700">·</span>
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection('summary-earnings')}
+                      className="hover:underline transition-all"
+                    >
+                      Earnings
+                    </button>
+                    <span className="text-neutral-300 dark:text-neutral-700">·</span>
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection('summary-payouts')}
+                      className="hover:underline transition-all"
+                    >
+                      Payouts
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 01: What you create */}
+              <div id="summary-recording" className="space-y-4 pt-2">
+                <div className="flex items-start gap-4">
+                  <span className="font-serif text-2xl sm:text-3xl font-normal text-neutral-300 dark:text-neutral-600 shrink-0 select-none">
+                    01
+                  </span>
+                  <div className="space-y-3 flex-1">
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                      What you create.
+                    </h3>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                      Original, faceless ASMR recordings combining rhythmic thigh-flapping with gum-chewing sounds. Each full video must be at least three minutes long.
+                    </p>
+
+                    <ul className="space-y-2 text-xs text-neutral-600 dark:text-neutral-400 pl-1">
+                      <li className="flex items-start gap-2">
+                        <span className="text-neutral-400 text-base leading-none">•</span>
+                        <span>Keep framing steady and faceless, with consistent lighting.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-neutral-400 text-base leading-none">•</span>
+                        <span>Capture clear original audio without music, television, voices, or other background noise.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-neutral-400 text-base leading-none">•</span>
+                        <span>Maintain safe, painless rhythmic pacing. Stop if you experience discomfort.</span>
+                      </li>
+                    </ul>
+
+                    {/* Highlight Pill Container: Eight-video batch rule */}
+                    <div className="bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F5D5E3] dark:border-[#3D2132] rounded-xl p-4 flex items-start gap-3 text-xs text-[#7B1E4B] dark:text-[#F472B6]">
+                      <Video className="w-4 h-4 shrink-0 mt-0.5 opacity-90" />
+                      <div className="space-y-0.5">
+                        <span className="font-bold">The eight-video batch rule:</span>
+                        <p className="font-medium text-[11px] opacity-90">
+                          Wear the same knee-length skirt across all eight videos, with different panties for each submission.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Link
+                        href="/guidelines"
+                        className="text-xs font-semibold text-[#7B1E4B] dark:text-[#F472B6] hover:underline inline-flex items-center gap-1.5"
+                      >
+                        <span>Read the full recording guidelines</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 02: How your work is reviewed */}
+              <div id="summary-review" className="space-y-4 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-start gap-4">
+                  <span className="font-serif text-2xl sm:text-3xl font-normal text-neutral-300 dark:text-neutral-600 shrink-0 select-none">
+                    02
+                  </span>
+                  <div className="space-y-3 flex-1">
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                      How your work is reviewed.
+                    </h3>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                      Each submission is reviewed for sound quality, background noise, lighting, framing, and compliance with the recording guidelines.
+                    </p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                      A submitted video earns only after it is approved. If changes are needed, editorial notes explain what to revise before you resubmit.
+                    </p>
+
+                    <div>
+                      <Link
+                        href="/creator/videos"
+                        className="text-xs font-semibold text-[#7B1E4B] dark:text-[#F472B6] hover:underline inline-flex items-center gap-1.5"
+                      >
+                        <span>View your submissions</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 03: What you earn */}
+              <div id="summary-earnings" className="space-y-4 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-start gap-4">
+                  <span className="font-serif text-2xl sm:text-3xl font-normal text-neutral-300 dark:text-neutral-600 shrink-0 select-none">
+                    03
+                  </span>
+                  <div className="space-y-3 flex-1">
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                      What you earn.
+                    </h3>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                      Each approved full video earns <strong>$50 USD</strong>. Your dashboard displays this as your locked-in rate.
+                    </p>
+
+                    {/* Highlight Pill Container: Audition samples are non-billable */}
+                    <div className="bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F5D5E3] dark:border-[#3D2132] rounded-xl p-4 flex items-start gap-3 text-xs text-[#7B1E4B] dark:text-[#F472B6]">
+                      <FileText className="w-4 h-4 shrink-0 mt-0.5 opacity-90" />
+                      <div className="space-y-0.5">
+                        <span className="font-bold">Audition samples are non-billable.</span>
+                        <p className="font-medium text-[11px] opacity-90">
+                          Your approved audition lets you move on to full recordings. It does not earn $50 or count toward the payout minimum.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 04: When you get paid */}
+              <div id="summary-payouts" className="space-y-4 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-start gap-4">
+                  <span className="font-serif text-2xl sm:text-3xl font-normal text-neutral-300 dark:text-neutral-600 shrink-0 select-none">
+                    04
+                  </span>
+                  <div className="space-y-3 flex-1">
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-neutral-900 dark:text-white">
+                      When you get paid.
+                    </h3>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                      A payout becomes available with at least <strong>eight approved, unpaid full videos</strong>, for a minimum of <strong>$400 USD</strong>. Additional approved, unpaid videos can be included in the same request.
+                    </p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                      Earnings allocated to a processing payout are shown as reserved. Confirmed payments appear in your payout history, and the same video cannot be paid twice.
+                    </p>
+
+                    <div>
+                      <Link
+                        href="/creator/payouts"
+                        className="text-xs font-semibold text-[#7B1E4B] dark:text-[#F472B6] hover:underline inline-flex items-center gap-1.5"
+                      >
+                        <span>See your payout progress</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* ── Bottom Action Card: YOUR REVIEW CHECKLIST ────────── */}
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xs">
+              <div className="space-y-1">
+                <div className="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] text-[#9D174D] dark:text-pink-400 uppercase">
+                  YOUR REVIEW CHECKLIST
+                </div>
+                <h3 className="font-serif text-2xl sm:text-3xl font-normal text-neutral-900 dark:text-white">
+                  Ready for the next step?
+                </h3>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 font-normal">
+                  Confirm you've reviewed the summary before returning to your recordings.
+                </p>
+              </div>
+
+              {/* Checkboxes */}
+              <div className="space-y-3.5 pt-1">
+                <label className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors select-none">
+                  <input
+                    type="checkbox"
+                    checked={formatConfirmed}
+                    onChange={(e) => setFormatConfirmed(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-neutral-300 text-[#7B1E4B] focus:ring-[#7B1E4B] accent-[#7B1E4B]"
+                  />
+                  <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                    I have reviewed the recording format, quality standards, and eight-video batch requirements.
+                  </span>
+                </label>
+
+                <label className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50 cursor-pointer transition-colors select-none">
+                  <input
+                    type="checkbox"
+                    checked={termsConfirmed}
+                    onChange={(e) => setTermsConfirmed(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-neutral-300 text-[#7B1E4B] focus:ring-[#7B1E4B] accent-[#7B1E4B]"
+                  />
+                  <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                    I understand the $50 rate, non-billable audition, and eight-approved-video payout minimum.
+                  </span>
+                </label>
+              </div>
+
+              {/* Confirmation CTA Row */}
+              <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="text-xs text-neutral-400 font-medium">
+                  {reviewSubmitted ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      All items confirmed for this visit.
+                    </span>
+                  ) : canConfirm ? (
+                    <span className="text-neutral-700 dark:text-neutral-300 font-medium">
+                      All items checked. Ready to proceed.
+                    </span>
+                  ) : (
+                    'Review both items to continue.'
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleConfirmReview}
+                  disabled={!canConfirm || submittingReview}
+                  className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs font-semibold transition-all shadow-sm active:scale-95 ${
+                    canConfirm
+                      ? 'bg-[#130E14] hover:bg-black text-white cursor-pointer'
+                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                  }`}
+                >
+                  <span>{submittingReview ? 'Confirming...' : 'Confirm review'}</span>
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <p className="text-[11px] text-neutral-400 font-normal">
+                This checklist applies only to this visit. It does not sign or accept a contract.
               </p>
             </div>
 
-            {formError && (
-              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
-                <span>{formError}</span>
-              </div>
-            )}
-
-            {/* Checkboxes */}
-            <div className="space-y-3">
-              <label className="flex items-start gap-3 p-3 rounded-xl bg-white dark:bg-[#1C1C21] border border-neutral-200 dark:border-neutral-800 cursor-pointer hover:border-neutral-400 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={confirmedAdult}
-                  onChange={(e) => setConfirmedAdult(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-black focus:ring-black"
-                />
-                <span className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed font-medium">
-                  <strong>Age Verification:</strong> I confirm and certify under penalty of perjury that I am at least 18 years old and legally competent to enter into this contract.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 p-3 rounded-xl bg-white dark:bg-[#1C1C21] border border-neutral-200 dark:border-neutral-800 cursor-pointer hover:border-neutral-400 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={confirmedOriginal}
-                  onChange={(e) => setConfirmedOriginal(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-black focus:ring-black"
-                />
-                <span className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed font-medium">
-                  <strong>Original Creation Guarantee:</strong> I certify that all video and audio submitted will be 100% original, recorded solely by me, lasting at least 3 minutes, with no nudity or copyrighted media.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 p-3 rounded-xl bg-white dark:bg-[#1C1C21] border border-neutral-200 dark:border-neutral-800 cursor-pointer hover:border-neutral-400 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={confirmedTerms}
-                  onChange={(e) => setConfirmedTerms(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-black focus:ring-black"
-                />
-                <span className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed font-medium">
-                  <strong>Terms & Payment Agreement:</strong> I have read and agree to all terms of this Master Creator Agreement, including the $50/video rate, $400 payout threshold, and commercial rights terms.
-                </span>
-              </label>
-            </div>
-
-            {/* Signature Input */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-neutral-900 dark:text-[#F0F0F6]">
-                  Full Legal Name (Electronic Signature)
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={signatureName}
-                    onChange={(e) => setSignatureName(e.target.value)}
-                    placeholder="e.g., Jane Doe"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#18181D] text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
-                  />
-                </div>
-                <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                  Typing your legal name constitutes a binding legal signature.
-                </span>
-              </div>
-
-              {/* Digital Preview */}
-              <div className="p-3 rounded-xl bg-white dark:bg-[#1C1C21] border border-neutral-200 dark:border-neutral-800 flex flex-col justify-center">
-                <span className="text-[10px] uppercase font-bold text-neutral-500 dark:text-neutral-400 tracking-wider">
-                  Signature Preview
-                </span>
-                <div className="font-serif italic text-lg sm:text-xl text-neutral-900 dark:text-neutral-100 truncate pt-1">
-                  {signatureName.trim() ? signatureName.trim() : 'Your Signature'}
-                </div>
-                <span className="text-[10px] text-neutral-400 pt-0.5">
-                  Timestamp: {new Date().toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" />
-                256-bit encrypted audit log stored
-              </span>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3 rounded-full bg-[#7b1e4b] hover:bg-[#68173e] text-white font-bold text-sm disabled:opacity-50 transition-colors shadow-md"
-              >
-                {submitting ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Executing Agreement...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5">
-                    <span>Execute & Sign Agreement</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
-                )}
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="bg-neutral-50 dark:bg-[#161619] p-6 sm:p-8 border-t border-neutral-200 dark:border-[#2E2E38] flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <div className="text-sm font-bold text-neutral-900 dark:text-white">
-                Signature on File: {agreementStatus?.signature_name}
-              </div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400">
-                Executed on {agreementStatus?.signed_at ? new Date(agreementStatus.signed_at).toLocaleString() : 'Active'}
-              </div>
-            </div>
-
-            <Link
-              href="/creator/upload"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#7b1e4b] hover:bg-[#68173e] text-white font-bold text-xs transition-colors"
-            >
-              Start Creating Videos →
-            </Link>
           </div>
-        )}
-      </div>
+
+          {/* ── Right Column: Agreement Status & Support (4 cols) ────── */}
+          <div className="lg:col-span-4 space-y-6">
+
+            {/* Dark Card: YOUR AGREEMENT */}
+            <div className="bg-[#130E14] text-white rounded-2xl p-6 sm:p-7 space-y-5 border border-white/10 shadow-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-[0.18em] text-neutral-400 uppercase">
+                  YOUR AGREEMENT
+                </span>
+                <FileText className="w-4 h-4 text-neutral-400" />
+              </div>
+
+              <div>
+                <h3 className="font-serif text-2xl font-normal leading-snug text-white">
+                  One place for <br />
+                  <span className="italic font-serif text-pink-300">
+                    your agreement.
+                  </span>
+                </h3>
+              </div>
+
+              {/* Status Badge */}
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-white/10 text-white/90 border border-white/15">
+                  <Lock className="w-3 h-3" />
+                  <span>{isSigned ? 'Account connected' : 'Account not connected'}</span>
+                </span>
+              </div>
+
+              {/* Metadata rows */}
+              <div className="space-y-3 pt-2 text-xs border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-400">Creator</span>
+                  <span className="font-medium text-white">{creatorName}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-400">Agreement status</span>
+                  <span className="font-medium text-neutral-300">
+                    {isSigned ? 'Active & Signed' : 'Unavailable in preview'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-400">Signed on</span>
+                  <span className="font-medium text-neutral-300">
+                    {agreementData?.signed_at
+                      ? new Date(agreementData.signed_at).toLocaleDateString()
+                      : 'Not available'}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-neutral-400 font-normal leading-relaxed pt-1">
+                Your audition approval and your agreement acceptance are separate records.
+              </p>
+
+              <div className="pt-2">
+                <Link
+                  href="/creator"
+                  className="w-full py-2.5 rounded-full bg-white hover:bg-neutral-100 text-black font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <span>Open creator account</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Soft Pink Card: A question about the terms? */}
+            <div className="bg-[#FCEEF3] dark:bg-[#23151F] border border-[#F8D7E3] dark:border-[#3D2132] rounded-2xl p-6 sm:p-7 space-y-3 shadow-2xs">
+              <div className="w-8 h-8 rounded-lg bg-white/80 dark:bg-white/10 text-[#7B1E4B] dark:text-pink-300 flex items-center justify-center">
+                <HelpCircle className="w-4 h-4" />
+              </div>
+
+              <h4 className="font-serif text-xl font-normal text-neutral-900 dark:text-white">
+                A question about the terms?
+              </h4>
+
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-normal">
+                Ask the creator support team before accepting the full agreement.
+              </p>
+
+              <div className="pt-1">
+                <a
+                  href="mailto:notifications@pinkroom.online?subject=Question%20about%20Creator%20Agreement"
+                  className="text-xs font-semibold text-[#7B1E4B] dark:text-[#F472B6] hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Contact creator support</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* SIGNED DOCUMENTS Card */}
+            <div className="space-y-2 pt-1">
+              <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
+                SIGNED DOCUMENTS
+              </div>
+
+              <div className="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 rounded-2xl p-5 space-y-2 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                  <FileText className="w-4 h-4 text-neutral-400" />
+                  <span>No document connected</span>
+                </div>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed font-normal">
+                  Your complete agreement, version, and acceptance history will appear when your account is connected.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* ─── Bottom Summary Bar ──────────────────────────────────── */}
+        <div className="pt-8 border-t border-neutral-200/70 dark:border-neutral-800">
+          <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 font-medium tracking-wide">
+            <span>$50 flat rate.</span>
+            <span>·</span>
+            <span>8-video minimum.</span>
+            <span>·</span>
+            <span>Your work. Your earnings.</span>
+          </div>
+        </div>
+
+      </main>
     </div>
   );
 }
