@@ -589,13 +589,12 @@ class PagesDatabaseService {
    * Removes from: profiles, platform_memberships, notifications.
    * Also propagates deletes to Supabase.
    */
-  async removeStaleCreators(olderThanMs = 172_800_000): Promise<{ removed: number; emails: string[] }> {
+  async removeStaleCreators(olderThanMs = 86_400_000): Promise<{ removed: number; emails: string[] }> {
     this.reload();
     const cutoff = Date.now() - olderThanMs;
     const removed: string[] = [];
 
-    const stale = this.data.profiles.filter((p) => {
-      if (p.role !== 'CREATOR') return false;
+    const stale = this.getPlatformCreators().filter((p) => {
       // Must have no sample submission of any kind
       const hasSample = this.data.submissions.some(
         (s) => s.creator_id === p.id && s.is_sample
@@ -603,9 +602,11 @@ class PagesDatabaseService {
       if (hasSample) return false;
       // sample_status must still be NOT_SUBMITTED (or missing)
       if (p.sample_status && p.sample_status !== 'NOT_SUBMITTED') return false;
-      // Must have joined more than `olderThanMs` ms ago
-      const joinedAt = p.created_at ? new Date(p.created_at).getTime() : 0;
-      return joinedAt > 0 && joinedAt < cutoff;
+      if (olderThanMs > 0) {
+        const joinedAt = p.created_at ? new Date(p.created_at).getTime() : 0;
+        if (joinedAt === 0 || joinedAt >= cutoff) return false;
+      }
+      return true;
     });
 
     if (stale.length === 0) return { removed: 0, emails: [] };
@@ -627,8 +628,13 @@ class PagesDatabaseService {
     for (const id of staleIds) {
       removed.push(id);
       try {
-        await supabaseAdmin.from('platform_memberships').delete().eq('user_id', id).eq('platform_id', PLATFORM_ID);
+        await supabaseAdmin.from('platform_memberships').delete().eq('user_id', id);
+        await supabaseAdmin.from('notifications').delete().eq('user_id', id);
+        await supabaseAdmin.from('chat_messages').delete().or(`creator_id.eq.${id},sender_id.eq.${id}`);
         await supabaseAdmin.from('profiles').delete().eq('id', id);
+        try {
+          await supabaseAdmin.auth.admin.deleteUser(id);
+        } catch {}
       } catch (e) {
         console.warn('[Pages DB] removeStaleCreators Supabase delete warning:', e);
       }
