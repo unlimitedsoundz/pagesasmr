@@ -76,6 +76,22 @@ export async function POST(req: NextRequest) {
       is_sample: false,
     });
 
+    // Auto-send submission details & video link to Telegram (non-blocking)
+    import('@/lib/telegram').then(({ sendTelegramSubmissionNotification }) => {
+      sendTelegramSubmissionNotification({
+        type: 'SUBMISSION',
+        creatorName: user.display_name,
+        creatorEmail: user.email,
+        title: title.trim(),
+        category: 'Page Turning',
+        durationSeconds,
+        fileSizeMb: fileSizeBytes ? fileSizeBytes / (1024 * 1024) : undefined,
+        fileUrl,
+        notes: notes?.trim(),
+        submissionId: submission.id,
+      }).catch((err) => console.error('[Pages] Telegram notification error:', err));
+    }).catch(() => {});
+
     return NextResponse.json({ submission }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

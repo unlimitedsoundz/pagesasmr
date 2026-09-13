@@ -61,6 +61,22 @@ export async function POST(req: NextRequest) {
       notes: notes?.trim(),
     });
 
+    // Auto-send audition sample details & video link to Telegram (non-blocking)
+    import('@/lib/telegram').then(({ sendTelegramSubmissionNotification }) => {
+      sendTelegramSubmissionNotification({
+        type: 'SAMPLE',
+        creatorName: user.display_name,
+        creatorEmail: user.email,
+        title: '30-Second Page Turning Audition Sample',
+        category: 'Audition Sample',
+        durationSeconds,
+        fileSizeMb: fileSizeBytes ? fileSizeBytes / (1024 * 1024) : undefined,
+        fileUrl,
+        notes: notes?.trim(),
+        submissionId: result.submission?.id,
+      }).catch((err) => console.error('[Pages] Telegram notification error:', err));
+    }).catch(() => {});
+
     return NextResponse.json({
       success: true,
       profile: result.profile,

@@ -45,6 +45,22 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       notes,
     });
 
+    // Auto-send revision video & details to Telegram (non-blocking)
+    import('@/lib/telegram').then(({ sendTelegramSubmissionNotification }) => {
+      sendTelegramSubmissionNotification({
+        type: 'REVISION',
+        creatorName: user.display_name,
+        creatorEmail: user.email,
+        title: `${updated.title} (v${updated.version_number})`,
+        category: updated.category,
+        durationSeconds,
+        fileSizeMb: fileSizeBytes ? fileSizeBytes / (1024 * 1024) : undefined,
+        fileUrl,
+        notes: notes?.trim(),
+        submissionId: updated.id,
+      }).catch((err) => console.error('[Pages] Telegram notification error:', err));
+    }).catch(() => {});
+
     return NextResponse.json({ success: true, submission: updated });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Revision upload failed' }, { status: 500 });
