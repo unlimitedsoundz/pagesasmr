@@ -141,7 +141,7 @@ function getInitialSeedData(): DatabaseData {
     {
       id: 'b0000000-0000-4000-8000-000000000001',
       platform_id: PLATFORM_ID,
-      title: 'Official Reference: Faceless Page-Turning ASMR Sample',
+      title: 'Page Turning Sample',
       description:
         'Demonstration of authentic page-turning ASMR featuring clear paper whispering sounds, long press nails gently turning pages of a book, stationary overhead camera framing, and completely silent background.',
       video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
