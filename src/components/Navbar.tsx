@@ -382,6 +382,17 @@ export default function Navbar() {
                 </span>
               </NextLink>
 
+              {/* Desktop Log Out Button */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full bg-[#FDF2F4] hover:bg-[#F8E2EC] text-[#7B1E4B] text-xs font-bold transition-colors border-0 shadow-xs ml-1"
+                title="Log Out"
+              >
+                <LogOut className="w-3.5 h-3.5 mr-1 text-[#7B1E4B]" />
+                <span>Log Out</span>
+              </button>
+
               {/* Mobile Hamburger Menu Toggle */}
               <button
                 type="button"

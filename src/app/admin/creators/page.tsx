@@ -217,21 +217,21 @@ export default function AdminCreatorsPage() {
             onClick={() => handleCleanupStale(24)}
             disabled={cleaning}
             title="Automatically delete creator accounts that joined >24 hours ago and never submitted an audition sample"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-xs font-bold hover:bg-amber-100 transition-colors shadow-sm disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#FDF2F4] text-[#7B1E4B] text-xs font-bold hover:bg-[#F8E2EC] transition-colors border-0 disabled:opacity-50"
           >
-            <Clock className={`w-3.5 h-3.5 ${cleaning ? 'animate-spin' : ''}`} />
+            <Clock className={`w-3.5 h-3.5 text-[#7B1E4B] ${cleaning ? 'animate-spin' : ''}`} />
             <span>{cleaning ? 'Sweeping...' : 'Auto-Clean (>24h No Sample)'}</span>
           </button>
 
           <Link
             href="/admin/notifications"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#7B1E4B] text-white text-xs font-bold hover:bg-[#63183C] transition-colors border-0 shadow-xs"
           >
             <Bell className="w-3.5 h-3.5" />
             <span>Broadcast Notification</span>
           </Link>
 
-          <div className="text-xs font-bold bg-white px-3.5 py-2 rounded-lg border border-neutral-300 text-black shadow-sm">
+          <div className="text-xs font-bold bg-[#FDF2F4] px-4 py-2 rounded-full text-[#7B1E4B] border-0">
             Total Creators: {creators.length}
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function AdminCreatorsPage() {
             placeholder="Search creator by alias, email, or country..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-neutral-300 focus:outline-none focus:border-black bg-white font-medium"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-full border border-neutral-300 focus:outline-none focus:border-[#7B1E4B] bg-white font-medium"
           />
         </div>
       </div>
@@ -257,7 +257,7 @@ export default function AdminCreatorsPage() {
           <h2 className="font-serif text-xl font-bold text-black">
             Registered Creators ({filtered.length})
           </h2>
-          <span className="text-xs font-bold text-neutral-500">Page Turning Creators</span>
+          <span className="text-xs font-bold text-[#7B1E4B] bg-[#FDF2F4] px-3 py-1 rounded-full border-0">Page Turning Creators</span>
         </div>
 
         {loading ? (
@@ -293,7 +293,7 @@ export default function AdminCreatorsPage() {
 
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="font-medium text-black">{c.country}</div>
-                        <div className="text-[10px] uppercase font-bold text-neutral-600">
+                        <div className="text-[10px] uppercase font-bold text-[#7B1E4B]">
                           Page Turning
                         </div>
                       </td>
@@ -301,14 +301,14 @@ export default function AdminCreatorsPage() {
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="space-y-1.5">
                           {sampleStatus === 'APPROVED' ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF2F4] text-[#7B1E4B] border-0">
+                              <CheckCircle2 className="w-3 h-3 mr-1 text-[#7B1E4B]" />
                               Audition Approved
                             </span>
                           ) : sampleStatus === 'PENDING_REVIEW' ? (
                             <div className="space-y-1">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                <Clock className="w-3 h-3 mr-1" />
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF0F5] text-[#7B1E4B] border-0">
+                                <Clock className="w-3 h-3 mr-1 text-[#7B1E4B]" />
                                 Audition Pending
                               </span>
                               <div>
@@ -316,23 +316,23 @@ export default function AdminCreatorsPage() {
                                   type="button"
                                   disabled={approvingId === c.id}
                                   onClick={() => handleApproveAudition(c.id)}
-                                  className="px-2 py-1 rounded bg-black text-white text-[10px] font-bold hover:bg-neutral-800 disabled:opacity-50"
+                                  className="px-2.5 py-1 rounded-full bg-[#7B1E4B] text-white text-[10px] font-bold hover:bg-[#63183C] disabled:opacity-50 border-0"
                                 >
                                   {approvingId === c.id ? 'Approving...' : '1-Click Approve'}
                                 </button>
                               </div>
                             </div>
                           ) : sampleStatus === 'REVISION_REQUESTED' ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF0F4] text-[#7B1E4B] border-0">
                               Revision Requested
                             </span>
                           ) : sampleStatus === 'REJECTED' ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF2F4] text-[#993352] line-through border-0">
                               Rejected
                             </span>
                           ) : (
                             <div className="space-y-1">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-neutral-100 text-neutral-600 border border-neutral-300">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF2F4] text-[#7B1E4B] border-0">
                                 Not Submitted
                               </span>
                               <div>
@@ -340,7 +340,7 @@ export default function AdminCreatorsPage() {
                                   type="button"
                                   disabled={approvingId === c.id}
                                   onClick={() => handleApproveAudition(c.id)}
-                                  className="px-2 py-0.5 rounded border border-neutral-300 text-black text-[10px] font-bold hover:bg-neutral-100 disabled:opacity-50"
+                                  className="px-2.5 py-0.5 rounded-full bg-[#FDF2F4] text-[#7B1E4B] text-[10px] font-bold hover:bg-[#F8E2EC] disabled:opacity-50 border-0"
                                 >
                                   Pre-Approve
                                 </button>
@@ -370,13 +370,13 @@ export default function AdminCreatorsPage() {
 
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         {c.stats?.canRequestPayout ? (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold bg-black text-white">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-[#7B1E4B] text-white border-0">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
                             Ready for Payout ({c.stats.eligibleCount}/{c.stats.minRequired || 8})
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded text-[11px] text-black bg-neutral-100 border border-neutral-300">
-                            <Clock className="w-3 h-3 mr-1" />
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold text-[#7B1E4B] bg-[#FDF2F4] border-0">
+                            <Clock className="w-3 h-3 mr-1 text-[#7B1E4B]" />
                             {c.stats?.eligibleCount || 0} of {c.stats?.minRequired || 8} approved
                           </span>
                         )}
@@ -391,7 +391,7 @@ export default function AdminCreatorsPage() {
                               setNotifTitle(`Message from The Pink Room Editorial`);
                               setNotifMessage('');
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-100 text-black text-xs font-bold transition-colors shadow-sm"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#FDF2F4] hover:bg-[#F8E2EC] text-[#7B1E4B] text-xs font-bold transition-colors border-0 shadow-xs"
                             title="Push custom notification & email to this creator"
                           >
                             <Bell className="w-3 h-3" />
@@ -402,7 +402,7 @@ export default function AdminCreatorsPage() {
                             type="button"
                             disabled={deletingId === c.id}
                             onClick={() => handleDeleteCreator(c)}
-                            className="inline-flex items-center p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold transition-colors disabled:opacity-50"
+                            className="inline-flex items-center p-1.5 rounded-full bg-[#FDF2F4] text-rose-600 hover:bg-rose-100 text-xs font-bold transition-colors border-0 disabled:opacity-50"
                             title="Remove creator account"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
