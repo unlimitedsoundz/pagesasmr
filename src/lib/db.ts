@@ -20,6 +20,9 @@ import {
   PlatformMembership,
   ChatMessage,
   Referral,
+  StorageProvider,
+  UploadStatus,
+  ProcessingStatus,
 } from '@/types';
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
@@ -273,6 +276,19 @@ class PagesDatabaseService {
             file_name: ss.file_name,
             file_size_bytes: Number(ss.file_size_bytes),
             status: (ss.status || 'SUBMITTED').toString().toUpperCase() as SubmissionStatus,
+            storage_provider: (ss.storage_provider || (ss.file_url && (ss.file_url.includes('/api/videos/') || ss.file_url.includes('media.pinkroom.online')) ? 'hostinger' : 'supabase')) as any,
+            storage_key: ss.storage_key || ss.file_url,
+            upload_id: ss.upload_id || undefined,
+            original_filename: ss.original_filename || ss.file_name,
+            detected_mime_type: ss.detected_mime_type || undefined,
+            verified_duration_seconds: ss.verified_duration_seconds ? Number(ss.verified_duration_seconds) : Number(ss.duration_seconds),
+            upload_status: ss.upload_status || 'COMPLETED',
+            processing_status: ss.processing_status || 'READY',
+            preview_file_key: ss.preview_file_key || undefined,
+            preview_url: ss.preview_url || undefined,
+            failure_reason: ss.failure_reason || undefined,
+            upload_completed_at: ss.upload_completed_at || ss.created_at,
+            processing_completed_at: ss.processing_completed_at || ss.created_at,
             agreed_rate_usd: isSample ? (ss.status === 'APPROVED' ? Number(ss.agreed_rate_usd || 1.0) : 0) : Number(ss.agreed_rate_usd ?? RATE_PER_VIDEO_USD),
             payout_status: (ss.payout_status as PayoutItemStatus) || 'UNPAID',
             payout_id: ss.payout_id || undefined,
@@ -994,6 +1010,7 @@ class PagesDatabaseService {
   }
 
   createSubmission(submission: {
+    id?: string;
     creator_id: string;
     creator_name?: string;
     creator_email?: string;
@@ -1005,7 +1022,28 @@ class PagesDatabaseService {
     file_size_bytes?: number;
     notes?: string;
     is_sample?: boolean;
+    storage_provider?: StorageProvider;
+    storage_key?: string;
+    upload_id?: string;
+    original_filename?: string;
+    detected_mime_type?: string;
+    verified_duration_seconds?: number;
+    upload_status?: UploadStatus;
+    processing_status?: ProcessingStatus;
+    preview_file_key?: string;
+    preview_url?: string;
   }): Submission {
+    // Idempotency: if submission with this id already exists, update and return it
+    if (submission.id) {
+      const existing = this.data.submissions.find((s) => s.id === submission.id);
+      if (existing) {
+        Object.assign(existing, submission, { updated_at: new Date().toISOString() });
+        this.save();
+        this.syncSubmissionToSupabase(existing);
+        return existing;
+      }
+    }
+
     // Invariant: Creator must have their 30s sample approved before uploading full paid videos
     if (!submission.is_sample) {
       const creator = this.getProfileById(submission.creator_id);
@@ -1016,7 +1054,9 @@ class PagesDatabaseService {
       }
     }
 
-    const id = ensureUuid();
+    const id = submission.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submission.id)
+      ? submission.id
+      : ensureUuid();
     const now = new Date().toISOString();
     const isSample = Boolean(submission.is_sample);
 
@@ -1028,6 +1068,13 @@ class PagesDatabaseService {
     }
 
     const newSub: Submission = {
+      storage_provider: submission.storage_provider || (process.env.STORAGE_PROVIDER === 'supabase' ? 'supabase' : 'hostinger'),
+      upload_status: submission.upload_status || 'COMPLETED',
+      processing_status: submission.processing_status || 'READY',
+      original_filename: submission.original_filename || fileName,
+      verified_duration_seconds: submission.verified_duration_seconds || submission.duration_seconds,
+      storage_key: submission.storage_key || submission.file_url,
+      ...submission,
       id,
       platform_id: PLATFORM_ID,
       creator_id: submission.creator_id,
@@ -1837,6 +1884,19 @@ class PagesDatabaseService {
           file_name: sub.file_name || 'page_turning.mp4',
           file_size_bytes: sub.file_size_bytes || 0,
           status: sub.status,
+          storage_provider: sub.storage_provider || (sub.file_url && (sub.file_url.includes('/api/videos/') || sub.file_url.includes('media.pinkroom.online')) ? 'hostinger' : 'supabase'),
+          storage_key: sub.storage_key || sub.file_url,
+          upload_id: sub.upload_id || null,
+          original_filename: sub.original_filename || sub.file_name || 'page_turning.mp4',
+          detected_mime_type: sub.detected_mime_type || null,
+          verified_duration_seconds: sub.verified_duration_seconds || sub.duration_seconds,
+          upload_status: sub.upload_status || 'COMPLETED',
+          processing_status: sub.processing_status || 'READY',
+          preview_file_key: sub.preview_file_key || null,
+          preview_url: sub.preview_url || null,
+          failure_reason: sub.failure_reason || null,
+          upload_completed_at: sub.upload_completed_at || sub.created_at,
+          processing_completed_at: sub.processing_completed_at || sub.created_at,
           agreed_rate_usd: sub.agreed_rate_usd,
           payout_status: sub.payout_status,
           payout_id: sub.payout_id ? ensureUuid(sub.payout_id) : null,

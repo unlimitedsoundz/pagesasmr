@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       );
     }
 
-    const { fileUrl, fileName, fileSizeBytes, durationSeconds, notes } = await req.json();
+    const { fileUrl, fileName, fileSizeBytes, durationSeconds, notes, width, height } = await req.json();
 
     if (!fileUrl || !durationSeconds) {
       return NextResponse.json({ error: 'Missing updated video file information.' }, { status: 400 });
@@ -59,6 +59,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         fileUrl,
         notes: notes?.trim(),
         submissionId: updated.id,
+        width: typeof width === 'number' ? width : undefined,
+        height: typeof height === 'number' ? height : undefined,
       });
     } catch (err) {
       console.error('[Pages] Telegram notification error:', err);

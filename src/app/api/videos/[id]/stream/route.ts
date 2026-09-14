@@ -3,11 +3,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getSignedVideoUrl, getSignedVideoUrlResult, extractStorageKey } from '@/lib/supabase';
+import { getStorageProvider } from '@/lib/storage';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const ROOT_UPLOADS_DIR = path.resolve(process.cwd(), '../../uploads');
+const ROOT_UPLOADS_DIR = path.resolve(process.env.LOCAL_MEDIA_DIR || path.resolve(process.cwd(), '../../uploads'));
+const MEDIA_DIR = process.env.MEDIA_STORAGE_DIR ? path.resolve(process.env.MEDIA_STORAGE_DIR, 'originals') : ROOT_UPLOADS_DIR;
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 const TMP_UPLOADS_DIR = path.join(os.tmpdir(), 'uploads');
 
@@ -71,8 +73,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     req.nextUrl.searchParams.get('action') === 'url' ||
     req.headers.get('accept')?.includes('application/json');
 
-  // 4. Check local filesystem fallback (for local dev or legacy temp uploads)
+  // 4. Check persistent local filesystem first
   const possiblePaths = [
+    path.join(MEDIA_DIR, targetKey),
+    path.join(MEDIA_DIR, `${targetKey}.mp4`),
+    path.join(MEDIA_DIR, `${targetKey}.mov`),
     path.join(ROOT_UPLOADS_DIR, targetKey),
     path.join(ROOT_UPLOADS_DIR, `${targetKey}.mp4`),
     path.join(ROOT_UPLOADS_DIR, `${targetKey}.mov`),

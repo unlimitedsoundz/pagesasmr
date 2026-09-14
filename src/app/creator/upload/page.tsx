@@ -319,6 +319,14 @@ export default function CreatorUploadPage() {
 
     setAuditionError('');
 
+    const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
+    if (auditionFile.size > MAX_FILE_SIZE_BYTES) {
+      const err = `Audition sample (${formatBytes(auditionFile.size)}) exceeds the maximum allowed upload size of 500 MB.`;
+      setAuditionError(err);
+      toast.error(err, 'File Exceeds 500 MB');
+      return;
+    }
+
     try {
       const clientDuration = await getVideoDuration(auditionFile);
       if (clientDuration > 0 && clientDuration < 30) {
@@ -350,6 +358,7 @@ export default function CreatorUploadPage() {
       return;
     }
 
+    const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
     const newItems: UploadQueueItem[] = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -357,6 +366,14 @@ export default function CreatorUploadPage() {
       const isAllowed = file.name.toLowerCase().endsWith('.mp4') || file.name.toLowerCase().endsWith('.mov');
       if (!isAllowed) {
         toast.error(`File "${file.name}" is not an MP4 or MOV file. Only MP4 and MOV recordings are supported.`);
+        continue;
+      }
+
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        toast.error(
+          `"${file.name}" (${formatBytes(file.size)}) exceeds the maximum upload limit of 500 MB. Please compress or trim your video.`,
+          'File Too Large'
+        );
         continue;
       }
 
@@ -718,7 +735,7 @@ export default function CreatorUploadPage() {
                 </div>
 
                 <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2 font-medium">
-                  Select up to {minRequired} videos for this batch
+                  Select up to {minRequired} videos for this batch &bull; Max 500 MB per file
                 </div>
               </div>
 
@@ -730,11 +747,15 @@ export default function CreatorUploadPage() {
                 </span>
                 <span className="flex items-center gap-1">
                   <Video className="w-3.5 h-3.5 text-neutral-400" />
-                  <span>MP4 or MOV</span>
+                  <span>MP4 or MOV (Up to 500 MB)</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Shield className="w-3.5 h-3.5 text-neutral-400" />
+                  <span>Resumable Uploads</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <Lock className="w-3.5 h-3.5 text-neutral-400" />
-                  <span>Preview stays on your device</span>
+                  <span>Private &amp; Secure</span>
                 </span>
               </div>
 

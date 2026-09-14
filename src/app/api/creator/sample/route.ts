@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { fileUrl, fileName, fileSizeBytes, durationSeconds, notes } = body;
+    const { fileUrl, fileName, fileSizeBytes, durationSeconds, notes, width, height } = body;
 
     if (!fileUrl || !durationSeconds) {
       return NextResponse.json({ error: 'Missing required media details.' }, { status: 400 });
@@ -103,6 +103,8 @@ export async function POST(req: NextRequest) {
         fileUrl,
         notes: notes?.trim(),
         submissionId: result.submission?.id,
+        width: typeof width === 'number' ? width : undefined,
+        height: typeof height === 'number' ? height : undefined,
       });
     } catch (err) {
       console.error('[Pages] Telegram notification error:', err);

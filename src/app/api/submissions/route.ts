@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { title, durationSeconds, fileUrl, fileName, fileSizeBytes, notes, consentConfirmed } = body;
+    const { title, durationSeconds, fileUrl, fileName, fileSizeBytes, notes, consentConfirmed, width, height } = body;
 
     if (!title || !durationSeconds || !fileUrl) {
       return NextResponse.json({ error: 'Missing required submission fields.' }, { status: 400 });
@@ -90,6 +90,8 @@ export async function POST(req: NextRequest) {
         fileUrl,
         notes: notes?.trim(),
         submissionId: submission.id,
+        width: typeof width === 'number' ? width : undefined,
+        height: typeof height === 'number' ? height : undefined,
       });
     } catch (err) {
       console.error('[Pages] Telegram notification error:', err);

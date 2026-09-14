@@ -105,6 +105,10 @@ export interface Profile {
   created_at: string;
 }
 
+export type StorageProvider = 'supabase' | 'hostinger';
+export type UploadStatus = 'PENDING' | 'UPLOADING' | 'COMPLETED' | 'FAILED';
+export type ProcessingStatus = 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED';
+
 export interface Submission {
   id: string;
   platform_id: PlatformId | string;
@@ -119,6 +123,19 @@ export interface Submission {
   file_name?: string;
   file_size_bytes?: number;
   status: SubmissionStatus;
+  storage_provider?: StorageProvider;
+  storage_key?: string;
+  upload_id?: string;
+  original_filename?: string;
+  detected_mime_type?: string;
+  verified_duration_seconds?: number;
+  upload_status?: UploadStatus;
+  processing_status?: ProcessingStatus;
+  preview_file_key?: string;
+  preview_url?: string;
+  failure_reason?: string;
+  upload_completed_at?: string;
+  processing_completed_at?: string;
   rejection_reason?: string;
   revision_notes?: string;
   version_number: number;
@@ -142,6 +159,10 @@ export interface SubmissionVersion {
   file_name?: string;
   file_size_bytes?: number;
   duration_seconds: number;
+  storage_provider?: StorageProvider;
+  storage_key?: string;
+  original_filename?: string;
+  verified_duration_seconds?: number;
   notes?: string;
   created_at: string;
 }

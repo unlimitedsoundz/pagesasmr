@@ -778,13 +778,34 @@ export default function AdminSubmissionsPage() {
                                   30s Audition Sample
                                 </span>
                               )}
+                              {sub.storage_provider === 'hostinger' ? (
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-100 border border-purple-300 px-2 py-0.5 rounded flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
+                                  <span>Hostinger Storage</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 bg-neutral-100 border border-neutral-300 px-2 py-0.5 rounded flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+                                  <span>Supabase Storage</span>
+                                </span>
+                              )}
                               <span className="text-xs font-bold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200">
                                 Page Turning
                               </span>
                               <span className="text-xs text-black flex items-center gap-1 font-bold">
                                 <Clock className="w-3.5 h-3.5 text-black" />
                                 {minutes}:{seconds.toString().padStart(2, '0')} ({Math.round(sub.duration_seconds)}s)
+                                {sub.verified_duration_seconds ? (
+                                  <span className="text-[10px] text-emerald-700 font-semibold ml-1">
+                                    (Verified: {Math.round(sub.verified_duration_seconds)}s)
+                                  </span>
+                                ) : null}
                               </span>
+                              {sub.file_size_bytes ? (
+                                <span className="text-xs font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
+                                  {(sub.file_size_bytes / (1024 * 1024)).toFixed(1)} MB
+                                </span>
+                              ) : null}
                               {sub.created_at && (
                                 <span className="text-xs font-semibold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200 flex items-center gap-1">
                                   <Calendar className="w-3.5 h-3.5 text-neutral-600" />

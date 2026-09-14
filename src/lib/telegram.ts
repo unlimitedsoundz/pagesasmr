@@ -1,4 +1,5 @@
 import { getSignedVideoUrl, supabaseAdmin, STORAGE_BUCKET } from '@/lib/supabase';
+import { extractVideoDimensions } from '@/lib/media';
 import fs from 'fs';
 import path from 'path';
 
@@ -13,6 +14,8 @@ export interface TelegramSubmissionNotification {
   fileUrl: string;
   notes?: string;
   submissionId?: string;
+  width?: number;
+  height?: number;
 }
 
 const DEFAULT_TELEGRAM_BOT_TOKEN = '8903193318:AAFKkDsS5c8ri-DNKmleAyyzno22AeOmTJY';
@@ -103,6 +106,7 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
     try {
       console.log(`[Telegram Pages] Preparing direct video delivery for ${diskFileName}...`);
       let videoBlob: Blob | null = null;
+      let rawBuffer: Buffer | null = null;
 
       // Check local files first
       const localPaths = [
@@ -113,8 +117,8 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
 
       for (const p of localPaths) {
         if (fs.existsSync(p)) {
-          const buffer = fs.readFileSync(p);
-          videoBlob = new Blob([buffer], { type: 'video/mp4' });
+          rawBuffer = fs.readFileSync(p);
+          videoBlob = new Blob([new Uint8Array(rawBuffer)], { type: 'video/mp4' });
           break;
         }
       }
@@ -126,16 +130,48 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
           .download(diskFileName);
         if (!supaErr && supaBlob) {
           videoBlob = supaBlob;
+          try {
+            const ab = await supaBlob.arrayBuffer();
+            rawBuffer = Buffer.from(ab);
+          } catch (abErr) {
+            console.warn('[Telegram Pages] Could not read Supabase blob arrayBuffer:', abErr);
+          }
         }
       }
 
       if (videoBlob && videoBlob.size <= 50 * 1024 * 1024) {
+        // Resolve native aspect ratio and dimensions to prevent video stretching/squashing
+        let nativeWidth = params.width || 0;
+        let nativeHeight = params.height || 0;
+
+        if (rawBuffer && (!nativeWidth || !nativeHeight)) {
+          const dims = extractVideoDimensions(rawBuffer);
+          if (dims?.width && dims?.height) {
+            nativeWidth = dims.width;
+            nativeHeight = dims.height;
+            console.log(
+              `[Telegram Pages] Native video resolution detected: ${dims.width}x${dims.height} (rotation: ${dims.rotation}°)`
+            );
+          }
+        }
+
         const formData = new FormData();
         formData.append('chat_id', chatId);
         formData.append('video', videoBlob, downloadFilename);
         formData.append('caption', videoCaption);
         formData.append('parse_mode', 'HTML');
         formData.append('supports_streaming', 'true');
+
+        // Pass exact native dimensions and duration so Telegram renders the exact native aspect ratio
+        if (nativeWidth > 0 && nativeHeight > 0) {
+          formData.append('width', Math.round(nativeWidth).toString());
+          formData.append('height', Math.round(nativeHeight).toString());
+        }
+
+        if (params.durationSeconds && params.durationSeconds > 0) {
+          formData.append('duration', Math.round(params.durationSeconds).toString());
+        }
+
         formData.append('reply_markup', JSON.stringify(replyMarkup));
 
         const vidRes = await fetch(`https://api.telegram.org/bot${botToken}/sendVideo`, {
@@ -146,8 +182,8 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
 
         const vidData = await vidRes.json();
         if (vidData.ok) {
-          console.log('[Telegram Pages] Inline video player delivered successfully to Telegram chat!');
-          return { success: true, videoDelivered: true };
+          console.log('[Telegram Pages] Inline video player delivered successfully to Telegram chat in native aspect ratio!');
+          return { success: true, videoDelivered: true, width: nativeWidth, height: nativeHeight };
         } else {
           console.warn('[Telegram Pages] sendVideo multipart failed (' + vidData.description + '), falling back to sendMessage...');
         }

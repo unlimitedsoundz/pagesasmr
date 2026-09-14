@@ -3,8 +3,10 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import { getCurrentUser } from '@/lib/auth';
-import { extractVideoDuration } from '@/lib/media';
+import { extractVideoDuration, extractVideoDimensions } from '@/lib/media';
 import { db } from '@/lib/db';
 import { uploadToSupabaseStorage } from '@/lib/supabase';
 import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
@@ -148,26 +150,53 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Generate unique file ID — upload directly from memory buffer to Supabase.
-    // Identical to the working implementation on Pink Room Main.
+    // Generate unique file ID
     const uniqueFileId = `video-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     const extension = fileName.toLowerCase().endsWith('.mov') ? '.mov' : '.mp4';
     const diskFileName = `${uniqueFileId}${extension}`;
 
-    // Upload to Supabase with retry + verification (throws on failure)
+    // Resolve persistent local storage directory
+    const uploadsDir = path.resolve(process.env.LOCAL_MEDIA_DIR || path.join(process.cwd(), 'uploads'));
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    const diskPath = path.join(uploadsDir, diskFileName);
+
+    // 1. Primary: Save persistent master copy to Hostinger disk
     try {
-      await uploadToSupabaseStorage(diskFileName, buffer, mimeType);
-    } catch (supaErr: any) {
-      console.error('[Upload] Supabase storage failed:', supaErr?.message || supaErr);
+      fs.writeFileSync(diskPath, buffer);
+      console.log(`[Pages Upload] Saved persistent video file to Hostinger storage: ${diskPath}`);
+    } catch (fsErr: any) {
+      console.error('[Pages Upload] Failed to save video to Hostinger disk storage:', fsErr);
       return NextResponse.json(
-        {
-          error:
-            `Video could not be saved to storage after multiple attempts. Please try again. If this keeps happening, try a smaller file or check your connection. (${supaErr?.message || 'storage error'})`,
-        },
+        { error: `Could not save video to server storage: ${fsErr?.message || 'disk write error'}` },
         { status: 500 }
       );
     }
 
+    // 2. Secondary: Mirror to Supabase ONLY if rollback switch is explicitly enabled
+    const isSupabaseForced = process.env.STORAGE_PROVIDER?.toLowerCase() === 'supabase';
+    let storageProvider = 'hostinger';
+
+    if (isSupabaseForced) {
+      try {
+        await uploadToSupabaseStorage(diskFileName, buffer, mimeType);
+        storageProvider = 'supabase';
+      } catch (supaErr: any) {
+        console.warn('[Pages Upload] Supabase storage upload failed:', supaErr?.message || supaErr);
+        if (isSupabaseForced) {
+          return NextResponse.json(
+            {
+              error:
+                `Video could not be saved to Supabase storage after multiple attempts. (${supaErr?.message || 'storage error'})`,
+            },
+            { status: 500 }
+          );
+        }
+      }
+    }
+
+    const dimensions = extractVideoDimensions(buffer);
     const streamUrl = `/api/videos/${diskFileName}/stream`;
 
     return NextResponse.json({
@@ -178,7 +207,10 @@ export async function POST(req: NextRequest) {
       fileName,
       fileSizeBytes,
       durationSeconds: Math.round(durationSeconds * 10) / 10,
+      width: dimensions?.width,
+      height: dimensions?.height,
       previewUrl: streamUrl,
+      storageProvider,
     });
   } catch (error: any) {
     console.error('Upload handler error:', error);
