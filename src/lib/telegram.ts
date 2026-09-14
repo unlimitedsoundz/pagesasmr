@@ -13,9 +13,12 @@ export interface TelegramSubmissionNotification {
   submissionId?: string;
 }
 
+const DEFAULT_TELEGRAM_BOT_TOKEN = '8903193318:AAFKkDsS5c8ri-DNKmleAyyzno22AeOmTJY';
+const DEFAULT_TELEGRAM_CHAT_ID = '-5442804356';
+
 export async function sendTelegramSubmissionNotification(params: TelegramSubmissionNotification) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN || DEFAULT_TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID || DEFAULT_TELEGRAM_CHAT_ID;
 
   if (!botToken || !chatId) {
     console.warn('[Telegram Pages Alert] Skipped - TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not configured.');
@@ -79,8 +82,8 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
     .join('\n');
 
   try {
-    // 1. Primary: Send immediate, guaranteed alert message with action buttons
-    const msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    // 1. Primary: Send immediate alert message with inline action buttons
+    let msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -97,12 +100,63 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
           ],
         },
       }),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(10000),
     });
 
-    const msgData = await msgRes.json();
+    let msgData = await msgRes.json();
+
+    // Fallback 1: If inline keyboard button URL is rejected, retry without inline buttons
     if (!msgData.ok) {
-      console.error('[Telegram Pages Error] sendMessage failed:', msgData);
+      console.warn('[Telegram Pages Error] Primary sendMessage failed (' + msgData.description + '), retrying without inline keyboard...');
+      msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: captionHtml,
+          parse_mode: 'HTML',
+          disable_web_page_preview: false,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+      msgData = await msgRes.json();
+    }
+
+    // Fallback 2: If HTML parsing failed, retry as pure plain text
+    if (!msgData.ok) {
+      console.warn('[Telegram Pages Error] HTML sendMessage failed (' + msgData.description + '), retrying as plain text...');
+      const plainText = [
+        `${emoji} NEW SUBMISSION RECEIVED (PINKROOM PAGES)`,
+        ``,
+        `Type: ${typeLabel}`,
+        `Creator: ${params.creatorName} (${params.creatorEmail})`,
+        `Title: ${params.title}`,
+        params.category ? `Category: ${params.category}` : null,
+        `Duration: ${formattedDuration}`,
+        params.fileSizeMb ? `Size: ${params.fileSizeMb.toFixed(1)} MB` : null,
+        params.notes ? `Notes: ${params.notes}` : null,
+        ``,
+        `Download: ${publicDownloadUrl}`,
+        `Dashboard: ${adminReviewUrl}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+      msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: plainText,
+          disable_web_page_preview: false,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+      msgData = await msgRes.json();
+    }
+
+    if (!msgData.ok) {
+      console.error('[Telegram Pages Error] All sendMessage attempts failed:', msgData);
       return { success: false, error: msgData.description };
     }
     console.log('[Telegram Pages] Submission text alert sent successfully.');
