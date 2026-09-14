@@ -961,7 +961,7 @@ export default function CreatorSettingsPage() {
                         Legal Beneficiary Full Name
                       </label>
                       {resolvedNubanName ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#7B1E4B] dark:text-pink-400 bg-[#FFF5F8] dark:bg-[#25131D] px-2 py-0.5 rounded-md">
                           <CheckCircle2 className="w-3 h-3" />
                           <span>Auto-resolved from NUBAN</span>
                         </span>
@@ -979,7 +979,7 @@ export default function CreatorSettingsPage() {
                       placeholder="Account holder's legal full name (auto-filled on verification)"
                       className={`w-full px-4 py-2.5 rounded-xl border transition-all text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:ring-1 ${
                         resolvedNubanName
-                          ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/20 focus:ring-emerald-500'
+                          ? 'border-pink-200 dark:border-pink-900/50 bg-[#FFF5F8]/40 dark:bg-[#25131D]/40 focus:ring-[#7B1E4B]'
                           : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] focus:ring-[#7B1E4B]'
                       }`}
                     />
@@ -997,19 +997,19 @@ export default function CreatorSettingsPage() {
                   )}
 
                   {resolvedNubanName && !resolvingNuban && (
-                    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                      <div className="space-y-0.5 flex-1">
+                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#FFF5F8] dark:bg-[#25131D]/70 text-neutral-900 dark:text-white text-xs">
+                      <CheckCircle2 className="w-4 h-4 text-[#7B1E4B] dark:text-pink-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1 flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-emerald-900 dark:text-emerald-200">Verified Account Holder:</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold uppercase tracking-wider">
+                          <span className="font-bold text-[#7B1E4B] dark:text-pink-300">Verified Account Holder:</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FCE7F0] dark:bg-pink-950/80 text-[#7B1E4B] dark:text-pink-300 font-bold uppercase tracking-wider">
                             NIBSS Match
                           </span>
                         </div>
-                        <div className="font-mono text-sm font-bold tracking-wide text-emerald-950 dark:text-emerald-100">
+                        <div className="font-mono text-sm font-bold tracking-wide text-neutral-950 dark:text-neutral-50">
                           {resolvedNubanName}
                         </div>
-                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-normal">
+                        <div className="text-[11px] text-[#9D2D63] dark:text-pink-300/80 font-normal">
                           Populated directly into Legal Beneficiary Full Name.
                         </div>
                       </div>
