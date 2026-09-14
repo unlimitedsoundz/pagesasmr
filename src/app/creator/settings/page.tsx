@@ -203,16 +203,17 @@ export default function CreatorSettingsPage() {
           }
           if (data.profile.payment_details && !localStorage.getItem('pinkroom_payment_details')) {
             const d = data.profile.payment_details;
-            if (d.beneficiaryName) setBeneficiaryName(d.beneficiaryName);
-            if (d.nigerianBankName) setNigerianBankName(d.nigerianBankName);
-            if (d.nigerianAccountNumber) setNigerianAccountNumber(d.nigerianAccountNumber);
-            if (d.mobileNetwork) setMobileNetwork(d.mobileNetwork);
-            if (d.mobileNumber) setMobileNumber(d.mobileNumber);
-            if (d.wiseEmail) setWiseEmail(d.wiseEmail);
-            if (d.paypalEmail) setPaypalEmail(d.paypalEmail);
-            if (d.bankName) setBankName(d.bankName);
-            if (d.routingNumber) setRoutingNumber(d.routingNumber);
-            if (d.accountNumber) setAccountNumber(d.accountNumber);
+            // Support both camelCase (legacy) and snake_case (canonical) keys
+            if (d.beneficiaryName || d.beneficiary_name) setBeneficiaryName(d.beneficiaryName || d.beneficiary_name || '');
+            if (d.nigerianBankName || d.nigerian_bank_name) setNigerianBankName(d.nigerianBankName || d.nigerian_bank_name || 'Access Bank');
+            if (d.nigerianAccountNumber || d.nigerian_account_number) setNigerianAccountNumber(d.nigerianAccountNumber || d.nigerian_account_number || '');
+            if (d.mobileNetwork || d.mobile_money_provider) setMobileNetwork(d.mobileNetwork || d.mobile_money_provider || 'M-Pesa');
+            if (d.mobileNumber || d.mobile_money_phone) setMobileNumber(d.mobileNumber || d.mobile_money_phone || '');
+            if (d.wiseEmail || d.wise_email) setWiseEmail(d.wiseEmail || d.wise_email || '');
+            if (d.paypalEmail || d.paypal_email) setPaypalEmail(d.paypalEmail || d.paypal_email || '');
+            if (d.bankName || d.bank_name) setBankName(d.bankName || d.bank_name || '');
+            if (d.routingNumber || d.routing_number) setRoutingNumber(d.routingNumber || d.routing_number || '');
+            if (d.accountNumber || d.account_number) setAccountNumber(d.accountNumber || d.account_number || '');
           }
         }
       })
@@ -338,7 +339,9 @@ export default function CreatorSettingsPage() {
 
   const handleSavePaymentPreference = async () => {
     setSavingPayment(true);
+    // Include both camelCase (for settings restore logic) and snake_case (for db.ts resolver)
     const details = {
+      // camelCase keys — used by settings page restore
       beneficiaryName: beneficiaryName.trim(),
       nigerianBankName,
       nigerianAccountNumber: nigerianAccountNumber.trim(),
@@ -349,6 +352,19 @@ export default function CreatorSettingsPage() {
       bankName: bankName.trim(),
       routingNumber: routingNumber.trim(),
       accountNumber: accountNumber.trim(),
+      // snake_case keys — used by db.ts requestPayout resolver
+      beneficiary_name: beneficiaryName.trim(),
+      nigerian_bank_name: nigerianBankName,
+      nigerian_account_number: nigerianAccountNumber.trim(),
+      nigerian_account_name: (resolvedNubanName || beneficiaryName).trim(),
+      mobile_money_provider: mobileNetwork,
+      mobile_money_phone: mobileNumber.trim(),
+      mobile_money_account_name: beneficiaryName.trim(),
+      wise_email: wiseEmail.trim(),
+      paypal_email: paypalEmail.trim(),
+      bank_name: bankName.trim(),
+      routing_number: routingNumber.trim(),
+      account_number: accountNumber.trim(),
     };
 
     try {
