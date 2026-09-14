@@ -34,7 +34,7 @@ export default function CreatorPayoutsPage() {
   const [destination, setDestination] = useState('');
 
   useEffect(() => {
-    async function loadData() {
+    async function loadData(silent = false) {
       try {
         const [statsRes, profileRes, payoutsRes] = await Promise.all([
           fetch('/api/creator/stats', { cache: 'no-store' }),
@@ -52,12 +52,18 @@ export default function CreatorPayoutsPage() {
         if (profileData?.profile) setProfile(profileData.profile);
         if (payoutsData?.payouts) setPayouts(payoutsData.payouts);
       } catch (err) {
-        console.error('Failed to load payouts data', err);
+        if (!silent) console.error('Failed to load payouts data', err);
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     }
-    loadData();
+
+    // Initial load
+    loadData(false);
+
+    // Background auto-revalidate every 3 seconds
+    const interval = setInterval(() => loadData(true), 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const rate = profile?.rate_per_video_usd || 50;
