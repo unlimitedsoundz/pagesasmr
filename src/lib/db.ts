@@ -85,6 +85,7 @@ function getInitialSeedData(): DatabaseData {
       display_name: 'Platform Operations Admin',
       role: 'ADMIN',
       country: 'United States',
+      preferred_category: 'PAGE_TURNING',
       is_adult_confirmed: true,
       created_at: new Date().toISOString(),
     },
@@ -94,6 +95,7 @@ function getInitialSeedData(): DatabaseData {
       display_name: 'Unlymited Soundz',
       role: 'ADMIN',
       country: 'Nigeria',
+      preferred_category: 'PAGE_TURNING',
       is_adult_confirmed: true,
       created_at: new Date().toISOString(),
     },
@@ -103,6 +105,7 @@ function getInitialSeedData(): DatabaseData {
       display_name: 'Ophelia Adeleke',
       role: 'ADMIN',
       country: 'Nigeria',
+      preferred_category: 'PAGE_TURNING',
       is_adult_confirmed: true,
       password: 'Chichichi21#',
       created_at: new Date().toISOString(),
@@ -439,28 +442,25 @@ class PagesDatabaseService {
         .filter((s) => s.platform_id === PLATFORM_ID)
         .forEach((s) => pagesCreatorIds.add(s.creator_id));
 
-      if (pagesCreatorIds.size > 0) {
-        const creatorIdList = Array.from(pagesCreatorIds);
-        const { data: chats, error: cErr } = await supabaseAdmin
-          .from('chat_messages')
-          .select('*')
-          .in('creator_id', creatorIdList)
-          .order('created_at', { ascending: true });
-        if (!cErr && chats && chats.length > 0) {
-          this.data.chat_messages = chats.map((c: any) => ({
-            id: c.id,
-            creator_id: c.creator_id,
-            sender_id: c.sender_id,
-            sender_name: c.sender_name,
-            sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
-            message: c.message,
-            is_read: Boolean(c.is_read),
-            created_at: c.created_at,
-          }));
-        } else if (!cErr) {
-          this.data.chat_messages = [];
-        }
-      } else {
+      // 4. Live sync Chat Messages for pinkroom_pages ONLY
+      const { data: chats, error: cErr } = await supabaseAdmin
+        .from('chat_messages')
+        .select('*')
+        .eq('platform_id', PLATFORM_ID)
+        .order('created_at', { ascending: true });
+      if (!cErr && chats && chats.length > 0) {
+        this.data.chat_messages = chats.map((c: any) => ({
+          id: c.id,
+          platform_id: PLATFORM_ID,
+          creator_id: c.creator_id,
+          sender_id: c.sender_id,
+          sender_name: c.sender_name,
+          sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
+          message: c.message,
+          is_read: Boolean(c.is_read),
+          created_at: c.created_at,
+        }));
+      } else if (!cErr) {
         this.data.chat_messages = [];
       }
 
@@ -697,6 +697,7 @@ class PagesDatabaseService {
           display_name: data.display_name,
           role: data.role as any,
           country: data.country,
+          preferred_category: data.preferred_category || 'PAGE_TURNING',
           is_adult_confirmed: data.is_adult_confirmed,
           payment_method: data.payment_method as any,
           payment_details: data.payment_details || {},
@@ -734,6 +735,7 @@ class PagesDatabaseService {
           display_name: data.display_name,
           role: data.role as any,
           country: data.country,
+          preferred_category: data.preferred_category || 'PAGE_TURNING',
           is_adult_confirmed: data.is_adult_confirmed,
           payment_method: data.payment_method as any,
           payment_details: data.payment_details || {},
@@ -1771,7 +1773,7 @@ class PagesDatabaseService {
   notifyAdmins(payload: {
     title: string;
     message: string;
-    type?: 'REVIEW' | 'PAYOUT' | 'SYSTEM' | 'GENERAL';
+    type?: 'REVIEW' | 'PAYOUT' | 'SYSTEM';
     link?: string;
   }): void {
     // 1. In-app notifications for all registered admin profiles
@@ -1783,7 +1785,7 @@ class PagesDatabaseService {
         platform_id: PLATFORM_ID,
         title: payload.title,
         message: payload.message,
-        type: payload.type || 'GENERAL',
+        type: payload.type === 'REVIEW' || payload.type === 'PAYOUT' ? payload.type : 'SYSTEM',
         link: payload.link || '/admin/submissions',
         is_read: false,
         created_at: new Date().toISOString(),
@@ -2504,7 +2506,7 @@ class PagesDatabaseService {
       totalLedgerEntries,
       totalAuditEvents,
       unreadChatCount: (this.data.chat_messages || []).filter(
-        (m) => !m.is_read && m.sender_role === 'CREATOR'
+        (m) => !m.is_read && m.sender_role === 'CREATOR' && m.platform_id === PLATFORM_ID
       ).length,
       activeChatConversations: this.getChatConversations().length,
     };
@@ -2527,6 +2529,7 @@ class PagesDatabaseService {
 
       const payload: any = {
         id: ensureUuid(msg.id),
+        platform_id: PLATFORM_ID,
         creator_id: targetCreatorId,
         sender_id: targetSenderId,
         sender_name: msg.sender_name,
@@ -2547,7 +2550,7 @@ class PagesDatabaseService {
   getChatMessages(creatorId: string): ChatMessage[] {
     if (!this.data.chat_messages) this.data.chat_messages = [];
     return this.data.chat_messages
-      .filter((m) => m.creator_id === creatorId)
+      .filter((m) => m.creator_id === creatorId && m.platform_id === PLATFORM_ID)
       .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   }
 
@@ -2575,6 +2578,7 @@ class PagesDatabaseService {
     if (!this.data.chat_messages) this.data.chat_messages = [];
     const newMsg: ChatMessage = {
       id: ensureUuid(),
+      platform_id: PLATFORM_ID,
       creator_id: creatorId,
       sender_id: sender.id,
       sender_name: sender.display_name,
@@ -2616,7 +2620,7 @@ class PagesDatabaseService {
     let changed = false;
     const updated: ChatMessage[] = [];
     this.data.chat_messages.forEach((m) => {
-      if (m.creator_id === creatorId && m.sender_role !== readerRole && !m.is_read) {
+      if (m.creator_id === creatorId && m.platform_id === PLATFORM_ID && m.sender_role !== readerRole && !m.is_read) {
         m.is_read = true;
         changed = true;
         updated.push(m);
@@ -2633,14 +2637,14 @@ class PagesDatabaseService {
   getAdminUnreadChatCount(): number {
     this.reload();
     return (this.data.chat_messages || []).filter(
-      (m) => !m.is_read && m.sender_role === 'CREATOR'
+      (m) => !m.is_read && m.sender_role === 'CREATOR' && m.platform_id === PLATFORM_ID
     ).length;
   }
 
   getCreatorUnreadChatCount(creatorId: string): number {
     this.reload();
     return (this.data.chat_messages || []).filter(
-      (m) => m.creator_id === creatorId && !m.is_read && m.sender_role === 'ADMIN'
+      (m) => m.creator_id === creatorId && !m.is_read && m.sender_role === 'ADMIN' && m.platform_id === PLATFORM_ID
     ).length;
   }
 

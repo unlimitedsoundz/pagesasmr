@@ -70,8 +70,24 @@ const LOCAL_STORAGE_ACTIVE_KEY = 'pinkroom_pages_active_video_upload';
 export function UploadProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast() as any;
 
+  interface ChunkUploadSession {
+    file: File;
+    meta: UploadMetadata;
+    submissionId: string;
+    isSample: boolean;
+    title: string;
+    chunkSize: number;
+    totalChunks: number;
+    currentChunkIndex: number;
+    isPaused: boolean;
+    storageProvider: string;
+    resolve: (value: any) => void;
+    reject: (reason?: any) => void;
+  }
+
   const tusUploadRef = useRef<tus.Upload | null>(null);
   const xhrRef = useRef<XMLHttpRequest | null>(null);
+  const chunkUploadRef = useRef<ChunkUploadSession | null>(null);
   const activeFileRef = useRef<File | null>(null);
 
   const [uploadState, setUploadState] = useState<UploadTaskState>({
@@ -143,9 +159,216 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const uploadNextChunk = () => {
+    const session = chunkUploadRef.current;
+    if (!session || session.isPaused) return;
+
+    const {
+      file,
+      meta,
+      submissionId,
+      isSample,
+      title,
+      chunkSize,
+      totalChunks,
+      currentChunkIndex,
+      storageProvider,
+      resolve,
+      reject,
+    } = session;
+
+    if (currentChunkIndex >= totalChunks) return;
+
+    const start = currentChunkIndex * chunkSize;
+    const end = Math.min(file.size, start + chunkSize);
+    const chunkBlob = file.slice(start, end);
+
+    const formData = new FormData();
+    formData.append('chunk', chunkBlob, file.name);
+    formData.append('chunkIndex', String(currentChunkIndex));
+    formData.append('totalChunks', String(totalChunks));
+    formData.append('submissionId', submissionId);
+    formData.append('fileName', file.name);
+    formData.append('fileSizeBytes', String(file.size));
+    if (meta.durationSeconds) formData.append('duration_seconds', String(meta.durationSeconds));
+    if (isSample) formData.append('is_sample', 'true');
+    formData.append('title', title);
+
+    const xhr = new XMLHttpRequest();
+    xhrRef.current = xhr;
+    xhr.open('POST', '/api/upload/chunk');
+
+    xhr.upload.onprogress = (event) => {
+      if (session.isPaused) return;
+      const loadedInChunk = event.lengthComputable ? event.loaded : 0;
+      const totalLoaded = start + loadedInChunk;
+      const pct = Math.min(99, Math.round((totalLoaded / file.size) * 100));
+      const loadedMb = (totalLoaded / (1024 * 1024)).toFixed(1);
+      const totalMb = (file.size / (1024 * 1024)).toFixed(1);
+
+      setUploadState((prev) => ({
+        ...prev,
+        transferredBytes: totalLoaded,
+        fileSizeBytes: file.size,
+        progress: pct,
+        phase: `Uploading: ${loadedMb} MB / ${totalMb} MB (${pct}%)`,
+        status: 'UPLOADING',
+      }));
+    };
+
+    xhr.onload = async () => {
+      if (session.isPaused) return;
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const resp = JSON.parse(xhr.responseText);
+
+          if (currentChunkIndex === totalChunks - 1) {
+            setUploadState((prev) => ({
+              ...prev,
+              progress: 100,
+              phase: 'Upload received. Verifying recording on server...',
+              status: 'VERIFYING',
+            }));
+
+            const fileUrl = resp.fileUrl;
+            const fileKey = resp.fileKey;
+            const fileSizeBytes = resp.fileSizeBytes || file.size;
+            const actualDuration = resp.durationSeconds || meta.durationSeconds;
+
+            const completeRes = await fetch('/api/submissions/complete-upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                submissionId,
+                title,
+                category: meta.category || 'PAGE_TURNING',
+                durationSeconds: actualDuration,
+                fileUrl,
+                fileKey,
+                fileName: file.name,
+                fileSizeBytes,
+                notes: meta.notes,
+                consentConfirmed: meta.consentConfirmed ?? true,
+                is_office_bonus: Boolean((meta as any).isOfficeBonus),
+                isSample,
+                width: resp.width,
+                height: resp.height,
+                storageProvider: resp.storageProvider || storageProvider,
+              }),
+            });
+
+            if (!completeRes.ok) {
+              const compErr = await completeRes.json().catch(() => ({}));
+              throw new Error(compErr.error || 'Failed to complete submission registration.');
+            }
+
+            const subData = await completeRes.json();
+
+            try {
+              localStorage.removeItem(LOCAL_STORAGE_ACTIVE_KEY);
+            } catch {}
+
+            setUploadState({
+              isUploading: false,
+              submissionId,
+              title,
+              fileName: file.name,
+              fileSizeBytes,
+              transferredBytes: fileSizeBytes,
+              progress: 100,
+              phase: 'Submitted for admin quality review!',
+              status: 'COMPLETED',
+              error: null,
+              isSample,
+              isMinimized: false,
+            });
+
+            toast.success(
+              isSample
+                ? 'Audition sample uploaded & submitted for admin review!'
+                : `"${title}" uploaded & submitted for quality inspection!`,
+              'Upload Successful'
+            );
+
+            xhrRef.current = null;
+            chunkUploadRef.current = null;
+            activeFileRef.current = null;
+            resolve(subData);
+          } else {
+            session.currentChunkIndex = currentChunkIndex + 1;
+            uploadNextChunk();
+          }
+        } catch (err: any) {
+          const errText = err.message || 'Error completing submission registration.';
+          setUploadState((prev) => ({
+            ...prev,
+            isUploading: false,
+            status: 'ERROR',
+            error: errText,
+          }));
+          toast.error(errText);
+          xhrRef.current = null;
+          chunkUploadRef.current = null;
+          reject(err);
+        }
+      } else {
+        let errText = `Upload failed with status ${xhr.status}`;
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.error) errText = res.error;
+        } catch {}
+        setUploadState((prev) => ({
+          ...prev,
+          isUploading: false,
+          status: 'ERROR',
+          error: errText,
+        }));
+        toast.error(errText);
+        xhrRef.current = null;
+        chunkUploadRef.current = null;
+        reject(new Error(errText));
+      }
+    };
+
+    xhr.onerror = () => {
+      if (session.isPaused) return;
+      const errText = 'Network connection interrupted during video transfer.';
+      setUploadState((prev) => ({
+        ...prev,
+        isUploading: false,
+        status: 'ERROR',
+        error: errText,
+      }));
+      toast.error(errText);
+      xhrRef.current = null;
+      chunkUploadRef.current = null;
+      reject(new Error(errText));
+    };
+
+    xhr.send(formData);
+  };
+
   const pauseUpload = () => {
     if (tusUploadRef.current) {
       tusUploadRef.current.abort();
+      setUploadState((prev) => ({
+        ...prev,
+        status: 'PAUSED',
+        phase: `Upload paused at ${prev.progress}% (${(prev.transferredBytes / (1024 * 1024)).toFixed(1)} MB)`,
+      }));
+      toast.info('Video upload paused.');
+      return;
+    }
+
+    if (chunkUploadRef.current) {
+      chunkUploadRef.current.isPaused = true;
+      if (xhrRef.current) {
+        try {
+          xhrRef.current.abort();
+        } catch {}
+        xhrRef.current = null;
+      }
       setUploadState((prev) => ({
         ...prev,
         status: 'PAUSED',
@@ -164,15 +387,35 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
       }));
       tusUploadRef.current.start();
       toast.info('Resuming video upload...');
+      return;
+    }
+
+    if (chunkUploadRef.current && activeFileRef.current) {
+      chunkUploadRef.current.isPaused = false;
+      setUploadState((prev) => ({
+        ...prev,
+        status: 'UPLOADING',
+        phase: `Resuming transfer from chunk ${chunkUploadRef.current!.currentChunkIndex + 1} of ${chunkUploadRef.current!.totalChunks}...`,
+      }));
+      toast.info('Resuming video upload...');
+      uploadNextChunk();
     }
   };
 
   const cancelUpload = () => {
     if (tusUploadRef.current) {
       try {
-        tusUploadRef.current.abort(true);
+        tusUploadRef.current.abort(true); // Terminate and clean up remote upload
       } catch {}
       tusUploadRef.current = null;
+    }
+    if (chunkUploadRef.current) {
+      chunkUploadRef.current.isPaused = true;
+      const subId = chunkUploadRef.current.submissionId;
+      if (subId) {
+        fetch(`/api/upload/chunk?submissionId=${encodeURIComponent(subId)}`, { method: 'DELETE' }).catch(() => {});
+      }
+      chunkUploadRef.current = null;
     }
     if (xhrRef.current) {
       try {
@@ -441,160 +684,27 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
+    // Step 2b: Fallback to resilient chunked slice upload with full Pause / Resume support
     return new Promise((resolve, reject) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      if (isSample) formData.append('is_sample', 'true');
-      if (submissionId) formData.append('submission_id', submissionId);
+      const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks
+      const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
 
-      const xhr = new XMLHttpRequest();
-      xhrRef.current = xhr;
-      xhr.open('POST', '/api/upload');
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const pct = Math.min(99, Math.round((event.loaded / event.total) * 100));
-          const loadedMb = (event.loaded / (1024 * 1024)).toFixed(1);
-          const totalMb = (event.total / (1024 * 1024)).toFixed(1);
-          setUploadState((prev) => ({
-            ...prev,
-            transferredBytes: event.loaded,
-            fileSizeBytes: event.total,
-            progress: pct,
-            phase: `Uploading: ${loadedMb} MB / ${totalMb} MB (${pct}%)`,
-            status: 'UPLOADING',
-          }));
-        }
+      chunkUploadRef.current = {
+        file,
+        meta,
+        submissionId: submissionId || crypto.randomUUID(),
+        isSample,
+        title,
+        chunkSize: CHUNK_SIZE,
+        totalChunks,
+        currentChunkIndex: 0,
+        isPaused: false,
+        storageProvider,
+        resolve,
+        reject,
       };
 
-      xhr.upload.onload = () => {
-        setUploadState((prev) => ({
-          ...prev,
-          progress: 100,
-          phase: 'Upload received. Verifying recording on server...',
-          status: 'VERIFYING',
-        }));
-      };
-
-      xhr.onload = async () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const uploadRes = JSON.parse(xhr.responseText);
-            const fileUrl = uploadRes.fileUrl;
-            const fileKey = uploadRes.fileKey;
-            const fileSizeBytes = uploadRes.fileSizeBytes || file.size;
-
-            const completeRes = await fetch('/api/submissions/complete-upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                submissionId,
-                title,
-                category: 'PAGE_TURNING',
-                durationSeconds: meta.durationSeconds,
-                fileUrl,
-                fileKey,
-                fileName: file.name,
-                fileSizeBytes,
-                notes: meta.notes,
-                consentConfirmed: meta.consentConfirmed ?? true,
-                isSample,
-                width: uploadRes.width,
-                height: uploadRes.height,
-                storageProvider: uploadRes.storageProvider || storageProvider,
-              }),
-            });
-
-            if (!completeRes.ok) {
-              const compErr = await completeRes.json().catch(() => ({}));
-              throw new Error(compErr.error || 'Failed to complete submission registration.');
-            }
-
-            const subData = await completeRes.json();
-
-            try {
-              localStorage.removeItem(LOCAL_STORAGE_ACTIVE_KEY);
-            } catch {}
-
-            setUploadState({
-              isUploading: false,
-              submissionId,
-              title,
-              fileName: file.name,
-              fileSizeBytes,
-              transferredBytes: fileSizeBytes,
-              progress: 100,
-              phase: 'Submitted for admin quality review!',
-              status: 'COMPLETED',
-              error: null,
-              isSample,
-              isMinimized: false,
-            });
-
-            toast.success(
-              isSample
-                ? 'Audition sample uploaded & submitted for admin review!'
-                : `"${title}" uploaded & submitted for quality inspection!`,
-              'Upload Successful'
-            );
-
-            xhrRef.current = null;
-            activeFileRef.current = null;
-            resolve(subData);
-          } catch (err: any) {
-            const errText = err.message || 'Error completing submission registration.';
-            setUploadState((prev) => ({
-              ...prev,
-              isUploading: false,
-              status: 'ERROR',
-              error: errText,
-            }));
-            toast.error(errText);
-            xhrRef.current = null;
-            reject(err);
-          }
-        } else {
-          try {
-            const res = JSON.parse(xhr.responseText);
-            const errText = res.error || `Upload failed with status ${xhr.status}`;
-            setUploadState((prev) => ({
-              ...prev,
-              isUploading: false,
-              status: 'ERROR',
-              error: errText,
-            }));
-            toast.error(errText);
-            xhrRef.current = null;
-            reject(new Error(errText));
-          } catch {
-            const errText = `Upload failed with HTTP status ${xhr.status}`;
-            setUploadState((prev) => ({
-              ...prev,
-              isUploading: false,
-              status: 'ERROR',
-              error: errText,
-            }));
-            toast.error(errText);
-            xhrRef.current = null;
-            reject(new Error(errText));
-          }
-        }
-      };
-
-      xhr.onerror = () => {
-        const errText = 'Network connection failed during video upload.';
-        setUploadState((prev) => ({
-          ...prev,
-          isUploading: false,
-          status: 'ERROR',
-          error: errText,
-        }));
-        toast.error(errText);
-        xhrRef.current = null;
-        reject(new Error(errText));
-      };
-
-      xhr.send(formData);
+      uploadNextChunk();
     });
   };
 

@@ -1069,6 +1069,12 @@ export default function AdminSubmissionsPage() {
                   durationSeconds={previewDuration}
                   onDownloadNormal={() => handleDownload(targetForDownload, false)}
                   onDownloadCompressed={() => handleDownload(targetForDownload, true)}
+                  onRequestReupload={() => {
+                    setActionType('REQUEST_REVISION');
+                    setFeedbackText(
+                      'The recording file could not be persisted during server maintenance. Please re-upload your video recording so we can verify and process your payout.'
+                    );
+                  }}
                   isDownloadingNormal={downloadingId === reviewingSub.id}
                   isDownloadingCompressed={downloadingCompressId === reviewingSub.id}
                   compressPercent={compressProgress?.id === reviewingSub.id ? compressProgress.percent : undefined}

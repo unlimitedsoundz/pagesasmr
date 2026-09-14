@@ -43,13 +43,31 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     console.warn('Submission lookup warning in stream route:', err);
   }
 
+  // Special alias: /api/videos/sample/stream dynamically routes to the active guideline sample
+  if (rawId === 'sample' || targetKey === 'sample') {
+    const guidelineSamples = db.getGuidelineSamples();
+    const activeSample = guidelineSamples[0];
+    if (activeSample?.video_url) {
+      if (activeSample.video_url.startsWith('http://') || activeSample.video_url.startsWith('https://')) {
+        return NextResponse.redirect(activeSample.video_url, 307);
+      }
+      const extracted = extractStorageKey(activeSample.video_url);
+      if (extracted) {
+        targetKey = extracted;
+      }
+    }
+  }
+
   // 2. Guideline / Benchmark sample check
   const isGuidelineSample =
+    rawId === 'sample' ||
+    targetKey === 'sample' ||
     targetKey.startsWith('guideline-') ||
     targetKey.startsWith('sample-') ||
     targetKey.startsWith('guide-') ||
     targetKey.includes('benchmark') ||
-    Boolean(targetSubmission?.is_sample);
+    Boolean(targetSubmission?.is_sample) ||
+    db.getGuidelineSamples().some((g) => g.video_url && g.video_url.includes(targetKey));
 
   // 3. Authorization check
   const user = await getCurrentUser();

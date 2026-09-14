@@ -2,9 +2,14 @@ import * as mm from 'music-metadata';
 
 /**
  * Extracts duration in seconds from an MP4 or MOV file buffer.
- * Uses music-metadata with fallback to direct ISO BMFF / QuickTime `mvhd` atom parsing.
+ * Uses music-metadata with fallback to direct ISO BMFF / QuickTime `mvhd` atom parsing,
+ * fragmented MP4 `mehd` parsing, and client-verified duration fallback.
  */
-export async function extractVideoDuration(buffer: Buffer, mimeType?: string): Promise<number> {
+export async function extractVideoDuration(
+  buffer: Buffer,
+  mimeType?: string,
+  fallbackDuration?: number
+): Promise<number> {
   // Strategy 1: music-metadata parser
   try {
     const metadata = await mm.parseBuffer(buffer, mimeType || 'video/mp4', {
@@ -12,7 +17,7 @@ export async function extractVideoDuration(buffer: Buffer, mimeType?: string): P
       skipCovers: true,
     });
     if (metadata.format && typeof metadata.format.duration === 'number' && metadata.format.duration > 0) {
-      return metadata.format.duration;
+      return Math.round(metadata.format.duration);
     }
   } catch (err) {
     console.warn('music-metadata parse warning, attempting ISO BMFF fallback:', err);
@@ -22,46 +27,101 @@ export async function extractVideoDuration(buffer: Buffer, mimeType?: string): P
   try {
     const parsed = parseMvhdDuration(buffer);
     if (parsed && parsed > 0) {
-      return parsed;
+      return Math.round(parsed);
     }
   } catch (err) {
     console.error('ISO BMFF fallback error:', err);
   }
 
-  // If both fail to find an mvhd box (e.g. truncated or unusual packaging)
+  // Strategy 3: Graceful client-measured duration fallback (HTML5 video element verified)
+  if (fallbackDuration && fallbackDuration > 0) {
+    return Math.round(fallbackDuration);
+  }
+
+  // If both binary header parsing and client duration fail
   throw new Error('Could not read valid media duration from video container headers.');
 }
 
 /**
- * Pure binary fallback parser for MP4 and MOV 'mvhd' atom (Movie Header).
- * Reads timescale and duration directly from the ISO BMFF / QuickTime header.
+ * Pure binary fallback parser for MP4 and MOV 'mvhd' atom (Movie Header)
+ * and fragmented MP4 'mehd' atom (Movie Extends Header).
+ * Scans all candidate positions to avoid false positives in compressed video streams.
  */
 function parseMvhdDuration(buf: Buffer): number | null {
-  const mvhdIndex = buf.indexOf(Buffer.from('mvhd'));
-  if (mvhdIndex === -1) return null;
+  const target = Buffer.from('mvhd');
+  const matches: number[] = [];
+  let pos = 0;
 
-  const dataStart = mvhdIndex + 4;
-  if (dataStart + 20 > buf.length) return null;
-
-  const version = buf.readUInt8(dataStart);
-  let timescale = 0;
-  let duration = 0;
-
-  if (version === 1) {
-    const timescaleOffset = dataStart + 1 + 3 + 8 + 8;
-    if (timescaleOffset + 12 > buf.length) return null;
-    timescale = buf.readUInt32BE(timescaleOffset);
-    const durationBig = buf.readBigUInt64BE(timescaleOffset + 4);
-    duration = Number(durationBig);
-  } else {
-    const timescaleOffset = dataStart + 1 + 3 + 4 + 4;
-    if (timescaleOffset + 8 > buf.length) return null;
-    timescale = buf.readUInt32BE(timescaleOffset);
-    duration = buf.readUInt32BE(timescaleOffset + 4);
+  // Locate all 'mvhd' fourCC occurrences (scanning full buffer)
+  while (pos < buf.length) {
+    const idx = buf.indexOf(target, pos);
+    if (idx === -1) break;
+    matches.push(idx);
+    pos = idx + 4;
+    if (matches.length > 30) break; // Reasonable cap
   }
 
-  if (timescale > 0 && duration > 0) {
-    return duration / timescale;
+  let validTimescale: number | null = null;
+
+  // Check each candidate match (testing latest matches first since moov often sits at the end)
+  for (let i = matches.length - 1; i >= 0; i--) {
+    const mvhdIndex = matches[i];
+    const dataStart = mvhdIndex + 4;
+    if (dataStart + 24 > buf.length) continue;
+
+    const version = buf.readUInt8(dataStart);
+    let timescale = 0;
+    let duration = 0;
+
+    if (version === 1) {
+      // 64-bit offsets: flags (3), creation (8), mod (8) = 19 bytes
+      const timescaleOffset = dataStart + 1 + 3 + 8 + 8;
+      if (timescaleOffset + 12 > buf.length) continue;
+      timescale = buf.readUInt32BE(timescaleOffset);
+      const durationBig = buf.readBigUInt64BE(timescaleOffset + 4);
+      duration = Number(durationBig);
+    } else if (version === 0) {
+      // 32-bit offsets: flags (3), creation (4), mod (4) = 11 bytes
+      const timescaleOffset = dataStart + 1 + 3 + 4 + 4;
+      if (timescaleOffset + 8 > buf.length) continue;
+      timescale = buf.readUInt32BE(timescaleOffset);
+      duration = buf.readUInt32BE(timescaleOffset + 4);
+    } else {
+      continue;
+    }
+
+    if (timescale > 0 && timescale <= 10000000) {
+      validTimescale = timescale;
+      if (duration > 0) {
+        const secs = duration / timescale;
+        // Verify sanity: duration between 0.5 seconds and 7 days
+        if (secs >= 0.5 && secs <= 604800) {
+          return secs;
+        }
+      }
+    }
+  }
+
+  // Strategy 2b: Fragmented MP4 (mvex -> mehd box)
+  const mehdTarget = Buffer.from('mehd');
+  const mehdIdx = buf.indexOf(mehdTarget);
+  if (mehdIdx !== -1 && mehdIdx + 16 <= buf.length) {
+    const dataStart = mehdIdx + 4;
+    const version = buf.readUInt8(dataStart);
+    let fragDuration = 0;
+    if (version === 1 && dataStart + 1 + 3 + 8 <= buf.length) {
+      fragDuration = Number(buf.readBigUInt64BE(dataStart + 4));
+    } else if (version === 0 && dataStart + 1 + 3 + 4 <= buf.length) {
+      fragDuration = buf.readUInt32BE(dataStart + 4);
+    }
+
+    const ts = validTimescale || 1000;
+    if (fragDuration > 0 && ts > 0) {
+      const secs = fragDuration / ts;
+      if (secs >= 0.5 && secs <= 604800) {
+        return secs;
+      }
+    }
   }
 
   return null;

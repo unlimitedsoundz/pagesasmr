@@ -8,7 +8,7 @@ import path from 'path';
 import { getCurrentUser } from '@/lib/auth';
 import { extractVideoDuration, extractVideoDimensions } from '@/lib/media';
 import { db } from '@/lib/db';
-import { uploadToSupabaseStorage } from '@/lib/supabase';
+import { uploadToSupabaseStorage, supabaseAdmin } from '@/lib/supabase';
 import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
 
 export async function POST(req: NextRequest) {
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     const clientDuration = Number(formData.get('duration_seconds') || 0);
     let durationSeconds: number;
     try {
-      durationSeconds = await extractVideoDuration(buffer, mimeType);
+      durationSeconds = await extractVideoDuration(buffer, mimeType, clientDuration);
     } catch (e: any) {
       if (clientDuration > 0) {
         durationSeconds = clientDuration;
@@ -151,7 +151,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate unique file ID
-    const uniqueFileId = `video-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const uniqueFileId = isAdminUpload
+      ? `guideline-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
+      : `video-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     const extension = fileName.toLowerCase().endsWith('.mov') ? '.mov' : '.mp4';
     const diskFileName = `${uniqueFileId}${extension}`;
 
@@ -174,21 +176,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Secondary: Mirror to Supabase ONLY if rollback switch is explicitly enabled
+    // 2. Secondary: Resilient cloud mirroring
     const isSupabaseForced = process.env.STORAGE_PROVIDER?.toLowerCase() === 'supabase';
     let storageProvider = 'hostinger';
+    let streamUrl = `/api/videos/${diskFileName}/stream`;
 
-    if (isSupabaseForced) {
+    if (isAdminUpload) {
+      try {
+        const { error: supaErr } = await supabaseAdmin.storage
+          .from('guideline-samples')
+          .upload(diskFileName, buffer, {
+            contentType: mimeType,
+            upsert: true,
+          });
+        if (!supaErr) {
+          const { data: pubData } = supabaseAdmin.storage
+            .from('guideline-samples')
+            .getPublicUrl(diskFileName);
+          if (pubData?.publicUrl) {
+            streamUrl = pubData.publicUrl;
+            storageProvider = 'supabase_public';
+          }
+        }
+      } catch (adminUploadErr) {
+        console.warn('[Pages Upload] Failed to mirror guideline sample to Supabase:', adminUploadErr);
+      }
+    } else if (isSupabaseForced || fileSizeBytes <= 50 * 1024 * 1024) {
       try {
         await uploadToSupabaseStorage(diskFileName, buffer, mimeType);
-        storageProvider = 'supabase';
+        if (isSupabaseForced) storageProvider = 'supabase';
       } catch (supaErr: any) {
-        console.warn('[Pages Upload] Supabase storage upload failed:', supaErr?.message || supaErr);
+        console.warn('[Pages Upload] Supabase backup mirror failed:', supaErr?.message || supaErr);
         if (isSupabaseForced) {
           return NextResponse.json(
             {
-              error:
-                `Video could not be saved to Supabase storage after multiple attempts. (${supaErr?.message || 'storage error'})`,
+              error: `Video could not be saved to Supabase storage after multiple attempts. (${supaErr?.message || 'storage error'})`,
             },
             { status: 500 }
           );
@@ -197,7 +219,6 @@ export async function POST(req: NextRequest) {
     }
 
     const dimensions = extractVideoDimensions(buffer);
-    const streamUrl = `/api/videos/${diskFileName}/stream`;
 
     return NextResponse.json({
       success: true,

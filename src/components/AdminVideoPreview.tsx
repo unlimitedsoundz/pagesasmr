@@ -23,6 +23,7 @@ interface AdminVideoPreviewProps {
   className?: string;
   onDownloadNormal?: () => void;
   onDownloadCompressed?: () => void;
+  onRequestReupload?: () => void;
   isDownloadingNormal?: boolean;
   isDownloadingCompressed?: boolean;
   compressPercent?: number;
@@ -35,6 +36,7 @@ export default function AdminVideoPreview({
   className = '',
   onDownloadNormal,
   onDownloadCompressed,
+  onRequestReupload,
   isDownloadingNormal = false,
   isDownloadingCompressed = false,
   compressPercent,
@@ -444,10 +446,20 @@ export default function AdminVideoPreview({
               <AlertCircle className="w-5 h-5 text-red-400" />
             </div>
             <h4 className="text-xs sm:text-sm font-bold text-white mb-1">Video File Missing</h4>
-            <p className="text-[11px] sm:text-xs text-neutral-400 max-w-[240px] mb-3 leading-relaxed">
-              The physical video file was not found in local storage or Supabase.<br />
+            <p className="text-[11px] sm:text-xs text-neutral-400 max-w-[280px] mb-3 leading-relaxed">
+              The physical video file was not found in local storage or Supabase. The upload likely failed to save during server restart.<br />
               <span className="text-red-400 font-semibold">Ask the creator to re-upload this video.</span>
             </p>
+            {onRequestReupload && (
+              <button
+                type="button"
+                onClick={onRequestReupload}
+                className="mt-1 px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Request Re-Upload from Creator</span>
+              </button>
+            )}
           </div>
         )}
 

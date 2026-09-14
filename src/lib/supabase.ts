@@ -203,13 +203,31 @@ export async function getSignedVideoUrlResult(
 
   // 1. PRIMARY: Always query Supabase Storage first for high-performance streaming & downloads
   try {
-    const { data, error } = await supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
+    const isGuideline = filePath.startsWith('sample-') || filePath.startsWith('guideline-') || filePath.startsWith('guide-');
+    const primaryBucket = isGuideline ? 'guideline-samples' : STORAGE_BUCKET;
+    
+    let { data, error } = await supabaseAdmin.storage
+      .from(primaryBucket)
       .createSignedUrl(
         filePath,
         expiresInSeconds,
         options?.download ? { download: typeof options.download === 'string' ? options.download : true } : undefined
       );
+
+    // If not found in primary bucket and it might be a guideline sample, check guideline-samples
+    if ((error || !data?.signedUrl) && primaryBucket !== 'guideline-samples') {
+      const fallback = await supabaseAdmin.storage
+        .from('guideline-samples')
+        .createSignedUrl(
+          filePath,
+          expiresInSeconds,
+          options?.download ? { download: typeof options.download === 'string' ? options.download : true } : undefined
+        );
+      if (!fallback.error && fallback.data?.signedUrl) {
+        data = fallback.data;
+        error = null;
+      }
+    }
 
     if (!error && data?.signedUrl) {
       signedUrlCache.set(cacheKey, {
