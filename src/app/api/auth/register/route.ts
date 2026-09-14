@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
         db.notifyAdmins({
           title: `New Creator Registered: ${resolvedName}`,
           message: `A new creator, ${resolvedName} (${trimmedEmail}) from ${country.trim()}, has registered on The Pink Room — Page Turning.`,
-          type: 'GENERAL',
+          type: 'SYSTEM',
           link: '/admin/submissions',
         });
       } catch (adminErr) {
