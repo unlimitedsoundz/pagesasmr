@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+const ROOT_UPLOADS_DIR = path.resolve(process.cwd(), '../../uploads');
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 const TMP_UPLOADS_DIR = path.join(os.tmpdir(), 'uploads');
 
@@ -72,6 +73,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   // 4. Check local filesystem fallback (for local dev or legacy temp uploads)
   const possiblePaths = [
+    path.join(ROOT_UPLOADS_DIR, targetKey),
+    path.join(ROOT_UPLOADS_DIR, `${targetKey}.mp4`),
+    path.join(ROOT_UPLOADS_DIR, `${targetKey}.mov`),
     path.join(UPLOADS_DIR, targetKey),
     path.join(UPLOADS_DIR, `${targetKey}.mp4`),
     path.join(UPLOADS_DIR, `${targetKey}.mov`),

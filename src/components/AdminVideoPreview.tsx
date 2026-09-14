@@ -243,6 +243,16 @@ export default function AdminVideoPreview({
     console.warn('Video preview playback error:', e);
     const v = videoRef.current;
     const err = v?.error;
+
+    // Automatic fallback: If direct CDN URL failed, seamlessly fall back to server proxy stream
+    if (isDirectCdn && activeUrl && src && activeUrl !== src) {
+      console.log('Direct CDN URL playback failed, switching to streaming proxy fallback:', src);
+      setIsDirectCdn(false);
+      setActiveUrl(src);
+      setIsBuffering(true);
+      return;
+    }
+
     let msg = 'Playback encountered an issue.';
     if (err) {
       if (err.code === 2) msg = 'Network error while buffering video stream.';
@@ -492,15 +502,27 @@ export default function AdminVideoPreview({
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Retry Stream</span>
               </button>
-              <a
-                href={activeUrl || src}
-                download
-                target="_blank"
-                rel="noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-neutral-800 text-white text-xs font-bold hover:bg-neutral-700 border border-neutral-700 transition-colors"
-              >
-                Open in Tab
-              </a>
+              {onDownloadNormal ? (
+                <button
+                  type="button"
+                  onClick={onDownloadNormal}
+                  className="px-3 py-1.5 rounded-lg bg-neutral-800 text-white text-xs font-bold hover:bg-neutral-700 border border-neutral-700 transition-colors flex items-center gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Video</span>
+                </button>
+              ) : (
+                <a
+                  href={activeUrl || src}
+                  download
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-neutral-800 text-white text-xs font-bold hover:bg-neutral-700 border border-neutral-700 transition-colors flex items-center gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Video</span>
+                </a>
+              )}
             </div>
           </div>
         )}

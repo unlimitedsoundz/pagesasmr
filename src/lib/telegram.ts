@@ -1,4 +1,6 @@
-import { getSignedVideoUrl } from '@/lib/supabase';
+import { getSignedVideoUrl, supabaseAdmin, STORAGE_BUCKET } from '@/lib/supabase';
+import fs from 'fs';
+import path from 'path';
 
 export interface TelegramSubmissionNotification {
   type: 'SAMPLE' | 'SUBMISSION' | 'REVISION';
@@ -40,7 +42,7 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
   const safeCreator = (params.creatorName || 'creator').replace(/[^a-z0-9_\-\s]/gi, '').trim().replace(/\s+/g, '_');
   const downloadFilename = `${safeTitle}_${safeCreator}.mp4`;
 
-  // Generate signed URLs for direct streaming and download if hosted on Supabase / Storj
+  // Generate signed URLs from Supabase Storage ($0 Storj dependency eliminated)
   let directSignedUrl: string | null = null;
   let downloadUrl: string | null = null;
 
@@ -81,8 +83,82 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
     .filter(Boolean)
     .join('\n');
 
+  const replyMarkup = {
+    inline_keyboard: [
+      [
+        { text: '⬇️ Download MP4 File', url: publicDownloadUrl },
+        { text: '⚡ Review in Dashboard', url: adminReviewUrl },
+      ],
+    ],
+  };
+
+  // Telegram sendVideo captions must be <= 1024 characters
+  const videoCaption = captionHtml.length > 1024 ? captionHtml.substring(0, 1020) + '...' : captionHtml;
+
+  // 1. PRIMARY: Deliver the actual playable video directly into Telegram!
+  // Telegram bot multipart upload supports files up to 50MB.
+  const isEligibleForDirectVideo = !params.fileSizeMb || params.fileSizeMb <= 50;
+
+  if (isEligibleForDirectVideo && diskFileName && !diskFileName.startsWith('http')) {
+    try {
+      console.log(`[Telegram Pages] Preparing direct video delivery for ${diskFileName}...`);
+      let videoBlob: Blob | null = null;
+
+      // Check local files first
+      const localPaths = [
+        path.join(process.cwd(), 'uploads', diskFileName),
+        path.resolve(process.cwd(), '../../uploads', diskFileName),
+        path.join(process.cwd(), 'public', 'uploads', diskFileName),
+      ];
+
+      for (const p of localPaths) {
+        if (fs.existsSync(p)) {
+          const buffer = fs.readFileSync(p);
+          videoBlob = new Blob([buffer], { type: 'video/mp4' });
+          break;
+        }
+      }
+
+      // If not on local disk, download from Supabase Storage
+      if (!videoBlob) {
+        const { data: supaBlob, error: supaErr } = await supabaseAdmin.storage
+          .from(STORAGE_BUCKET)
+          .download(diskFileName);
+        if (!supaErr && supaBlob) {
+          videoBlob = supaBlob;
+        }
+      }
+
+      if (videoBlob && videoBlob.size <= 50 * 1024 * 1024) {
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('video', videoBlob, downloadFilename);
+        formData.append('caption', videoCaption);
+        formData.append('parse_mode', 'HTML');
+        formData.append('supports_streaming', 'true');
+        formData.append('reply_markup', JSON.stringify(replyMarkup));
+
+        const vidRes = await fetch(`https://api.telegram.org/bot${botToken}/sendVideo`, {
+          method: 'POST',
+          body: formData,
+          signal: AbortSignal.timeout(60000), // 60s timeout for video upload
+        });
+
+        const vidData = await vidRes.json();
+        if (vidData.ok) {
+          console.log('[Telegram Pages] Inline video player delivered successfully to Telegram chat!');
+          return { success: true, videoDelivered: true };
+        } else {
+          console.warn('[Telegram Pages] sendVideo multipart failed (' + vidData.description + '), falling back to sendMessage...');
+        }
+      }
+    } catch (vidErr: any) {
+      console.warn('[Telegram Pages] Direct sendVideo error, falling back to sendMessage:', vidErr?.message || vidErr);
+    }
+  }
+
+  // 2. FALLBACK: Send rich text alert with inline download and review buttons
   try {
-    // 1. Primary: Send immediate alert message with inline action buttons
     let msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -91,21 +167,14 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
         text: captionHtml,
         parse_mode: 'HTML',
         disable_web_page_preview: false,
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: '⬇️ Download MP4 File', url: publicDownloadUrl },
-              { text: '⚡ Review in Dashboard', url: adminReviewUrl },
-            ],
-          ],
-        },
+        reply_markup: replyMarkup,
       }),
       signal: AbortSignal.timeout(10000),
     });
 
     let msgData = await msgRes.json();
 
-    // Fallback 1: If inline keyboard button URL is rejected, retry without inline buttons
+    // Fallback if inline keyboard button URL is rejected
     if (!msgData.ok) {
       console.warn('[Telegram Pages Error] Primary sendMessage failed (' + msgData.description + '), retrying without inline keyboard...');
       msgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -122,7 +191,7 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
       msgData = await msgRes.json();
     }
 
-    // Fallback 2: If HTML parsing failed, retry as pure plain text
+    // Fallback if HTML parsing failed, retry as pure plain text
     if (!msgData.ok) {
       console.warn('[Telegram Pages Error] HTML sendMessage failed (' + msgData.description + '), retrying as plain text...');
       const plainText = [
@@ -161,26 +230,7 @@ export async function sendTelegramSubmissionNotification(params: TelegramSubmiss
     }
     console.log('[Telegram Pages] Submission text alert sent successfully.');
 
-    // 2. Optional: If media is under 20MB and has a direct signed URL, also try to post video preview directly
-    if (directSignedUrl && params.fileSizeMb && params.fileSizeMb <= 20) {
-      try {
-        await fetch(`https://api.telegram.org/bot${botToken}/sendVideo`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            video: directSignedUrl,
-            caption: `🎬 <b>Video Stream:</b> ${escapeHtml(params.title)}`,
-            parse_mode: 'HTML',
-          }),
-          signal: AbortSignal.timeout(6000),
-        });
-      } catch (videoErr) {
-        console.warn('[Telegram Pages] Optional sendVideo preview skipped:', videoErr);
-      }
-    }
-
-    return { success: true };
+    return { success: true, videoDelivered: false };
   } catch (err: any) {
     console.error('[Telegram Pages Exception]', err?.message || err);
     return { success: false, error: err?.message };

@@ -25,7 +25,9 @@ const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_
 const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
 const s3Endpoint = process.env.S3_ENDPOINT || (r2AccountId ? `https://${r2AccountId}.r2.cloudflarestorage.com` : undefined);
 
-const forceSupabaseOnly = process.env.FORCE_SUPABASE_STORAGE === 'true' || process.env.USE_SUPABASE_STORAGE_ONLY === 'true';
+const isStorjEndpoint = Boolean(s3Endpoint && s3Endpoint.includes('storjshare.io'));
+const allowStorj = process.env.ALLOW_STORJ === 'true';
+const forceSupabaseOnly = process.env.FORCE_SUPABASE_STORAGE === 'true' || process.env.USE_SUPABASE_STORAGE_ONLY === 'true' || (isStorjEndpoint && !allowStorj);
 
 const s3Client = !forceSupabaseOnly && s3Endpoint && s3AccessKeyId && s3SecretAccessKey
   ? new S3Client({
@@ -199,9 +201,31 @@ export async function getSignedVideoUrlResult(
     return { url: null };
   }
 
-  const s3Blocked = isS3BandwidthExceeded();
+  // 1. PRIMARY: Always query Supabase Storage first for high-performance streaming & downloads
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(
+        filePath,
+        expiresInSeconds,
+        options?.download ? { download: typeof options.download === 'string' ? options.download : true } : undefined
+      );
 
-  // 1. Try S3 / Storj ($0 Egress Fees) ONLY if circuit breaker is not tripped
+    if (!error && data?.signedUrl) {
+      signedUrlCache.set(cacheKey, {
+        url: data.signedUrl,
+        expiresAt: now + (expiresInSeconds - 60) * 1000,
+        source: 'supabase',
+      });
+      return { url: data.signedUrl, source: 'supabase' };
+    }
+  } catch (err: any) {
+    console.warn('[Supabase Storage] createSignedUrl check warning:', err?.message || err);
+  }
+
+  // 2. SECONDARY FALLBACK: Check S3 / R2 ONLY if configured, healthy, and not Storj
+  const s3Blocked = isS3BandwidthExceeded() || isStorjEndpoint;
+
   if (s3Client && !s3Blocked) {
     let isOnFileStorj = storjVerifiedKeys.get(filePath);
 
@@ -226,76 +250,52 @@ export async function getSignedVideoUrlResult(
           const offsetMs = await syncServerClockOffset();
           const signingDate = new Date(Date.now() + offsetMs);
 
-        const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
-        const isMov = filePath.toLowerCase().endsWith('.mov');
-        const isWebm = filePath.toLowerCase().endsWith('.webm');
-        const mimeType = isMov ? 'video/quicktime' : isWebm ? 'video/webm' : 'video/mp4';
+          const filename = typeof options?.download === 'string' ? options.download : `${filePath}.mp4`;
+          const isMov = filePath.toLowerCase().endsWith('.mov');
+          const isWebm = filePath.toLowerCase().endsWith('.webm');
+          const mimeType = isMov ? 'video/quicktime' : isWebm ? 'video/webm' : 'video/mp4';
 
-        const command = new GetObjectCommand({
-          Bucket: STORAGE_BUCKET,
-          Key: filePath,
-          ResponseContentType: mimeType,
-          ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
-        });
-
-        const signedUrl = await getSignedUrl(s3Client, command, {
-          expiresIn: expiresInSeconds,
-          signingDate,
-        });
-
-        if (signedUrl) {
-          signedUrlCache.set(cacheKey, {
-            url: signedUrl,
-            expiresAt: now + (expiresInSeconds - 60) * 1000,
-            source: 's3',
+          const command = new GetObjectCommand({
+            Bucket: STORAGE_BUCKET,
+            Key: filePath,
+            ResponseContentType: mimeType,
+            ...(options?.download ? { ResponseContentDisposition: `attachment; filename="${encodeURIComponent(filename)}"` } : {}),
           });
-          return { url: signedUrl, source: 's3' };
+
+          const signedUrl = await getSignedUrl(s3Client, command, {
+            expiresIn: expiresInSeconds,
+            signingDate,
+          });
+
+          if (signedUrl) {
+            signedUrlCache.set(cacheKey, {
+              url: signedUrl,
+              expiresAt: now + (expiresInSeconds - 60) * 1000,
+              source: 's3',
+            });
+            return { url: signedUrl, source: 's3' };
+          }
+        } catch (err: any) {
+          if (err?.name === 'BandwidthLimitExceeded' || err?.message?.includes('bandwidth')) {
+            markS3BandwidthExceeded();
+          }
+          console.warn('[S3 Storage] Signed URL error:', err?.message || err);
         }
-      } catch (err: any) {
-        if (err?.name === 'BandwidthLimitExceeded' || err?.message?.includes('bandwidth')) {
-          markS3BandwidthExceeded();
-        }
-        console.warn('[S3/Storj Storage] Signed URL error, falling back to Supabase:', err?.message || err);
       }
     }
   }
-}
 
-  // 2. Primary fallback: Supabase Storage
-  try {
-    const { data, error } = await supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrl(
-        filePath,
-        expiresInSeconds,
-        options?.download ? { download: typeof options.download === 'string' ? options.download : true } : undefined
-      );
-
-    if (error || !data?.signedUrl) {
-      // Check if this file was on Storj but blocked by bandwidth limit
-      const wasOnStorj = storjVerifiedKeys.get(filePath);
-      if (wasOnStorj || s3Blocked) {
-        return {
-          url: null,
-          bandwidthExceeded: true,
-          error: 'Video file is stored on Storj DCS which has reached its monthly project bandwidth limit. Please upgrade or add billing at storj.io.',
-        };
-      }
-      negativeUrlCache.set(filePath, now + 3000);
-      return { url: null };
-    }
-
-    signedUrlCache.set(cacheKey, {
-      url: data.signedUrl,
-      expiresAt: now + (expiresInSeconds - 60) * 1000,
-      source: 'supabase',
-    });
-    return { url: data.signedUrl, source: 'supabase' };
-  } catch (err: any) {
-    console.error('getSignedVideoUrl Supabase error:', err);
-    negativeUrlCache.set(filePath, now + 3000);
-    return { url: null, error: err?.message };
+  // If object was on Storj or Storj was the designated endpoint
+  if (isStorjEndpoint || storjVerifiedKeys.get(filePath)) {
+    return {
+      url: null,
+      bandwidthExceeded: true,
+      error: 'Video file was stored on legacy Storj DCS which has consumed its monthly project bandwidth limit. Please re-upload this video or add billing at storj.io.',
+    };
   }
+
+  negativeUrlCache.set(filePath, now + 3000);
+  return { url: null };
 }
 
 /**
