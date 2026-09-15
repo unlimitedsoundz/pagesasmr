@@ -28,7 +28,9 @@ export async function POST(req: NextRequest) {
       storageProvider = 'hostinger',
     } = body;
 
-    if (!fileUrl || !durationSeconds) {
+    const safeDuration = Number(durationSeconds) > 0 ? Number(durationSeconds) : (isSample ? 30 : 180);
+
+    if (!fileUrl) {
       return NextResponse.json({ error: 'Missing required media details.' }, { status: 400 });
     }
 
@@ -40,31 +42,49 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!isSample && !consentConfirmed) {
-      return NextResponse.json(
-        { error: 'You must confirm that this is your original recording and you have full rights.' },
-        { status: 400 }
-      );
-    }
+    let submission;
 
-    const submission = db.createSubmission({
-      id: submissionId,
-      creator_id: user.id,
-      creator_name: user.display_name,
-      creator_email: user.email,
-      title: (title || fileName || 'Page Turning Submission').trim(),
-      category: 'PAGE_TURNING',
-      duration_seconds: durationSeconds,
-      file_url: fileUrl,
-      file_name: fileName || (isSample ? 'audition_sample.mp4' : 'page_turning.mp4'),
-      file_size_bytes: fileSizeBytes || 0,
-      notes: notes?.trim() || undefined,
-      is_sample: Boolean(isSample),
-      storage_provider: storageProvider,
-      storage_key: fileKey || fileUrl,
-      upload_status: 'COMPLETED',
-      processing_status: 'READY',
-    });
+    if (isSample) {
+      const sampleResult = await db.submitCreatorSampleAsync(user.id, {
+        id: submissionId,
+        file_url: fileUrl,
+        file_name: fileName || `${user.display_name} - 30s Audition Sample.mp4`,
+        file_size_bytes: fileSizeBytes || 0,
+        duration_seconds: safeDuration,
+        notes: notes?.trim(),
+        storage_provider: storageProvider,
+        storage_key: fileKey || fileUrl,
+        upload_status: 'COMPLETED',
+        processing_status: 'READY',
+      });
+      submission = sampleResult.submission;
+    } else {
+      if (!consentConfirmed) {
+        return NextResponse.json(
+          { error: 'You must confirm that this is your original recording and you have full rights.' },
+          { status: 400 }
+        );
+      }
+
+      submission = await db.createSubmissionAsync({
+        id: submissionId,
+        creator_id: user.id,
+        creator_name: user.display_name,
+        creator_email: user.email,
+        title: (title || fileName || 'Page Turning Submission').trim(),
+        category: 'PAGE_TURNING',
+        duration_seconds: safeDuration,
+        file_url: fileUrl,
+        file_name: fileName || 'page_turning.mp4',
+        file_size_bytes: fileSizeBytes || 0,
+        notes: notes?.trim() || undefined,
+        is_sample: false,
+        storage_provider: storageProvider,
+        storage_key: fileKey || fileUrl,
+        upload_status: 'COMPLETED',
+        processing_status: 'READY',
+      });
+    }
 
     if (submission.is_duplicate) {
       db.createNotification({

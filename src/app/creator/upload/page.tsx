@@ -329,7 +329,7 @@ export default function CreatorUploadPage() {
 
     try {
       const clientDuration = await getVideoDuration(auditionFile);
-      if (clientDuration > 0 && clientDuration < 30) {
+      if (clientDuration > 0 && clientDuration < 28) {
         throw new Error(`Audition sample is only ${clientDuration}s long. Audition samples must be at least 30 seconds.`);
       }
 

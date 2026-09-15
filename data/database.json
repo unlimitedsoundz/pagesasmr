@@ -1724,6 +1724,24 @@
       "agreement_signed_at": "2026-09-15T13:50:45.817+00:00",
       "agreement_signature_name": "Lyzbeth",
       "created_at": "2026-09-15T13:50:45.817+00:00"
+    },
+    {
+      "id": "33016ffc-6640-46de-a6b9-00202c0d9b2a",
+      "email": "hotfit505@gmail.com",
+      "display_name": "Adie DivineFavour",
+      "role": "CREATOR",
+      "country": "United States",
+      "is_adult_confirmed": true,
+      "payment_method": null,
+      "payment_details": {},
+      "date_of_birth": "2003-01-31",
+      "password": "090savage",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
+      "sample_status": "NOT_SUBMITTED",
+      "agreement_signed": true,
+      "agreement_signed_at": "2026-09-15T22:53:21.423+00:00",
+      "agreement_signature_name": "Adie DivineFavour",
+      "created_at": "2026-09-15T22:53:21.427+00:00"
     }
   ],
   "submissions": [

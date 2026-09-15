@@ -501,7 +501,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
     let storageProvider = 'hostinger';
 
     try {
-      const initRes = await fetch(isSample ? '/api/creator/sample' : '/api/submissions/init-upload', {
+      const initRes = await fetch('/api/submissions/init-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isSample, title, durationSeconds: meta.durationSeconds }),

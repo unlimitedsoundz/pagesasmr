@@ -70,14 +70,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { fileUrl, fileName, fileSizeBytes, durationSeconds, notes, width, height } = body;
 
-    if (!fileUrl || !durationSeconds) {
+    const safeDuration = Number(durationSeconds) > 0 ? Number(durationSeconds) : 30;
+
+    if (!fileUrl) {
       return NextResponse.json({ error: 'Missing required media details.' }, { status: 400 });
     }
 
     // Must be at least 30 seconds (allow 28s+ to handle video container timestamp rounding)
-    if (durationSeconds < 28) {
+    if (safeDuration < 28) {
       return NextResponse.json(
-        { error: `Audition sample must be at least 30 seconds long (received ${Math.round(durationSeconds)}s).` },
+        { error: `Audition sample must be at least 30 seconds long (received ${Math.round(safeDuration)}s).` },
         { status: 422 }
       );
     }
@@ -86,7 +88,7 @@ export async function POST(req: NextRequest) {
       file_url: fileUrl,
       file_name: fileName || 'page_turning_audition_30s.mp4',
       file_size_bytes: fileSizeBytes || 0,
-      duration_seconds: durationSeconds,
+      duration_seconds: safeDuration,
       notes: notes?.trim(),
     });
 

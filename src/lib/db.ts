@@ -1249,7 +1249,7 @@ class PagesDatabaseService {
       duplicate_of_id: duplicateOfId,
       rejection_reason: rejectionReason,
       is_sample: isSample,
-      agreed_rate_usd: isDuplicate ? 0 : (isSample ? 0 : RATE_PER_VIDEO_USD),
+      agreed_rate_usd: isDuplicate ? 0 : (isSample ? 1.0 : RATE_PER_VIDEO_USD),
       payout_status: 'UNPAID',
       notes: submission.notes,
       version_number: 1,
@@ -1270,6 +1270,12 @@ class PagesDatabaseService {
       created_at: now,
     };
     this.data.submission_versions.push(ver1);
+
+    if (isSample && creator) {
+      creator.sample_status = 'PENDING_REVIEW';
+      creator.sample_submission_id = id;
+      this.syncProfileToSupabase(creator);
+    }
 
     this.save();
     this.syncSubmissionToSupabase(newSub);
@@ -2325,29 +2331,71 @@ class PagesDatabaseService {
   submitCreatorSample(
     creatorId: string,
     sampleData: {
+      id?: string;
       file_url: string;
       file_name: string;
       file_size_bytes: number;
       duration_seconds: number;
       notes?: string;
+      storage_provider?: StorageProvider;
+      storage_key?: string;
+      upload_status?: UploadStatus;
+      processing_status?: ProcessingStatus;
     }
   ): { profile: Profile; submission: Submission } {
     const creator = this.getProfileById(creatorId);
     if (!creator) throw new Error('Creator profile not found.');
 
-    const subId = ensureUuid();
+    const subId = sampleData.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sampleData.id)
+      ? sampleData.id
+      : ensureUuid();
+
+    const creatorName = creator.display_name?.trim() || 'Creator';
+    let sampleFileName = sampleData.file_name || 'audition_sample.mp4';
+    if (!sampleFileName.toLowerCase().startsWith(creatorName.toLowerCase())) {
+      sampleFileName = `${creatorName} - ${sampleFileName}`;
+    }
+
+    // Idempotency: check if submission exists
+    const existing = this.data.submissions.find((s) => s.id === subId);
+    if (existing) {
+      Object.assign(existing, {
+        file_url: sampleData.file_url,
+        file_name: sampleFileName,
+        file_size_bytes: sampleData.file_size_bytes,
+        duration_seconds: sampleData.duration_seconds,
+        notes: sampleData.notes || existing.notes,
+        storage_provider: sampleData.storage_provider || existing.storage_provider || 'hostinger',
+        storage_key: sampleData.storage_key || sampleData.file_url,
+        upload_status: sampleData.upload_status || 'COMPLETED',
+        processing_status: sampleData.processing_status || 'READY',
+        updated_at: new Date().toISOString(),
+      });
+      creator.sample_status = 'PENDING_REVIEW';
+      creator.sample_submission_id = subId;
+      this.save();
+      this.syncSubmissionToSupabase(existing);
+      this.syncProfileToSupabase(creator);
+      return { profile: creator, submission: existing };
+    }
+
+    const defaultProvider: StorageProvider = process.env.STORAGE_PROVIDER === 'supabase' ? 'supabase' : 'hostinger';
     const submission: Submission = {
       id: subId,
       platform_id: PLATFORM_ID,
       creator_id: creator.id,
-      creator_name: creator.display_name,
+      creator_name: creatorName,
       creator_email: creator.email,
-      title: `${creator.display_name} - 30s Audition Sample`,
+      title: `${creatorName} - 30s Audition Sample`,
       category: 'PAGE_TURNING',
       duration_seconds: sampleData.duration_seconds,
       file_url: sampleData.file_url,
-      file_name: sampleData.file_name,
+      file_name: sampleFileName,
       file_size_bytes: sampleData.file_size_bytes,
+      storage_provider: sampleData.storage_provider || defaultProvider,
+      storage_key: sampleData.storage_key || sampleData.file_url,
+      upload_status: sampleData.upload_status || 'COMPLETED',
+      processing_status: sampleData.processing_status || 'READY',
       status: 'UNDER_REVIEW',
       agreed_rate_usd: 1.0, // $1.00 audition bonus upon approval
       payout_status: 'UNPAID',
@@ -2400,11 +2448,16 @@ class PagesDatabaseService {
   async submitCreatorSampleAsync(
     creatorId: string,
     sampleData: {
+      id?: string;
       file_url: string;
       file_name: string;
       file_size_bytes: number;
       duration_seconds: number;
       notes?: string;
+      storage_provider?: StorageProvider;
+      storage_key?: string;
+      upload_status?: UploadStatus;
+      processing_status?: ProcessingStatus;
     }
   ): Promise<{ profile: Profile; submission: Submission }> {
     const res = this.submitCreatorSample(creatorId, sampleData);
