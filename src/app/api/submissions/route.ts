@@ -20,9 +20,9 @@ export async function GET(req: NextRequest) {
     creatorId = user.id;
   }
 
-  // Live sync with Supabase for admins
+  // Keep creator lists current when reviews and revisions are written from another session.
+  await db.syncFromSupabase().catch((e) => console.warn('[Pages] Supabase sync warning on submissions GET:', e));
   if (user.role === 'ADMIN') {
-    await db.syncFromSupabase().catch((e) => console.warn('[Pages] Supabase sync warning on submissions GET:', e));
     db.flagExistingDuplicateSubmissions();
   }
 
