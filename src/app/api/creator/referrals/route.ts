@@ -1,10 +1,11 @@
 export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { Referral } from '@/types';
+import { PUBLIC_URL } from '@/lib/constants';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -12,8 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     const referralCode = db.getReferralCodeForProfile(user.id);
-    const origin = req.nextUrl.origin || 'https://pages.pinkroom.online';
-    const referralLink = `${origin}/auth/register?ref=${encodeURIComponent(referralCode)}`;
+    const referralLink = `${PUBLIC_URL.replace(/\/$/, '')}/auth/register?ref=${encodeURIComponent(referralCode)}`;
 
     const referrals = db.getReferralsByReferrer(user.id);
 
