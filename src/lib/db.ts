@@ -320,7 +320,7 @@ class PagesDatabaseService {
             const existing = this.data.submissions[existingIdx];
             const localUpdated = existing.updated_at ? new Date(existing.updated_at).getTime() : 0;
             const remoteUpdated = ss.updated_at ? new Date(ss.updated_at).getTime() : 0;
-            if (localUpdated > remoteUpdated || (existing.status === 'REVISION_REQUESTED' && ['SUBMITTED', 'UNDER_REVIEW', 'PENDING_REVIEW', 'PENDING'].includes(mappedSub.status))) {
+            if (localUpdated > remoteUpdated) {
               mappedSub.status = existing.status;
               mappedSub.revision_notes = existing.revision_notes || mappedSub.revision_notes;
               mappedSub.rejection_reason = existing.rejection_reason || mappedSub.rejection_reason;
