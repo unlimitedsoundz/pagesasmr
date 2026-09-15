@@ -1746,6 +1746,36 @@
   ],
   "submissions": [
     {
+      "id": "73950620-ff00-411c-bd0d-42c7a83dc91a",
+      "creator_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "creator_name": "Ada Wunor",
+      "creator_email": "adannakanayo@gmail.com",
+      "title": "Ancalagon the Black – The Final Terror of Morgoth Cinematic",
+      "category": "PAGE_TURNING",
+      "duration_seconds": 191,
+      "file_url": "/api/videos/video-1789422605276-c8llm0.mp4/stream",
+      "file_name": "Ada Wunor - Ancalagon the Black – The Final Terror of Morgoth _ Cinematic.mp4",
+      "file_size_bytes": 39171028,
+      "status": "APPROVED",
+      "storage_provider": "hostinger",
+      "storage_key": "/api/videos/video-1789422605276-c8llm0.mp4/stream",
+      "original_filename": "Ada Wunor - Ancalagon the Black – The Final Terror of Morgoth _ Cinematic.mp4",
+      "verified_duration_seconds": 191,
+      "upload_status": "COMPLETED",
+      "processing_status": "READY",
+      "upload_completed_at": "2026-09-14T21:50:05.574+00:00",
+      "processing_completed_at": "2026-09-14T21:50:05.574+00:00",
+      "agreed_rate_usd": 50,
+      "is_office_bonus": false,
+      "bonus_amount_usd": 0,
+      "payout_status": "UNPAID",
+      "version_number": 2,
+      "is_sample": false,
+      "platform_id": "pinkroom_pages",
+      "created_at": "2026-09-14T21:50:05.574+00:00",
+      "updated_at": "2026-09-15T23:45:17.905+00:00"
+    },
+    {
       "id": "0626acf7-9490-4c1d-b46a-ab216553a045",
       "platform_id": "pinkroom_pages",
       "creator_id": "c8208612-a9d2-42df-abb6-ef6b4ec5847d",
@@ -2225,6 +2255,17 @@
       "file_size_bytes": 0,
       "duration_seconds": 31,
       "created_at": "2026-09-14T15:46:41.735+00:00"
+    },
+    {
+      "id": "73950620-ff00-411c-bd0d-42c7a83dc912",
+      "submission_id": "73950620-ff00-411c-bd0d-42c7a83dc91a",
+      "version_number": 2,
+      "file_url": "/api/videos/video-1789422605276-c8llm0.mp4/stream",
+      "file_name": "Ada Wunor - Ancalagon the Black – The Final Terror of Morgoth _ Cinematic.mp4",
+      "file_size_bytes": 39171028,
+      "duration_seconds": 191,
+      "notes": "Done the changes",
+      "created_at": "2026-09-16T00:02:00.000+00:00"
     }
   ],
   "earnings_ledger": [
@@ -2237,6 +2278,17 @@
       "amount_usd": 50,
       "description": "Approval credit: Bfe12d40 2546 486f b1de 7a0b1ca08736",
       "created_at": "2026-09-11T23:49:38.941+00:00"
+    },
+    {
+      "id": "edf16196-ec5d-4bb5-8202-d868ed616962",
+      "creator_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "submission_id": "73950620-ff00-411c-bd0d-42c7a83dc91a",
+      "payout_id": null,
+      "type": "CREDIT",
+      "amount_usd": 50,
+      "description": "Approval credit: Ancalagon the Black – The Final Terror of Morgoth Cinematic (v2)",
+      "created_at": "2026-09-14T22:24:46.544+00:00",
+      "platform_id": "pinkroom_pages"
     }
   ],
   "payout_requests": [],
@@ -3095,6 +3147,16 @@
       "terms_agreed_at": "2026-09-15T18:49:07.377+00:00",
       "terms_signature": "Yubstar",
       "created_at": "2026-09-15T18:49:07.377+00:00"
+    },
+    {
+      "id": "168227ed-f434-48c1-a123-cbb6607fd143",
+      "user_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-07T20:21:29.089+00:00",
+      "terms_signature": "Ada Wunor",
+      "created_at": "2026-09-07T14:58:43.165206+00:00"
     }
   ]
 }

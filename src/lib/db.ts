@@ -269,11 +269,11 @@ class PagesDatabaseService {
         }));
       }
 
-      // 3. Sync Submissions for pinkroom_pages ONLY (strict platform isolation)
+      // 3. Sync Submissions for pinkroom_pages (strict platform isolation + page turning)
       const { data: subs, error: sErr } = await supabaseAdmin
         .from('submissions')
         .select('*')
-        .eq('platform_id', PLATFORM_ID);
+        .or(`platform_id.eq.${PLATFORM_ID},category.eq.PAGE_TURNING`);
       if (!sErr && subs) {
         for (const ss of subs) {
           const existingIdx = this.data.submissions.findIndex((s) => s.id === ss.id);
@@ -320,6 +320,14 @@ class PagesDatabaseService {
             const existing = this.data.submissions[existingIdx];
             const localUpdated = existing.updated_at ? new Date(existing.updated_at).getTime() : 0;
             const remoteUpdated = ss.updated_at ? new Date(ss.updated_at).getTime() : 0;
+            if (existing.version_number && Number(existing.version_number) > Number(ss.version_number)) {
+              mappedSub.version_number = existing.version_number;
+              mappedSub.file_url = existing.file_url || mappedSub.file_url;
+              mappedSub.file_name = existing.file_name || mappedSub.file_name;
+              mappedSub.file_size_bytes = existing.file_size_bytes || mappedSub.file_size_bytes;
+              mappedSub.duration_seconds = existing.duration_seconds || mappedSub.duration_seconds;
+              mappedSub.notes = existing.notes || mappedSub.notes;
+            }
             if (localUpdated > remoteUpdated) {
               mappedSub.status = existing.status;
               mappedSub.revision_notes = existing.revision_notes || mappedSub.revision_notes;
@@ -524,9 +532,9 @@ class PagesDatabaseService {
               !s.creator_name?.includes('Test')
             );
           });
-          // Strip any leaked submissions from the main platform
+          // Keep submissions that belong to page-turning platform or page turning category
           parsed.submissions = parsed.submissions.filter((s) =>
-            !s.platform_id || s.platform_id === PLATFORM_ID
+            !s.platform_id || s.platform_id === PLATFORM_ID || s.category === 'PAGE_TURNING'
           );
         }
         // Filter chat messages to only those belonging to pinkroom_pages creators
@@ -992,7 +1000,7 @@ class PagesDatabaseService {
     this.reload();
     return this.data.submissions
       .filter((s) => {
-        if (s.platform_id !== PLATFORM_ID) return false;
+        if (s.platform_id !== PLATFORM_ID && s.category !== 'PAGE_TURNING') return false;
         if (filters?.creatorId && s.creator_id !== filters.creatorId) return false;
         if (filters?.status && s.status !== filters.status) return false;
         if (filters?.search) {
@@ -1021,7 +1029,7 @@ class PagesDatabaseService {
   }
 
   getSubmissionById(id: string): Submission | undefined {
-    return this.data.submissions.find((s) => s.id === id && s.platform_id === PLATFORM_ID);
+    return this.data.submissions.find((s) => s.id === id && (s.platform_id === PLATFORM_ID || s.category === 'PAGE_TURNING'));
   }
 
   detectDuplicateSubmission(
@@ -1573,7 +1581,7 @@ class PagesDatabaseService {
 
     // Strictly page_turning platform videos
     const creatorSubmissions = this.data.submissions.filter(
-      (s) => s.creator_id === creatorId && s.platform_id === PLATFORM_ID
+      (s) => s.creator_id === creatorId && (s.platform_id === PLATFORM_ID || s.category === 'PAGE_TURNING')
     );
 
     // Filter full production videos (audition samples earn $1.00 bonus upon approval)
@@ -2042,44 +2050,32 @@ class PagesDatabaseService {
   // Supabase sync helpers
   public async syncSubmissionToSupabase(sub: Submission) {
     try {
-      const { error } = await supabaseAdmin.from('submissions').upsert(
-        {
-          id: ensureUuid(sub.id),
-          platform_id: PLATFORM_ID,
-          creator_id: ensureUuid(sub.creator_id),
-          title: sub.title,
-          category: 'PAGE_TURNING',
-          duration_seconds: Math.round(sub.duration_seconds || 0),
-          file_url: sub.file_url,
-          file_name: sub.file_name || 'page_turning.mp4',
-          file_size_bytes: sub.file_size_bytes || 0,
-          status: sub.status,
-          storage_provider: sub.storage_provider || (sub.file_url && (sub.file_url.includes('/api/videos/') || sub.file_url.includes('media.pinkroom.online')) ? 'hostinger' : 'supabase'),
-          storage_key: sub.storage_key || sub.file_url,
-          upload_id: sub.upload_id || null,
-          original_filename: sub.original_filename || sub.file_name || 'page_turning.mp4',
-          detected_mime_type: sub.detected_mime_type || null,
-          verified_duration_seconds: sub.verified_duration_seconds || sub.duration_seconds,
-          upload_status: sub.upload_status || 'COMPLETED',
-          processing_status: sub.processing_status || 'READY',
-          preview_file_key: sub.preview_file_key || null,
-          preview_url: sub.preview_url || null,
-          failure_reason: sub.failure_reason || null,
-          upload_completed_at: sub.upload_completed_at || sub.created_at,
-          processing_completed_at: sub.processing_completed_at || sub.created_at,
-          agreed_rate_usd: sub.agreed_rate_usd,
-          payout_status: sub.payout_status,
-          payout_id: sub.payout_id ? ensureUuid(sub.payout_id) : null,
-          notes: sub.notes || null,
-          rejection_reason: sub.rejection_reason || null,
-          revision_notes: sub.revision_notes || null,
-          version_number: sub.version_number || 1,
-          is_sample: Boolean(sub.is_sample),
-          created_at: sub.created_at,
-          updated_at: sub.updated_at,
-        },
-        { onConflict: 'id' }
-      );
+      const payload: any = {
+        id: ensureUuid(sub.id),
+        platform_id: sub.platform_id || PLATFORM_ID,
+        creator_id: ensureUuid(sub.creator_id),
+        title: sub.title,
+        category: sub.category || 'PAGE_TURNING',
+        duration_seconds: Math.round(sub.duration_seconds || 0),
+        file_url: sub.file_url,
+        file_name: sub.file_name || 'page_turning.mp4',
+        file_size_bytes: sub.file_size_bytes || 0,
+        status: sub.status,
+        agreed_rate_usd: sub.agreed_rate_usd !== undefined ? Number(sub.agreed_rate_usd) : 50.0,
+        payout_status: sub.payout_status || 'UNPAID',
+        payout_id: sub.payout_id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sub.payout_id) ? sub.payout_id : null,
+        notes: sub.notes || null,
+        rejection_reason: sub.rejection_reason || null,
+        revision_notes: sub.revision_notes || null,
+        version_number: sub.version_number || 1,
+        is_sample: Boolean(sub.is_sample),
+        parent_submission_id: sub.parent_submission_id || null,
+        is_office_bonus: Boolean((sub as any).is_office_bonus),
+        bonus_amount_usd: (sub as any).bonus_amount_usd || 0,
+        created_at: sub.created_at || new Date().toISOString(),
+        updated_at: sub.updated_at || new Date().toISOString(),
+      };
+      const { error } = await supabaseAdmin.from('submissions').upsert(payload, { onConflict: 'id' });
       if (error) {
         console.warn('[Pages DB] Submission Supabase sync error:', error);
       }
