@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ChevronDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface FaqItem {
   q: string;
@@ -10,8 +10,6 @@ interface FaqItem {
 }
 
 export default function FaqPage() {
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
-
   const faqs: FaqItem[] = [
     {
       q: 'What does "faceless" mean for creators on this platform?',
@@ -57,6 +55,62 @@ export default function FaqPage() {
       q: 'Are there any fees or hidden subscription costs to join?',
       a: 'No. The Pink Room is 100% free for creators. There are no registration fees, platform monthly charges, or equipment deductions.',
     },
+    {
+      q: 'Who can join?',
+      a: 'Adults aged 18 or older who can record original page-turning ASMR in a quiet setting may apply. You must be able to accept the creator agreement and provide accurate payout information when you become eligible.',
+    },
+    {
+      q: 'Which countries are supported?',
+      a: 'Creators may apply from countries where The Pink Room can legally review content and send a supported payout. Available payment methods vary by country, so confirm your destination during onboarding or contact support before recording a full batch.',
+    },
+    {
+      q: 'What information is required to register?',
+      a: 'Registration requires your name, email address, country, date of birth or adult confirmation, password, and acceptance of the creator terms. Payout details are requested separately when you prepare to withdraw.',
+    },
+    {
+      q: 'How is identity verified?',
+      a: 'We use account, age, agreement, and payout information to verify eligibility and prevent fraud. We may request additional information when required for payment compliance. Never send passwords, PINs, or full banking credentials by email.',
+    },
+    {
+      q: 'How long does approval take?',
+      a: 'Review timing depends on queue volume and recording quality. The dashboard shows whether a submission is awaiting review, approved, rejected, or needs revision. We do not guarantee a fixed review time.',
+    },
+    {
+      q: 'What causes rejection?',
+      a: 'Common reasons include recordings under three minutes, background noise, speech or music, unstable framing, poor lighting, unsupported content, duplicate files, copyright concerns, or failure to follow the recording guidelines.',
+    },
+    {
+      q: 'Can rejected submissions be resubmitted?',
+      a: 'A submission marked Revision Requested can be re-uploaded from your creator dashboard and keeps its version history. A rejected submission may not be resubmittable; follow the admin note or contact support for clarification.',
+    },
+    {
+      q: 'How are earnings calculated?',
+      a: 'Each approved full video earns the agreed $50 USD rate recorded with that submission. Pending, rejected, duplicate, and revision-requested videos do not count toward the payout balance.',
+    },
+    {
+      q: 'When can I withdraw?',
+      a: 'You can request a payout once you have at least 8 approved, unpaid full videos, equal to the $400 minimum threshold. The payout page shows your eligible balance and whether the request button is available.',
+    },
+    {
+      q: 'How long do payouts take?',
+      a: 'Payout requests are reviewed and processed during normal payment operations. Timing depends on verification, your payment method, country, weekends, and banking networks. A completed payout is recorded with a payment reference.',
+    },
+    {
+      q: 'Are there payout fees?',
+      a: 'The Pink Room does not add a creator subscription fee. Third-party payment, bank, currency-conversion, or receiving fees may apply depending on your chosen method and country; any known deductions are shown before confirmation where possible.',
+    },
+    {
+      q: 'What happens if payment fails?',
+      a: 'The payout is not treated as completed. We may ask you to correct the destination or provide updated information, and the eligible earnings remain subject to the payout status shown in your account.',
+    },
+    {
+      q: 'How can I delete my account?',
+      a: 'Contact support from the email associated with your account and request deletion. We will verify the request, explain any records we must retain for legal, fraud, accounting, or payment reasons, and remove or anonymize eligible data.',
+    },
+    {
+      q: 'How is personal information protected?',
+      a: 'We restrict access to account, submission, and payout information, use authenticated access controls for private recordings, and disclose data only as described in the Privacy Policy or when required to operate the service or comply with law.',
+    },
   ];
 
   return (
@@ -81,33 +135,19 @@ export default function FaqPage() {
       <section className="w-full bg-white dark:bg-[#1A1620] py-16 sm:py-24 border-y border-neutral-200/60 dark:border-neutral-800/60 transition-colors">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           {faqs.map((faq, idx) => {
-            const isOpen = openIdx === idx;
             return (
               <div
                 key={idx}
                 className="border-b border-neutral-200/80 dark:border-neutral-800/80 last:border-b-0 pb-5 pt-3 reveal-on-scroll"
               >
-                <button
-                  onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full text-left flex items-start justify-between gap-4 py-2 group cursor-pointer select-none"
-                  aria-expanded={isOpen}
-                >
+                <div className="w-full text-left flex items-start justify-between gap-4 py-2">
                   <span className="font-serif text-xl sm:text-2xl font-medium text-[#1C1520] dark:text-white group-hover:text-[#9D174D] dark:group-hover:text-pink-300 transition-colors leading-snug">
                     {faq.q}
                   </span>
-                  <span
-                    className={`mt-1.5 w-6 h-6 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 bg-[#FDF2F7] text-[#9D174D] dark:bg-[#2A1725] dark:text-pink-300' : ''
-                    }`}
-                  >
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </span>
-                </button>
-                {isOpen && (
-                  <div className="pt-2 pb-3 text-sm sm:text-[15px] text-neutral-600 dark:text-neutral-300 leading-relaxed pr-8 animate-fadeIn">
-                    <p>{faq.a}</p>
-                  </div>
-                )}
+                </div>
+                <div className="pt-2 pb-3 text-sm sm:text-[15px] text-neutral-600 dark:text-neutral-300 leading-relaxed pr-8">
+                  <p>{faq.a}</p>
+                </div>
               </div>
             );
           })}

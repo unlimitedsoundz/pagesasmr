@@ -71,21 +71,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Payout Partners Col */}
+          {/* Supported Payment Methods Col */}
           <div className="md:col-span-2 space-y-3.5">
             <h4 className="text-[11px] font-bold uppercase tracking-wider !text-white leading-tight">
-              PAYOUT<br className="hidden sm:inline" /> PARTNERS
+              SUPPORTED PAYMENT<br className="hidden sm:inline" /> METHODS
             </h4>
-            <div className="flex items-center gap-4 !text-white pt-1">
-              {/* PayPal Logo */}
-              <svg
-                aria-label="PayPal"
-                className="h-5 w-5 fill-current !text-white"
-                viewBox="0 0 24 24"
-              >
-                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.655h7.02c3.483 0 5.86 1.488 5.614 4.887-.291 4.02-3.123 6.068-6.666 6.068h-2.14l-1.4 7.024a.641.641 0 0 1-.633.535l-.436-.242zm2.93-9.524h1.724c2.25 0 3.73-1.037 3.916-3.606.155-2.138-1.125-3.08-3.327-3.08H8.38l-1.927 9.87.525.045 1.028-3.23z" />
-              </svg>
-            </div>
+            <p className="text-xs sm:text-sm leading-relaxed !text-white/80">
+              PayPal, Mobile Money, local bank transfer, ACH, and wire transfer where available. Availability, fees, and timing depend on your country and payment setup.
+            </p>
           </div>
         </div>
 

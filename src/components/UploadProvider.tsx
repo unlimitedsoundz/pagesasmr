@@ -241,25 +241,30 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
             const completeRes = await fetch(
               isRevision ? `/api/submissions/${submissionId}/revision` : '/api/submissions/complete-upload',
               {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  submissionId,
-                  title,
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                submissionId,
+                title,
+                category: meta.category || 'PAGE_TURNING',
+                durationSeconds: actualDuration,
+                fileUrl,
+                fileKey,
+                fileName: file.name,
+                fileSizeBytes,
+                notes: meta.notes,
+                consentConfirmed: meta.consentConfirmed ?? true,
+                is_office_bonus: Boolean((meta as any).isOfficeBonus),
+                isSample,
+                width: resp.width,
+                height: resp.height,
+                storageProvider: resp.storageProvider || storageProvider,
+                ...(isRevision ? {} : {
                   category: meta.category || 'PAGE_TURNING',
-                  durationSeconds: actualDuration,
-                  fileUrl,
-                  fileKey,
-                  fileName: file.name,
-                  fileSizeBytes,
-                  notes: meta.notes,
                   consentConfirmed: meta.consentConfirmed ?? true,
-                  is_office_bonus: Boolean((meta as any).isOfficeBonus),
                   isSample,
-                  width: resp.width,
-                  height: resp.height,
-                  storageProvider: resp.storageProvider || storageProvider,
                 }),
+              }),
               }
             );
 
