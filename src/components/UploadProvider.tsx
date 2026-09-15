@@ -53,7 +53,7 @@ export interface UploadTaskState {
 
 interface UploadContextType {
   uploadState: UploadTaskState;
-  startUpload: (file: File, meta: UploadMetadata, options?: { submissionId?: string }) => Promise<any>;
+  startUpload: (file: File, meta: UploadMetadata, options?: { submissionId?: string; isRevision?: boolean }) => Promise<any>;
   pauseUpload: () => void;
   resumeUpload: () => void;
   cancelUpload: () => void;
@@ -81,6 +81,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
     currentChunkIndex: number;
     isPaused: boolean;
     storageProvider: string;
+    isRevision: boolean;
     resolve: (value: any) => void;
     reject: (reason?: any) => void;
   }
@@ -173,6 +174,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
       totalChunks,
       currentChunkIndex,
       storageProvider,
+      isRevision,
       resolve,
       reject,
     } = session;
@@ -236,27 +238,30 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
             const fileSizeBytes = resp.fileSizeBytes || file.size;
             const actualDuration = resp.durationSeconds || meta.durationSeconds;
 
-            const completeRes = await fetch('/api/submissions/complete-upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                submissionId,
-                title,
-                category: meta.category || 'PAGE_TURNING',
-                durationSeconds: actualDuration,
-                fileUrl,
-                fileKey,
-                fileName: file.name,
-                fileSizeBytes,
-                notes: meta.notes,
-                consentConfirmed: meta.consentConfirmed ?? true,
-                is_office_bonus: Boolean((meta as any).isOfficeBonus),
-                isSample,
-                width: resp.width,
-                height: resp.height,
-                storageProvider: resp.storageProvider || storageProvider,
-              }),
-            });
+            const completeRes = await fetch(
+              isRevision ? `/api/submissions/${submissionId}/revision` : '/api/submissions/complete-upload',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  submissionId,
+                  title,
+                  category: meta.category || 'PAGE_TURNING',
+                  durationSeconds: actualDuration,
+                  fileUrl,
+                  fileKey,
+                  fileName: file.name,
+                  fileSizeBytes,
+                  notes: meta.notes,
+                  consentConfirmed: meta.consentConfirmed ?? true,
+                  is_office_bonus: Boolean((meta as any).isOfficeBonus),
+                  isSample,
+                  width: resp.width,
+                  height: resp.height,
+                  storageProvider: resp.storageProvider || storageProvider,
+                }),
+              }
+            );
 
             if (!completeRes.ok) {
               const compErr = await completeRes.json().catch(() => ({}));
@@ -287,6 +292,8 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
             toast.success(
               isSample
                 ? 'Audition sample uploaded & submitted for admin review!'
+                : isRevision
+                ? `"${title}" revision uploaded & submitted for review!`
                 : `"${title}" uploaded & submitted for quality inspection!`,
               'Upload Successful'
             );
@@ -456,7 +463,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
   const startUpload = async (
     file: File,
     meta: UploadMetadata,
-    options?: { submissionId?: string }
+    options?: { submissionId?: string; isRevision?: boolean }
   ): Promise<any> => {
     if (uploadState.isUploading && (uploadState.status === 'UPLOADING' || uploadState.status === 'VERIFYING')) {
       const msg = 'Another video upload is currently in progress. Please wait for it to finish.';
@@ -484,6 +491,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
     });
 
     let submissionId = options?.submissionId;
+    const isRevision = Boolean(options?.isRevision);
     let tusEndpoint = '';
     let storageProvider = 'hostinger';
 
@@ -601,24 +609,27 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
                 const fileKey = `${uploadId}${extension}`;
                 const fileUrl = `${tusEndpoint.replace(/\/files\/?$/, '')}/media/stream/${encodeURIComponent(fileKey)}`;
 
-                const completeRes = await fetch('/api/submissions/complete-upload', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    submissionId,
-                    title,
-                    category: 'PAGE_TURNING',
-                    durationSeconds: meta.durationSeconds,
-                    fileUrl,
-                    fileKey,
-                    fileName: file.name,
-                    fileSizeBytes: file.size,
-                    notes: meta.notes,
-                    consentConfirmed: meta.consentConfirmed ?? true,
-                    isSample,
-                    storageProvider: 'hostinger',
-                  }),
-                });
+                const completeRes = await fetch(
+                  isRevision ? `/api/submissions/${submissionId}/revision` : '/api/submissions/complete-upload',
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      submissionId,
+                      title,
+                      category: 'PAGE_TURNING',
+                      durationSeconds: meta.durationSeconds,
+                      fileUrl,
+                      fileKey,
+                      fileName: file.name,
+                      fileSizeBytes: file.size,
+                      notes: meta.notes,
+                      consentConfirmed: meta.consentConfirmed ?? true,
+                      isSample,
+                      storageProvider: 'hostinger',
+                    }),
+                  }
+                );
 
                 if (!completeRes.ok) {
                   const compErr = await completeRes.json().catch(() => ({}));
@@ -649,6 +660,8 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
                 toast.success(
                   isSample
                     ? 'Audition sample uploaded & submitted for admin review!'
+                    : isRevision
+                    ? `"${title}" revision uploaded & submitted for review!`
                     : `"${title}" uploaded & submitted for quality inspection!`,
                   'Upload Successful'
                 );
@@ -700,6 +713,7 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
         currentChunkIndex: 0,
         isPaused: false,
         storageProvider,
+        isRevision,
         resolve,
         reject,
       };

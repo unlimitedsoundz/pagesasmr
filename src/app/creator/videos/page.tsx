@@ -19,6 +19,7 @@ import {
 import VideoThumbnail from '@/components/VideoThumbnail';
 import { Submission, SubmissionVersion } from '@/types';
 import { useToast } from '@/components/ToastProvider';
+import { useUpload } from '@/components/UploadProvider';
 import { supabase } from '@/lib/supabase';
 import { compressVideoFile, formatBytes } from '@/lib/videoCompression';
 import { downloadNormalVideo, downloadCompressedVideo } from '@/lib/videoDownload';
@@ -90,6 +91,7 @@ function StatusPill({ status }: { status: string }) {
 // â”€â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function SubmissionsPage() {
   const { toast } = useToast();
+  const { startUpload } = useUpload();
   const [user, setUser] = useState<any>(null);
   const [statsData, setStatsData] = useState<any>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -253,6 +255,22 @@ export default function SubmissionsPage() {
     }
   };
 
+  const getVideoDuration = (file: File): Promise<number> =>
+    new Promise((resolve) => {
+      const video = document.createElement('video');
+      const objectUrl = URL.createObjectURL(file);
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(Number.isFinite(video.duration) ? Math.round(video.duration) : 0);
+      };
+      video.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(0);
+      };
+      video.src = objectUrl;
+    });
+
   // â”€â”€ Revision submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleRevisionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -280,15 +298,20 @@ export default function SubmissionsPage() {
           setRevisionCompressing(false);
         }
       }
-      const formData = new FormData();
-      formData.append('file', fileToUpload);
-      if (revisionNotes.trim()) formData.append('notes', revisionNotes.trim());
-      const res = await fetch(`/api/submissions/${selectedSub.id}/revision`, {
-        method: 'POST',
-        body: formData,
+      const durationSeconds = await getVideoDuration(fileToUpload);
+      if (durationSeconds > 0 && durationSeconds < 180) {
+        throw new Error('Revised videos must be at least 3 minutes (180 seconds).');
+      }
+      const data = await startUpload(fileToUpload, {
+        title: selectedSub.title,
+        category: selectedSub.category,
+        durationSeconds: durationSeconds || selectedSub.duration_seconds,
+        notes: revisionNotes.trim(),
+        consentConfirmed: true,
+      }, {
+        submissionId: selectedSub.id,
+        isRevision: true,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Revision upload failed');
       toast.success(`Version ${data.submission.version_number} submitted for review!`);
       setSelectedSub(null);
       setRevisionFile(null);
