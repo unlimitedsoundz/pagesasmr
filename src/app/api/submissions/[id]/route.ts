@@ -7,6 +7,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  await db.syncFromSupabase().catch((error) => {
+    console.warn('[Pages] Supabase sync warning on submission detail GET:', error);
+  });
+
   const submission = db.getSubmissionById(params.id);
   if (!submission) {
     return NextResponse.json({ error: 'Submission not found' }, { status: 404 });

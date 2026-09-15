@@ -7,6 +7,9 @@ import { sendTelegramSubmissionNotification } from '@/lib/telegram';
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = await requireUser();
+    await db.syncFromSupabase().catch((error) => {
+      console.warn('[Pages] Supabase sync warning on revision POST:', error);
+    });
     const submission = db.getSubmissionById(params.id);
 
     if (!submission) {
