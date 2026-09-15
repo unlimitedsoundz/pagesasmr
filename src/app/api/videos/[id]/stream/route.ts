@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getSignedVideoUrl, getSignedVideoUrlResult, extractStorageKey } from '@/lib/supabase';
 import { getStorageProvider } from '@/lib/storage';
+import { createMediaAccessToken, getMediaServiceUrl } from '@/lib/mediaAccess';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -72,9 +73,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   // 3. Authorization check
   const user = await getCurrentUser();
   if (!user && !isGuidelineSample) {
-    if (!targetSubmission && !targetKey.startsWith('video-') && !targetKey.startsWith('prod-') && !targetKey.startsWith('audition-')) {
-      return NextResponse.json({ error: 'Unauthorized: Authentication required to access private video assets.' }, { status: 401 });
-    }
+    return NextResponse.json({ error: 'Unauthorized: Authentication required to access private video assets.' }, { status: 401 });
   }
 
   if (user && user.role !== 'ADMIN' && !isGuidelineSample) {
@@ -179,6 +178,23 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         },
       });
     }
+  }
+
+  const mediaBase = getMediaServiceUrl();
+  const mediaToken = (targetSubmission?.storage_provider === 'hostinger' || targetSubmission?.file_url?.includes('media.pinkroom.online')) && !isGuidelineSample
+    ? createMediaAccessToken(targetKey)
+    : null;
+  if (mediaBase && mediaToken) {
+    const mediaUrl = new URL(`${mediaBase}/media/stream/${encodeURIComponent(targetKey)}`);
+    mediaUrl.searchParams.set('token', mediaToken);
+    if (req.nextUrl.searchParams.get('download') === 'true') {
+      mediaUrl.searchParams.set('download', 'true');
+      mediaUrl.searchParams.set('filename', req.nextUrl.searchParams.get('filename') || `${targetKey}.mp4`);
+    }
+    if (wantsJson) {
+      return NextResponse.json({ success: true, url: mediaUrl.toString(), direct: true, source: 'hostinger', videoId: rawId });
+    }
+    return NextResponse.redirect(mediaUrl, { status: 307, headers: { 'Cache-Control': 'private, no-store' } });
   }
 
   // 5. Generate Supabase / S3 signed playback URL

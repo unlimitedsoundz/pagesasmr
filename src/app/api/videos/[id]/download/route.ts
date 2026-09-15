@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { supabaseAdmin, getSignedVideoUrl, getSignedVideoUrlResult, extractStorageKey } from '@/lib/supabase';
 import { getStorageProvider } from '@/lib/storage';
+import { createMediaAccessToken, getMediaServiceUrl } from '@/lib/mediaAccess';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -77,9 +78,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   // 3. Authorization check
   const user = await getCurrentUser();
   if (!user && !isGuidelineSample) {
-    if (!targetSubmission && !targetKey.startsWith('video-') && !targetKey.startsWith('prod-') && !targetKey.startsWith('audition-')) {
-      return NextResponse.json({ error: 'Unauthorized: Please log in to download video assets.' }, { status: 401 });
-    }
+    return NextResponse.json({ error: 'Unauthorized: Please log in to download video assets.' }, { status: 401 });
+  }
+  if (req.nextUrl.searchParams.get('admin') === '1' && user?.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Forbidden: Administrator authorization required.' }, { status: 403 });
   }
 
   if (user && user.role !== 'ADMIN' && !isGuidelineSample) {
@@ -131,6 +133,20 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   ];
 
   let actualFilePath: string | null = null;
+  const mediaBase = getMediaServiceUrl();
+  const mediaToken = (targetSubmission?.storage_provider === 'hostinger' || targetSubmission?.file_url?.includes('media.pinkroom.online')) && !isGuidelineSample
+    ? createMediaAccessToken(targetKey)
+    : null;
+  if (mediaBase && mediaToken) {
+    const mediaUrl = new URL(`${mediaBase}/media/download/${encodeURIComponent(targetKey)}`);
+    mediaUrl.searchParams.set('filename', cleanFilename);
+    mediaUrl.searchParams.set('token', mediaToken);
+    if (wantsJson) {
+      return NextResponse.json({ success: true, url: mediaUrl.toString(), direct: true, source: 'hostinger', filename: cleanFilename });
+    }
+    return NextResponse.redirect(mediaUrl, { status: 307, headers: { 'Cache-Control': 'private, no-store' } });
+  }
+
   for (const p of possiblePaths) {
     if (fs.existsSync(p)) {
       actualFilePath = p;

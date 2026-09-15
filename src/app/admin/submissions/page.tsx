@@ -31,8 +31,7 @@ import AdminVideoPreview from '@/components/AdminVideoPreview';
 import { Submission, SubmissionVersion } from '@/types';
 import { useToast } from '@/components/ToastProvider';
 import { supabase } from '@/lib/supabase';
-import { downloadNormalVideo, downloadCompressedVideo } from '@/lib/videoDownload';
-import { formatBytes } from '@/lib/clientVideoCompression';
+import { downloadNormalVideo } from '@/lib/videoDownload';
 
 export default function AdminSubmissionsPage() {
   const { toast } = useToast();
@@ -59,9 +58,7 @@ export default function AdminSubmissionsPage() {
 
   // Download States
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [downloadingCompressId, setDownloadingCompressId] = useState<string | null>(null);
   const [payingSampleId, setPayingSampleId] = useState<string | null>(null);
-  const [compressProgress, setCompressProgress] = useState<{ id: string; percent: number; stage: string } | null>(null);
 
   const handleMarkSamplePaid = async (creatorId: string, creatorName?: string) => {
     if (
@@ -94,70 +91,29 @@ export default function AdminSubmissionsPage() {
     }
   };
 
-  const handleDownload = async (sub: Submission, compress: boolean = true) => {
-    if (downloadingId || downloadingCompressId) return;
+  const handleDownload = async (sub: Submission) => {
+    if (downloadingId) return;
+    setDownloadingId(sub.id);
+    toast.info(`Saving original video "${sub.title}" directly to device storage...`);
 
-    if (compress) {
-      setDownloadingCompressId(sub.id);
-      setCompressProgress({ id: sub.id, percent: 0, stage: 'initializing' });
-      toast.info(`Preparing to compress "${sub.title}" for download...`);
-
-      try {
-        await downloadCompressedVideo(
-          {
-            id: sub.id,
-            title: sub.title,
-            creator_name: sub.creator_name,
-            file_url: sub.file_url,
-            file_name: sub.file_name,
-          },
-          {
-            onProgress: (p) => {
-              setCompressProgress({ id: sub.id, percent: p.percent, stage: p.stage });
-            },
-            onSuccess: (stats) => {
-              toast.success(
-                `Compressed video saved to your device! Reduced by ${stats.savedPercent}% (${formatBytes(stats.originalSize)} → ${formatBytes(stats.compressedSize)})`
-              );
-            },
-            onError: (err) => {
-              toast.error(err.message || 'Failed to compress and download video.');
-            },
-          }
-        );
-      } catch (err: any) {
-        console.error('Download compressed error:', err);
-      } finally {
-        setDownloadingCompressId(null);
-        setCompressProgress(null);
-      }
-    } else {
-      setDownloadingId(sub.id);
-      toast.info(`Saving normal video "${sub.title}" directly to device storage...`);
-
-      try {
-        await downloadNormalVideo(
-          {
-            id: sub.id,
-            title: sub.title,
-            creator_name: sub.creator_name,
-            file_url: sub.file_url,
-            file_name: sub.file_name,
-          },
-          {
-            onSuccess: (filename) => {
-              toast.success(`Video "${filename}" downloading to device storage!`);
-            },
-            onError: (err) => {
-              toast.error(err.message || 'Failed to download original video.');
-            },
-          }
-        );
-      } catch (err: any) {
-        console.error('Download normal error:', err);
-      } finally {
-        setDownloadingId(null);
-      }
+    try {
+      await downloadNormalVideo(
+        {
+          id: sub.id,
+          title: sub.title,
+          creator_name: sub.creator_name,
+          file_url: sub.file_url,
+          file_name: sub.file_name,
+        },
+        {
+          onSuccess: (filename) => toast.success(`Video "${filename}" downloading to device storage!`),
+          onError: (err) => toast.error(err.message || 'Failed to download original video.'),
+        }
+      );
+    } catch (err: any) {
+      console.error('Download error:', err);
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -880,26 +836,8 @@ export default function AdminSubmissionsPage() {
 
                               <button
                                 type="button"
-                                onClick={() => handleDownload(sub, true)}
-                                disabled={downloadingId === sub.id || downloadingCompressId === sub.id}
-                                title="Download Compressed MP4 directly to device storage"
-                                className="px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors bg-neutral-100 hover:bg-neutral-200 text-black border border-neutral-300 disabled:opacity-50"
-                              >
-                                <Zap className={`w-3.5 h-3.5 text-black ${downloadingCompressId === sub.id ? 'animate-pulse text-amber-500' : ''}`} />
-                                <Download className={`w-3.5 h-3.5 ${downloadingCompressId === sub.id ? 'animate-bounce' : ''}`} />
-                                <span className="font-bold">
-                                  {downloadingCompressId === sub.id
-                                    ? compressProgress?.id === sub.id
-                                      ? `${compressProgress.percent}%`
-                                      : 'Compressing...'
-                                    : 'Compressed'}
-                                </span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleDownload(sub, false)}
-                                disabled={downloadingId === sub.id || downloadingCompressId === sub.id}
+                                onClick={() => handleDownload(sub)}
+                                disabled={downloadingId === sub.id}
                                 title="Download Normal Original Video directly to device storage"
                                 className="px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors bg-neutral-100 hover:bg-neutral-200 text-black border border-neutral-300 disabled:opacity-50"
                               >
@@ -953,24 +891,8 @@ export default function AdminSubmissionsPage() {
               <div className="flex items-center gap-2 shrink-0 self-end sm:self-start">
                 <button
                   type="button"
-                  onClick={() => handleDownload(reviewingSub, true)}
-                  disabled={downloadingId === reviewingSub.id || downloadingCompressId === reviewingSub.id}
-                  title="Download Compressed MP4 directly to device storage"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-neutral-100 hover:bg-neutral-200 text-black border border-neutral-300 transition-colors disabled:opacity-50"
-                >
-                  <Zap className="w-3.5 h-3.5 text-black" />
-                  <Download className={`w-3.5 h-3.5 ${downloadingCompressId === reviewingSub.id ? 'animate-bounce' : ''}`} />
-                  <span>
-                    {downloadingCompressId === reviewingSub.id
-                      ? `Compressing ${compressProgress?.id === reviewingSub.id ? `${compressProgress.percent}%` : '...'}`
-                      : 'Download Compressed'}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleDownload(reviewingSub, false)}
-                  disabled={downloadingId === reviewingSub.id || downloadingCompressId === reviewingSub.id}
+                  onClick={() => handleDownload(reviewingSub)}
+                  disabled={downloadingId === reviewingSub.id}
                   title="Download Normal Original Video directly to device storage"
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-black text-white hover:bg-neutral-800 transition-colors disabled:opacity-50"
                 >
@@ -1067,8 +989,7 @@ export default function AdminSubmissionsPage() {
                   src={previewUrl}
                   title={previewTitle}
                   durationSeconds={previewDuration}
-                  onDownloadNormal={() => handleDownload(targetForDownload, false)}
-                  onDownloadCompressed={() => handleDownload(targetForDownload, true)}
+                  onDownloadNormal={() => handleDownload(targetForDownload)}
                   onRequestReupload={() => {
                     setActionType('REQUEST_REVISION');
                     setFeedbackText(
@@ -1076,8 +997,6 @@ export default function AdminSubmissionsPage() {
                     );
                   }}
                   isDownloadingNormal={downloadingId === reviewingSub.id}
-                  isDownloadingCompressed={downloadingCompressId === reviewingSub.id}
-                  compressPercent={compressProgress?.id === reviewingSub.id ? compressProgress.percent : undefined}
                 />
               );
             })()}

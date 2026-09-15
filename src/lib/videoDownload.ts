@@ -68,7 +68,7 @@ export async function downloadNormalVideo(
     const filename = `${safeCreator} - ${safeTitle}.mp4`;
 
     // 1. Request dedicated attachment download URL
-    const downloadApiUrl = `/api/videos/${encodeURIComponent(video.id)}/download?filename=${encodeURIComponent(filename)}&format=json`;
+    const downloadApiUrl = `/api/videos/${encodeURIComponent(video.id)}/download?filename=${encodeURIComponent(filename)}&format=json&admin=1`;
 
     let directUrl: string | null = null;
     try {
