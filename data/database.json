@@ -1421,7 +1421,7 @@
     },
     {
       "id": "5bb60135-e3b8-4632-89ce-fe5a04b8def9",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "creator_name": "Night page",
       "creator_email": "patanikadara91@gmail.com",
@@ -1535,7 +1535,7 @@
     },
     {
       "id": "cba715f4-1bea-4ecf-a244-e6c7eaa5edf4",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "creator_name": "Night page",
       "creator_email": "patanikadara91@gmail.com",
@@ -1932,7 +1932,7 @@
   "earnings_ledger": [
     {
       "id": "ed2451a7-90d3-4c22-b8c4-4e74c33e1b58",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "submission_id": "cba715f4-1bea-4ecf-a244-e6c7eaa5edf4",
       "type": "CREDIT",
@@ -2656,7 +2656,7 @@
   "chat_messages": [
     {
       "id": "746cbbd5-fcd2-4d3f-95dc-a45d872f1516",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_name": "Amani",
@@ -2667,7 +2667,7 @@
     },
     {
       "id": "f9dc24cb-4d48-4902-bfee-04e4db16446f",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_name": "Amani",
@@ -2678,7 +2678,7 @@
     },
     {
       "id": "7b37a374-8c70-4577-96f2-2e11772add91",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "sender_name": "Unlymited Soundz",
@@ -2689,7 +2689,7 @@
     },
     {
       "id": "92d84fbd-04bd-488d-8d0d-2bbabc7a435d",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "sender_name": "Unlymited Soundz",
@@ -2700,7 +2700,7 @@
     },
     {
       "id": "fe41f813-42c7-4ccc-83c8-844a07486910",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_name": "Amani",
@@ -2711,7 +2711,7 @@
     },
     {
       "id": "bbe3e248-d519-416f-92c6-142b0f97b960",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "sender_name": "Unlymited Soundz",
@@ -2722,7 +2722,7 @@
     },
     {
       "id": "667c41f1-b705-4307-b95f-296a95598079",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_name": "Amani",
@@ -2733,7 +2733,7 @@
     },
     {
       "id": "44d38faa-0cfc-4f8a-a9bc-f4299cc4b71b",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_name": "Amani",
@@ -2744,7 +2744,7 @@
     },
     {
       "id": "09c8ac47-d00d-4e4f-9669-51cbde4ca8c1",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "sender_name": "Unlymited Soundz",
@@ -2755,7 +2755,7 @@
     },
     {
       "id": "44970b93-b18c-40e4-bcb4-db01caca2e12",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
       "sender_name": "Amani",
@@ -2766,7 +2766,7 @@
     },
     {
       "id": "d0fb4cf1-08c3-44e3-ba42-cbaed0cc628d",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2777,7 +2777,7 @@
     },
     {
       "id": "5a4645ca-88c3-424c-ac14-875489ab74d4",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2788,7 +2788,7 @@
     },
     {
       "id": "a068f180-1bce-44ed-931c-e68580585c94",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2799,7 +2799,7 @@
     },
     {
       "id": "ffeb2323-fcb4-4258-9d0d-d1e0549eef79",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "c0000000-0000-4000-8000-000000000001",
       "sender_name": "Ophelia Adeleke",
@@ -2810,7 +2810,7 @@
     },
     {
       "id": "c0fa7c3e-071f-4cab-9048-b446d7a83bc6",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2821,7 +2821,7 @@
     },
     {
       "id": "ac6feeed-7e75-48a8-9ba4-4d4293a88b17",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2832,7 +2832,7 @@
     },
     {
       "id": "afceb926-137f-4c21-9ac0-0912a2f26ce7",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "c0000000-0000-4000-8000-000000000001",
       "sender_name": "Ophelia Adeleke",
@@ -2843,7 +2843,7 @@
     },
     {
       "id": "0a780825-d632-48b5-b3eb-fa33f34855e2",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2854,7 +2854,7 @@
     },
     {
       "id": "2d10bd3f-ea4b-46c7-b448-94f5583c6346",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "c0000000-0000-4000-8000-000000000001",
       "sender_name": "Ophelia Adeleke",
@@ -2865,7 +2865,7 @@
     },
     {
       "id": "e04a4514-63a6-4962-92af-016c92e31657",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2876,7 +2876,7 @@
     },
     {
       "id": "10ff8879-ec75-4a34-8966-88e2991ae400",
-      "platform_id": "pinkroom_pages",
+      "platform_id": "pinkroom_main",
       "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
       "sender_name": "Night page",
@@ -2917,16 +2917,6 @@
       "terms_agreed_at": "2026-09-11T15:30:57.151+00:00",
       "terms_signature": "Dencia Adeleke",
       "created_at": "2026-09-11T15:30:57.151+00:00"
-    },
-    {
-      "id": "11cea1dc-ea95-4c01-b553-347cd5633877",
-      "user_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
-      "platform_id": "pinkroom_pages",
-      "role": "CREATOR",
-      "terms_agreed": true,
-      "terms_agreed_at": "2026-09-11T19:34:33.946+00:00",
-      "terms_signature": "Amani",
-      "created_at": "2026-09-11T19:34:33.946+00:00"
     },
     {
       "id": "d839296f-7982-48da-996e-25de407a2389",
@@ -2999,16 +2989,6 @@
       "created_at": "2026-09-13T06:06:36.456+00:00"
     },
     {
-      "id": "7a3e7709-f344-4b24-8859-15036252854d",
-      "user_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
-      "platform_id": "pinkroom_pages",
-      "role": "CREATOR",
-      "terms_agreed": true,
-      "terms_agreed_at": "2026-09-13T06:46:32.634+00:00",
-      "terms_signature": "Night page",
-      "created_at": "2026-09-13T06:46:32.634+00:00"
-    },
-    {
       "id": "1e6b113d-f960-457a-80e9-03105514a5b0",
       "user_id": "99ac3c68-c56f-48b9-b9cb-22258b7db276",
       "platform_id": "pinkroom_pages",
@@ -3037,6 +3017,26 @@
       "terms_agreed_at": "2026-09-13T10:27:11.537+00:00",
       "terms_signature": "Ema Onochie",
       "created_at": "2026-09-13T10:27:11.537+00:00"
+    },
+    {
+      "id": "migrated-596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "user_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-15T14:17:59.391Z",
+      "terms_signature": "Night page",
+      "created_at": "2026-09-15T14:17:59.391Z"
+    },
+    {
+      "id": "migrated-569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "user_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-15T14:17:59.391Z",
+      "terms_signature": "Amani",
+      "created_at": "2026-09-15T14:17:59.391Z"
     }
   ]
 }
