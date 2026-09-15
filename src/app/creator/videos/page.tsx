@@ -692,10 +692,10 @@ export default function SubmissionsPage() {
                           <button
                             type="button"
                             onClick={() => openDetails(sub)}
-                            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold text-xs hover:bg-[#8E2848] hover:text-white transition-colors"
+                            className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#8E2848] hover:bg-[#72203a] text-white dark:bg-[#9D174D] dark:hover:bg-[#831843] font-semibold text-xs shadow-sm transition-all active:scale-95"
                           >
                             Details
-                            <ArrowRight className="w-3 h-3" />
+                            <ArrowRight className="w-3 h-3 text-white" />
                           </button>
                         </div>
                       </div>
