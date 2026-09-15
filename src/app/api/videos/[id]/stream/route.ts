@@ -67,7 +67,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     targetKey.startsWith('sample-') ||
     targetKey.startsWith('guide-') ||
     targetKey.includes('benchmark') ||
-    Boolean(targetSubmission?.is_sample) ||
     db.getGuidelineSamples().some((g) => g.video_url && g.video_url.includes(targetKey));
 
   // 3. Authorization check
