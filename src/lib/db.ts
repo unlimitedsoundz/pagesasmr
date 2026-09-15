@@ -191,6 +191,19 @@ class PagesDatabaseService {
       this.data = diskData;
       return;
     }
+    this.data.referrals = diskData.referrals || [];
+    this.data.earnings_ledger = diskData.earnings_ledger || [];
+    this.data.notifications = diskData.notifications || [];
+
+    for (const diskProfile of diskData.profiles || []) {
+      const idx = this.data.profiles.findIndex((p) => p.id === diskProfile.id);
+      if (idx !== -1) {
+        this.data.profiles[idx] = { ...this.data.profiles[idx], ...diskProfile };
+      } else {
+        this.data.profiles.push(diskProfile);
+      }
+    }
+
     const existingSubIds = new Set(this.data.submissions.map((s) => s.id));
     for (const sub of diskData.submissions) {
       if (!existingSubIds.has(sub.id)) {
@@ -1011,6 +1024,127 @@ class PagesDatabaseService {
     return this.data.submissions.find((s) => s.id === id && s.platform_id === PLATFORM_ID);
   }
 
+  detectDuplicateSubmission(
+    creatorId: string,
+    candidate: {
+      id?: string;
+      file_name?: string;
+      original_filename?: string;
+      file_size_bytes?: number;
+      duration_seconds?: number;
+      file_url?: string;
+      storage_key?: string;
+    }
+  ): { isDuplicate: boolean; duplicateOf?: Submission } {
+    this.reload();
+    const subs = (this.data.submissions || []).filter(
+      (s) => s.creator_id === creatorId && s.id !== candidate.id
+    );
+
+    const norm = (str?: string) =>
+      (str || '')
+        .toLowerCase()
+        .replace(/^.*?-\s*/, '')
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+
+    const candidateNormName = norm(candidate.original_filename || candidate.file_name);
+
+    for (const s of subs) {
+      if (
+        (candidate.file_url && s.file_url && candidate.file_url === s.file_url) ||
+        (candidate.storage_key && s.storage_key && candidate.storage_key === s.storage_key)
+      ) {
+        return { isDuplicate: true, duplicateOf: s };
+      }
+
+      const sNormName = norm(s.original_filename || s.file_name);
+      if (candidateNormName && sNormName && candidateNormName === sNormName) {
+        if (
+          (candidate.file_size_bytes && s.file_size_bytes && candidate.file_size_bytes === s.file_size_bytes) ||
+          (candidate.duration_seconds && s.duration_seconds && Math.abs(candidate.duration_seconds - s.duration_seconds) <= 2)
+        ) {
+          return { isDuplicate: true, duplicateOf: s };
+        }
+      }
+
+      if (
+        candidate.file_size_bytes &&
+        s.file_size_bytes &&
+        candidate.file_size_bytes > 100000 &&
+        candidate.file_size_bytes === s.file_size_bytes &&
+        candidate.duration_seconds &&
+        s.duration_seconds &&
+        Math.abs(candidate.duration_seconds - s.duration_seconds) <= 1
+      ) {
+        return { isDuplicate: true, duplicateOf: s };
+      }
+    }
+
+    return { isDuplicate: false };
+  }
+
+  flagExistingDuplicateSubmissions(): { flaggedCount: number; flaggedSubmissionIds: string[] } {
+    this.reload();
+    const candidates = (this.data.submissions || [])
+      .filter((s) => s.platform_id === PLATFORM_ID && !s.is_sample)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    const originals: Submission[] = [];
+    const flaggedSubmissionIds: string[] = [];
+    const normalizeName = (value?: string) =>
+      (value || '')
+        .toLowerCase()
+        .replace(/^.*?-\s*/, '')
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+
+    for (const submission of candidates) {
+      const submissionName = normalizeName(submission.original_filename || submission.file_name);
+      const duplicateOf = originals.find((original) => {
+        if (original.creator_id !== submission.creator_id) return false;
+        if (
+          (submission.file_url && original.file_url && submission.file_url === original.file_url) ||
+          (submission.storage_key && original.storage_key && submission.storage_key === original.storage_key)
+        ) {
+          return true;
+        }
+
+        const originalName = normalizeName(original.original_filename || original.file_name);
+        const sameNameAndMetadata = submissionName && originalName && submissionName === originalName && (
+          (submission.file_size_bytes && original.file_size_bytes && submission.file_size_bytes === original.file_size_bytes) ||
+          (submission.duration_seconds && original.duration_seconds && Math.abs(submission.duration_seconds - original.duration_seconds) <= 2)
+        );
+        const sameMediaMetadata = submission.file_size_bytes && original.file_size_bytes && submission.file_size_bytes > 100000 &&
+          submission.file_size_bytes === original.file_size_bytes && submission.duration_seconds && original.duration_seconds &&
+          Math.abs(submission.duration_seconds - original.duration_seconds) <= 1;
+
+        return Boolean(sameNameAndMetadata || sameMediaMetadata);
+      });
+
+      if (!duplicateOf) {
+        if (!submission.is_duplicate) originals.push(submission);
+        continue;
+      }
+
+      if (!submission.is_duplicate || submission.status !== 'REJECTED') {
+        submission.is_duplicate = true;
+        submission.duplicate_of_id = duplicateOf.id;
+        submission.status = 'REJECTED';
+        submission.agreed_rate_usd = 0;
+        submission.rejection_reason = `Duplicate video file submission: Matches earlier recording #${duplicateOf.id} ("${duplicateOf.title}"). Duplicate submissions are rejected.`;
+        submission.updated_at = new Date().toISOString();
+        flaggedSubmissionIds.push(submission.id);
+        this.syncSubmissionToSupabase(submission);
+      }
+    }
+
+    if (flaggedSubmissionIds.length > 0) {
+      this.save();
+    }
+
+    return { flaggedCount: flaggedSubmissionIds.length, flaggedSubmissionIds };
+  }
+
   createSubmission(submission: {
     id?: string;
     creator_id: string;
@@ -1034,6 +1168,10 @@ class PagesDatabaseService {
     processing_status?: ProcessingStatus;
     preview_file_key?: string;
     preview_url?: string;
+    is_duplicate?: boolean;
+    duplicate_of_id?: string;
+    rejection_reason?: string;
+    status?: SubmissionStatus;
   }): Submission {
     // Idempotency: if submission with this id already exists, update and return it
     if (submission.id) {
@@ -1069,6 +1207,24 @@ class PagesDatabaseService {
       fileName = `${creatorName} - ${fileName}`;
     }
 
+    // Check for duplicate video submission
+    const duplicateCheck = this.detectDuplicateSubmission(submission.creator_id, {
+      id,
+      file_name: fileName,
+      original_filename: submission.original_filename,
+      file_size_bytes: submission.file_size_bytes,
+      duration_seconds: submission.duration_seconds,
+      file_url: submission.file_url,
+      storage_key: submission.storage_key,
+    });
+
+    const isDuplicate = Boolean(submission.is_duplicate || duplicateCheck.isDuplicate);
+    const duplicateOfId = submission.duplicate_of_id || duplicateCheck.duplicateOf?.id;
+    const initialStatus: SubmissionStatus = isDuplicate ? 'REJECTED' : (isSample ? 'UNDER_REVIEW' : 'SUBMITTED');
+    const rejectionReason = isDuplicate
+      ? (submission.rejection_reason || `Duplicate video file submission: Matches earlier recording #${duplicateOfId} ("${duplicateCheck.duplicateOf?.title || 'Existing submission'}"). Duplicate submissions are rejected.`)
+      : submission.rejection_reason;
+
     const newSub: Submission = {
       storage_provider: submission.storage_provider || (process.env.STORAGE_PROVIDER === 'supabase' ? 'supabase' : 'hostinger'),
       upload_status: submission.upload_status || 'COMPLETED',
@@ -1088,9 +1244,12 @@ class PagesDatabaseService {
       file_url: submission.file_url,
       file_name: fileName,
       file_size_bytes: submission.file_size_bytes || 0,
-      status: isSample ? 'UNDER_REVIEW' : 'SUBMITTED',
+      status: initialStatus,
+      is_duplicate: isDuplicate,
+      duplicate_of_id: duplicateOfId,
+      rejection_reason: rejectionReason,
       is_sample: isSample,
-      agreed_rate_usd: isSample ? 0 : RATE_PER_VIDEO_USD, // Audition sample is unpaid ($0), full production is locked at $50.00
+      agreed_rate_usd: isDuplicate ? 0 : (isSample ? 0 : RATE_PER_VIDEO_USD),
       payout_status: 'UNPAID',
       notes: submission.notes,
       version_number: 1,
@@ -1116,36 +1275,39 @@ class PagesDatabaseService {
     this.syncSubmissionToSupabase(newSub);
     this.syncSubmissionVersionToSupabase(ver1);
 
-    // In-app & email notification to creator (for both sample and full video)
-    this.createNotification({
-      user_id: newSub.creator_id,
-      title: isSample
-        ? '30-Second Audition Submitted for Review'
-        : `Page-Turning Video Submitted: "${newSub.title}"`,
-      message: isSample
-        ? 'Your 30-second audition sample has been received and is queued for administrative review. You will be notified as soon as a decision is made.'
-        : `Your video "${newSub.title}" has been submitted for admin quality inspection.`,
-      type: 'REVIEW',
-      link: isSample ? '/creator/upload' : '/creator/videos',
-    });
+    if (!isDuplicate) {
+      // In-app & email notification to creator (for both sample and full video)
+      this.createNotification({
+        user_id: newSub.creator_id,
+        title: isSample
+          ? '30-Second Audition Submitted for Review'
+          : `Page-Turning Video Submitted: "${newSub.title}"`,
+        message: isSample
+          ? 'Your 30-second audition sample has been received and is queued for administrative review. You will be notified as soon as a decision is made.'
+          : `Your video "${newSub.title}" has been submitted for admin quality inspection.`,
+        type: 'REVIEW',
+        link: isSample ? '/creator/upload' : '/creator/videos',
+      });
 
-    // Transactional alert to all admins (for both sample and full video)
-    this.notifyAdmins({
-      title: isSample
-        ? `New Audition Sample Submitted: ${creatorName}`
-        : `New Video Submitted: "${newSub.title}"`,
-      message: isSample
-        ? `${creatorName} (${newSub.creator_email || creator?.email || 'Creator'}) submitted a 30-second audition sample for review. Action required to approve/reject before they can upload full paid videos.`
-        : `${creatorName} (${newSub.creator_email || creator?.email || 'Creator'}) submitted a new page-turning video "${newSub.title}" (${Math.round(newSub.duration_seconds)}s) for review.`,
-      type: 'REVIEW',
-      link: '/admin/submissions',
-    });
+      // Transactional alert to all admins (for both sample and full video)
+      this.notifyAdmins({
+        title: isSample
+          ? `New Audition Sample Submitted: ${creatorName}`
+          : `New Video Submitted: "${newSub.title}"`,
+        message: isSample
+          ? `${creatorName} (${newSub.creator_email || creator?.email || 'Creator'}) submitted a 30-second audition sample for review. Action required to approve/reject before they can upload full paid videos.`
+          : `${creatorName} (${newSub.creator_email || creator?.email || 'Creator'}) submitted a new page-turning video "${newSub.title}" (${Math.round(newSub.duration_seconds)}s) for review.`,
+        type: 'REVIEW',
+        link: '/admin/submissions',
+      });
+    }
 
     return newSub;
   }
 
   async createSubmissionAsync(submission: any): Promise<Submission> {
     const sub = this.createSubmission(submission);
+    if (sub.is_duplicate) return sub;
     const ver = this.data.submission_versions.find(
       (v) => v.submission_id === sub.id && v.version_number === 1
     );
@@ -2684,6 +2846,7 @@ class PagesDatabaseService {
   }
 
   createReferral(referrerId: string, referredUserId: string): Referral {
+    this.reload();
     if (!this.data.referrals) {
       this.data.referrals = [];
     }
@@ -2738,7 +2901,8 @@ class PagesDatabaseService {
     return newReferral;
   }
 
-  checkAndUpdateReferralMilestone(referredUserId: string): void {
+  checkAndUpdateReferralMilestone(referredUserId: string): any {
+    this.reload();
     if (!this.data.referrals) {
       this.data.referrals = [];
     }
@@ -2747,7 +2911,7 @@ class PagesDatabaseService {
     if (referralIndex === -1) return;
 
     const referral = this.data.referrals[referralIndex];
-    if (referral.reward_status === 'REWARDED') return;
+    if (referral.reward_status === 'REWARDED') return referral;
 
     const referredUser = this.getProfileById(referredUserId);
     if (!referredUser) return;
@@ -2764,6 +2928,7 @@ class PagesDatabaseService {
       referral.milestone_reached = true;
       referral.reward_status = 'REWARDED';
       referral.rewarded_at = new Date().toISOString();
+      this.save();
 
       const existingRewardLedger = this.data.earnings_ledger.find(
         (l) => l.creator_id === referral.referrer_id && l.description.includes(referredUserId)
@@ -2780,6 +2945,7 @@ class PagesDatabaseService {
           created_at: new Date().toISOString(),
         };
         this.data.earnings_ledger.push(creditEntry);
+        this.save();
         this.syncLedgerToSupabase(creditEntry);
       }
 
@@ -2792,7 +2958,7 @@ class PagesDatabaseService {
       });
 
       try {
-        const referrer = this.getProfileById(referral.referrer_id);
+        const referrer = this.data.profiles.find((p) => p.id === referral.referrer_id);
         sendNotificationEmail({
           to: ADMIN_NOTIFICATION_EMAILS,
           recipientName: 'Admin',
@@ -2807,6 +2973,7 @@ class PagesDatabaseService {
     }
 
     this.save();
+    return referral;
   }
 
   getReferralsByReferrer(referrerId: string): Referral[] {

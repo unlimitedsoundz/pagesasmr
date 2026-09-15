@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
   // Live sync with Supabase for admins
   if (user.role === 'ADMIN') {
     await db.syncFromSupabase().catch((e) => console.warn('[Pages] Supabase sync warning on submissions GET:', e));
+    db.flagExistingDuplicateSubmissions();
   }
 
   const submissions = db.getSubmissions({
@@ -76,6 +77,25 @@ export async function POST(req: NextRequest) {
       notes: notes?.trim() || undefined,
       is_sample: false,
     });
+
+    if (submission.is_duplicate) {
+      db.createNotification({
+        user_id: 'admin-001',
+        title: 'Duplicate Video Submission Flagged & Rejected',
+        message: `${user.display_name} attempted to submit a duplicate file for "${submission.title}". It has been automatically flagged and rejected.`,
+        type: 'REVIEW',
+        link: '/admin/submissions',
+      });
+
+      return NextResponse.json(
+        {
+          error: 'Duplicate video detected: This recording was already submitted previously. Duplicate submissions are automatically rejected.',
+          submission,
+          isDuplicate: true,
+        },
+        { status: 409 }
+      );
+    }
 
     // Auto-send submission details & video link to Telegram
     try {

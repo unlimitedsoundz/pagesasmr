@@ -144,6 +144,8 @@ export interface Submission {
   agreed_rate_usd: number;
   payout_status: PayoutItemStatus;
   payout_id?: string;
+  is_duplicate?: boolean;
+  duplicate_of_id?: string;
   notes?: string;
   consent_confirmed?: boolean;
   is_adult_confirmed?: boolean;
