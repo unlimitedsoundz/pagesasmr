@@ -29,14 +29,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     const { fileUrl, fileName, fileSizeBytes, durationSeconds, notes, width, height } = await req.json();
 
-    if (!fileUrl || !durationSeconds) {
+    const safeDuration = Number(durationSeconds) > 0 ? Number(durationSeconds) : (submission.duration_seconds || 180);
+
+    if (!fileUrl) {
       return NextResponse.json({ error: 'Missing updated video file information.' }, { status: 400 });
     }
 
-    const settings = db.getSettings();
-    if (durationSeconds < settings.min_duration_seconds) {
+    if (safeDuration < 175) {
       return NextResponse.json(
-        { error: `Revised video must be at least ${settings.min_duration_seconds} seconds.` },
+        { error: 'Revised video must be at least 3 minutes (180 seconds).' },
         { status: 422 }
       );
     }
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       file_url: fileUrl,
       file_name: fileName || 'revised.mp4',
       file_size_bytes: fileSizeBytes || 0,
-      duration_seconds: durationSeconds,
+      duration_seconds: safeDuration,
       notes,
     });
 

@@ -91,7 +91,7 @@ function StatusPill({ status }: { status: string }) {
 // â”€â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function SubmissionsPage() {
   const { toast } = useToast();
-  const { startUpload } = useUpload();
+  const { startUpload, uploadState } = useUpload();
   const [user, setUser] = useState<any>(null);
   const [statsData, setStatsData] = useState<any>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -240,7 +240,14 @@ export default function SubmissionsPage() {
     };
   }, [fetchAll, handleReviewEvent]);
 
-  // â”€â”€ Open detail drawer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const isCurrentSubUploading =
+    uploadState.isUploading &&
+    Boolean(
+      (selectedSub && uploadState.submissionId === selectedSub.id) ||
+      (selectedSub && uploadState.title === selectedSub.title)
+    );
+
+  // ── Open detail drawer ──────────────────────────────────────────────────────
   const openDetails = async (sub: Submission) => {
     setSelectedSub(sub);
     setRevisionFile(null);
@@ -271,48 +278,43 @@ export default function SubmissionsPage() {
       video.src = objectUrl;
     });
 
-  // â”€â”€ Revision submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Revision submit ──────────────────────────────────────────────────────────
   const handleRevisionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSub || !revisionFile) return;
+    if (uploadState.isUploading) {
+      toast.warning('Another video upload is currently in progress. Please wait for it to finish.');
+      return;
+    }
     setRevisionLoading(true);
     setRevisionError('');
     try {
-      let fileToUpload = revisionFile;
-      if (revisionFile.size > 15 * 1024 * 1024) {
-        setRevisionCompressing(true);
-        setRevisionCompProgress(5);
-        try {
-          const comp = await compressVideoFile(revisionFile, {
-            maxDimension: 1280,
-            videoBitrate: 2_000_000,
-            onProgress: (p: any) => setRevisionCompProgress(p.percent),
-          });
-          fileToUpload = comp.file;
-          toast.success(
-            `Revision compressed: ${formatBytes(comp.originalSize)} â†’ ${formatBytes(comp.compressedSize)} (${comp.savedPercent}% saved)!`
-          );
-        } catch (cErr) {
-          console.warn('Revision compression skipped:', cErr);
-        } finally {
-          setRevisionCompressing(false);
-        }
-      }
-      const durationSeconds = await getVideoDuration(fileToUpload);
-      if (durationSeconds > 0 && durationSeconds < 180) {
+      const durationSeconds = await getVideoDuration(revisionFile);
+      if (durationSeconds > 0 && durationSeconds < 175) {
         throw new Error('Revised videos must be at least 3 minutes (180 seconds).');
       }
-      const data = await startUpload(fileToUpload, {
-        title: selectedSub.title,
-        category: selectedSub.category,
-        durationSeconds: durationSeconds || selectedSub.duration_seconds,
-        notes: revisionNotes.trim(),
-        consentConfirmed: true,
-      }, {
-        submissionId: selectedSub.id,
-        isRevision: true,
-      });
-      toast.success(`Version ${data.submission.version_number} submitted for review!`);
+
+      const targetSub = selectedSub;
+      toast.info(`Starting upload for "${targetSub.title}" revision...`);
+
+      const data = await startUpload(
+        revisionFile,
+        {
+          title: targetSub.title,
+          category: targetSub.category,
+          durationSeconds: durationSeconds || targetSub.duration_seconds || 180,
+          notes: revisionNotes.trim(),
+          consentConfirmed: true,
+        },
+        {
+          submissionId: targetSub.id,
+          isRevision: true,
+        }
+      );
+
+      toast.success(
+        `Version ${data?.submission?.version_number || (targetSub.version_number + 1)} submitted for review!`
+      );
       setSelectedSub(null);
       setRevisionFile(null);
       setRevisionNotes('');
@@ -1138,6 +1140,51 @@ export default function SubmissionsPage() {
                   </div>
                 )}
 
+                {/* Active Upload Progress in Modal */}
+                {isCurrentSubUploading && (
+                  <div className="bg-white/95 border border-pink-300/80 rounded-2xl p-4 sm:p-5 space-y-3 shadow-md">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping shrink-0" />
+                        <span className="text-xs font-bold text-neutral-900 truncate">
+                          Uploading Version {(selectedSub.version_number || 1) + 1} Revision...
+                        </span>
+                      </div>
+                      <span className="font-mono text-xs font-bold text-[#8E2848] shrink-0">
+                        {uploadState.progress}%
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-neutral-200/80 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-pink-500 to-[#8E2848] h-2.5 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${uploadState.progress}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-neutral-600 flex-wrap gap-2">
+                      <span className="font-medium">{uploadState.phase || 'Uploading video to server...'}</span>
+                      {uploadState.fileSizeBytes ? (
+                        <span className="text-neutral-500 font-mono">
+                          {formatBytes(uploadState.transferredBytes)} / {formatBytes(uploadState.fileSizeBytes)}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="pt-2 border-t border-neutral-200/70 flex items-center justify-between text-[11px] text-neutral-500">
+                      <span>Upload will continue in the background if you close this drawer.</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSub(null)}
+                        className="text-xs font-semibold text-[#8E2848] hover:underline"
+                      >
+                        Close Drawer
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <form onSubmit={handleRevisionSubmit} className="space-y-3">
                   <div>
                     <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
@@ -1167,12 +1214,22 @@ export default function SubmissionsPage() {
                   </div>
                   <button
                     type="submit"
-                    disabled={revisionLoading || !revisionFile}
-                    className="px-5 py-2.5 rounded-full bg-[#18151A] hover:bg-black text-white font-semibold text-xs transition-colors disabled:opacity-50"
+                    disabled={revisionLoading || !revisionFile || isCurrentSubUploading}
+                    className="px-5 py-2.5 rounded-full bg-[#18151A] hover:bg-black text-white font-semibold text-xs transition-colors disabled:opacity-50 flex items-center gap-2"
                   >
-                    {revisionLoading
-                      ? 'Processing Revision...'
-                      : 'Submit Revision'}
+                    {isCurrentSubUploading ? (
+                      <>
+                        <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Uploading Revision ({uploadState.progress}%)...</span>
+                      </>
+                    ) : revisionLoading ? (
+                      <>
+                        <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Starting Upload...</span>
+                      </>
+                    ) : (
+                      <span>Submit Version {selectedSub.version_number + 1} Revision</span>
+                    )}
                   </button>
                 </form>
               </div>
