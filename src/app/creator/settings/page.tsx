@@ -371,7 +371,7 @@ export default function CreatorSettingsPage() {
       localStorage.setItem('pinkroom_payment_method', paymentMethod);
       localStorage.setItem('pinkroom_payment_details', JSON.stringify(details));
 
-      await fetch('/api/creator/profile', {
+      const res = await fetch('/api/creator/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -379,9 +379,22 @@ export default function CreatorSettingsPage() {
           payment_details: details,
         }),
       });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save payout details');
+      }
+      setProfile((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              payment_method: paymentMethod as any,
+              payment_details: details,
+            }
+          : prev
+      );
       toast.success('Your payout method and details have been saved.', 'Payout details saved');
-    } catch {
-      toast.success('Payout preferences saved on this device.', 'Preferences saved');
+    } catch (err: any) {
+      toast.error(err.message || 'Could not save payout details', 'Save failed');
     } finally {
       setSavingPayment(false);
     }

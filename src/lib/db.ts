@@ -225,6 +225,28 @@ class PagesDatabaseService {
           const existingIdx = this.data.profiles.findIndex(
             (p) => p.id === sp.id || p.email.toLowerCase() === sp.email.toLowerCase()
           );
+          const existingProfile = existingIdx !== -1 ? this.data.profiles[existingIdx] : undefined;
+
+          // Resolve payment_method: check Supabase column, then Supabase payment_details, then existing profile
+          const resolvedPaymentMethod =
+            (sp.payment_method as any) ||
+            (sp.payment_details?.payment_method as any) ||
+            (sp.payment_details?.method as any) ||
+            existingProfile?.payment_method ||
+            undefined;
+
+          // Resolve payment_details: do NOT wipe existing profile payment_details if Supabase has empty/missing details
+          const spHasDetails = sp.payment_details && typeof sp.payment_details === 'object' && Object.keys(sp.payment_details).length > 0;
+          const existingDetails = existingProfile?.payment_details || {};
+          const resolvedPaymentDetails = spHasDetails
+            ? { ...existingDetails, ...sp.payment_details }
+            : { ...existingDetails };
+
+          if (resolvedPaymentMethod && !resolvedPaymentDetails.payment_method) {
+            resolvedPaymentDetails.payment_method = resolvedPaymentMethod;
+            resolvedPaymentDetails.method = resolvedPaymentMethod;
+          }
+
           const mappedProfile: Profile = {
             id: sp.id,
             email: sp.email,
@@ -232,8 +254,8 @@ class PagesDatabaseService {
             role: sp.role as any,
             country: sp.country,
             is_adult_confirmed: sp.is_adult_confirmed,
-            payment_method: sp.payment_method as any,
-            payment_details: sp.payment_details || {},
+            payment_method: resolvedPaymentMethod as any,
+            payment_details: resolvedPaymentDetails,
             avatar_url: sp.avatar_url || undefined,
             bio: sp.bio || undefined,
             date_of_birth: sp.date_of_birth || undefined,
@@ -1685,9 +1707,16 @@ class PagesDatabaseService {
         const name = pd.nigerian_account_name;
         if (num) resolvedDestination = `${b} - NUBAN: ${num}${name ? ` (${name})` : ''}`;
       } else if (resolvedMethod === 'MOBILE_MONEY') {
-        const prov = pd.mobile_money_provider || 'Mobile Money';
-        const phone = pd.mobile_money_phone;
-        const name = pd.mobile_money_account_name;
+        const prov =
+          (pd as any).mobile_money_provider || (pd as any).mobileNetwork ||
+          (pd as any).mobileMoneyProvider || (pd as any).provider || 'M-Pesa';
+        const phone =
+          (pd as any).mobile_money_phone || (pd as any).mobileNumber || (pd as any).mobile_number ||
+          (pd as any).mobileMoneyPhone || (pd as any).phone || (pd as any).phoneNumber;
+        const name =
+          (pd as any).mobile_money_account_name || (pd as any).mobileMoneyAccountName ||
+          (pd as any).beneficiary_name || (pd as any).beneficiaryName || (pd as any).account_name || (pd as any).accountName ||
+          creator.display_name;
         if (phone) resolvedDestination = `${prov} - ${phone}${name ? ` (${name})` : ''}`;
       } else if (resolvedMethod === 'ACH' || resolvedMethod === 'WIRE') {
         const parts = [];
@@ -2112,6 +2141,18 @@ class PagesDatabaseService {
 
   public async syncProfileToSupabase(profile: Profile) {
     try {
+      // Supabase profiles table check constraint: profiles_payment_method_check ('WISE', 'PAYPAL', 'ACH', 'WIRE', 'NIGERIA_BANK')
+      const ALLOWED_SUPABASE_PAYMENT_METHODS = ['WISE', 'PAYPAL', 'ACH', 'WIRE', 'NIGERIA_BANK'];
+      const supabasePaymentMethod =
+        profile.payment_method && ALLOWED_SUPABASE_PAYMENT_METHODS.includes(profile.payment_method)
+          ? profile.payment_method
+          : null;
+
+      const enhancedPaymentDetails = {
+        ...(profile.payment_details || {}),
+        ...(profile.payment_method ? { payment_method: profile.payment_method, method: profile.payment_method } : {}),
+      };
+
       const { error } = await supabaseAdmin.from('profiles').upsert(
         {
           id: ensureUuid(profile.id),
@@ -2127,8 +2168,8 @@ class PagesDatabaseService {
           sample_status: profile.sample_status || 'NOT_SUBMITTED',
           sample_submission_id: profile.sample_submission_id ? ensureUuid(profile.sample_submission_id) : null,
           sample_review_notes: profile.sample_review_notes || null,
-          payment_method: profile.payment_method || null,
-          payment_details: profile.payment_details || {},
+          payment_method: supabasePaymentMethod,
+          payment_details: enhancedPaymentDetails,
           agreement_signed: profile.agreement_signed ?? true,
           agreement_signed_at: profile.agreement_signed_at || null,
           agreement_signature_name: profile.agreement_signature_name || null,

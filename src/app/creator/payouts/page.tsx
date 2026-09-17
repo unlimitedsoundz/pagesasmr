@@ -88,21 +88,58 @@ export default function CreatorPayoutsPage() {
     return true;
   });
 
-  const paymentPreferenceName = profile?.payment_method
-    ? profile.payment_method.replace('_', ' ')
+  // Resolve effective payment method & details (checking profile first, then localStorage fallback)
+  let effectiveMethod = profile?.payment_method;
+  let effectiveDetails = profile?.payment_details;
+
+  if (typeof window !== 'undefined') {
+    if (!effectiveMethod) {
+      const storedMethod = localStorage.getItem('pinkroom_payment_method');
+      if (storedMethod) effectiveMethod = storedMethod as any;
+    }
+    if (!effectiveDetails || Object.keys(effectiveDetails).length === 0) {
+      const storedDetails = localStorage.getItem('pinkroom_payment_details');
+      if (storedDetails) {
+        try {
+          effectiveDetails = JSON.parse(storedDetails);
+        } catch {}
+      }
+    }
+  }
+
+  const paymentPreferenceName = effectiveMethod === 'MOBILE_MONEY'
+    ? 'African Mobile Money'
+    : effectiveMethod
+    ? effectiveMethod.replace(/_/g, ' ')
     : 'No preference selected';
 
   const handleRequestPayout = async () => {
     if (!canRequest) return;
     setSubmitting(true);
     try {
+      let resolvedMethod = profile?.payment_method || method;
+      let resolvedDetails = profile?.payment_details;
+
+      if (!resolvedDetails || Object.keys(resolvedDetails).length === 0) {
+        try {
+          const storedDetails = localStorage.getItem('pinkroom_payment_details');
+          if (storedDetails) {
+            resolvedDetails = JSON.parse(storedDetails);
+          }
+          const storedMethod = localStorage.getItem('pinkroom_payment_method');
+          if (storedMethod) {
+            resolvedMethod = storedMethod as any;
+          }
+        } catch {}
+      }
+
       const res = await fetch('/api/payouts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: availableBalance,
-          paymentMethod: profile?.payment_method || method,
-          paymentDetails: profile?.payment_details || { destination },
+          paymentMethod: resolvedMethod,
+          paymentDetails: resolvedDetails || (destination ? { destination } : {}),
         }),
       });
       const data = await res.json();
@@ -416,7 +453,17 @@ export default function CreatorPayoutsPage() {
                   {paymentPreferenceName}
                 </div>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                  Choose a payment preference in Settings. No payment account is connected in this preview.
+                  {(effectiveDetails as any)?.mobile_money_phone || (effectiveDetails as any)?.mobileNumber
+                    ? `${(effectiveDetails as any).mobile_money_provider || (effectiveDetails as any).mobileNetwork || 'Mobile Money'} (${(effectiveDetails as any).mobile_money_phone || (effectiveDetails as any).mobileNumber})`
+                    : (effectiveDetails as any)?.nigerian_account_number || (effectiveDetails as any)?.nigerianAccountNumber
+                    ? `${(effectiveDetails as any).nigerian_bank_name || 'Bank'} ••••${((effectiveDetails as any).nigerian_account_number || (effectiveDetails as any).nigerianAccountNumber).slice(-4)}`
+                    : (effectiveDetails as any)?.wise_email || (effectiveDetails as any)?.wiseEmail
+                    ? `Wise: ${(effectiveDetails as any).wise_email || (effectiveDetails as any).wiseEmail}`
+                    : (effectiveDetails as any)?.paypal_email || (effectiveDetails as any)?.paypalEmail
+                    ? `PayPal: ${(effectiveDetails as any).paypal_email || (effectiveDetails as any).paypalEmail}`
+                    : effectiveMethod
+                    ? 'Payment method configured. You can edit details in Settings.'
+                    : 'Choose a payment preference in Settings. No payment account is connected yet.'}
                 </p>
               </div>
 

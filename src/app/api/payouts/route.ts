@@ -37,9 +37,25 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireUser();
     const body = await req.json().catch(() => ({}));
-    let { paymentMethod, paymentDestination } = body;
+    let { paymentMethod, paymentDestination, paymentDetails } = body;
 
     const profile = await db.getProfileByIdAsync(user.id);
+
+    // If client supplied paymentDetails, persist to profile so it is saved and synced
+    if (paymentDetails && typeof paymentDetails === 'object' && Object.keys(paymentDetails).length > 0) {
+      const mergedDetails = {
+        ...(profile?.payment_details || {}),
+        ...paymentDetails,
+      };
+      await db.updateProfile(user.id, {
+        payment_details: mergedDetails,
+        ...(paymentMethod ? { payment_method: paymentMethod as PaymentMethodType } : {}),
+      });
+      const updatedProfile = db.getProfileById(user.id);
+      if (updatedProfile) {
+        await db.syncProfileToSupabase(updatedProfile);
+      }
+    }
 
     if (!paymentMethod && profile?.payment_method) {
       paymentMethod = profile.payment_method;
