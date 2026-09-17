@@ -23,6 +23,7 @@ import {
   StorageProvider,
   UploadStatus,
   ProcessingStatus,
+  BannedEntry,
 } from '@/types';
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
@@ -58,6 +59,9 @@ interface DatabaseData {
   guideline_samples: GuidelineSample[];
   chat_messages: ChatMessage[];
   referrals?: Referral[];
+  banned_ips?: string[];
+  banned_devices?: string[];
+  banned_entries?: BannedEntry[];
 }
 
 const APP_DATA_DIR = path.resolve(__dirname, '../../data');
@@ -2223,6 +2227,10 @@ class PagesDatabaseService {
     return item;
   }
 
+  recordAuditEvent(event: Omit<AuditEvent, 'id' | 'created_at'>): AuditEvent {
+    return this.createAuditEvent(event);
+  }
+
   getGuidelineSamples(): GuidelineSample[] {
     this.reload();
     return (this.data.guideline_samples || [])
@@ -3040,6 +3048,107 @@ class PagesDatabaseService {
   getLedgerEntries(): EarningsLedgerEntry[] {
     this.reload();
     return this.data.earnings_ledger || [];
+  }
+
+  // ==========================================
+  // BLACKLIST & BAN MANAGEMENT
+  // ==========================================
+  getBannedIps(): string[] {
+    this.reload();
+    return Array.from(new Set(this.data.banned_ips || []));
+  }
+
+  isIpBanned(ip: string): boolean {
+    if (!ip) return false;
+    const cleanIp = ip.trim();
+    if (!cleanIp) return false;
+    const bannedList = this.getBannedIps();
+    return bannedList.some((b) => b === cleanIp);
+  }
+
+  banIp(ip: string, reason?: string, targetUserId?: string): void {
+    if (!ip) return;
+    const cleanIp = ip.trim();
+    if (!cleanIp) return;
+    this.reload();
+    if (!this.data.banned_ips) this.data.banned_ips = [];
+    if (!this.data.banned_ips.includes(cleanIp)) {
+      this.data.banned_ips.push(cleanIp);
+    }
+    if (!this.data.banned_entries) this.data.banned_entries = [];
+    const existingIdx = this.data.banned_entries.findIndex((e) => e.type === 'IP' && e.value === cleanIp);
+    if (existingIdx === -1) {
+      const entry: BannedEntry = {
+        id: ensureUuid(),
+        type: 'IP',
+        value: cleanIp,
+        reason: reason || 'Permanent ban enforcement',
+        target_user_ids: targetUserId ? [targetUserId] : undefined,
+        created_at: new Date().toISOString(),
+      };
+      this.data.banned_entries.unshift(entry);
+    }
+    this.save();
+  }
+
+  getBannedDevices(): string[] {
+    this.reload();
+    return Array.from(new Set(this.data.banned_devices || []));
+  }
+
+  isDeviceBanned(deviceId: string): boolean {
+    if (!deviceId) return false;
+    const cleanDevice = deviceId.trim();
+    if (!cleanDevice) return false;
+    const bannedList = this.getBannedDevices();
+    return bannedList.some((b) => b === cleanDevice);
+  }
+
+  banDevice(deviceId: string, reason?: string, targetUserId?: string): void {
+    if (!deviceId) return;
+    const clean = deviceId.trim();
+    if (!clean) return;
+    this.reload();
+    if (!this.data.banned_devices) this.data.banned_devices = [];
+    if (!this.data.banned_devices.includes(clean)) {
+      this.data.banned_devices.push(clean);
+    }
+    if (!this.data.banned_entries) this.data.banned_entries = [];
+    const existingIdx = this.data.banned_entries.findIndex((e) => e.type === 'DEVICE' && e.value === clean);
+    if (existingIdx === -1) {
+      const entry: BannedEntry = {
+        id: ensureUuid(),
+        type: 'DEVICE',
+        value: clean,
+        reason: reason || 'Permanent device ban',
+        target_user_ids: targetUserId ? [targetUserId] : undefined,
+        created_at: new Date().toISOString(),
+      };
+      this.data.banned_entries.unshift(entry);
+    }
+    this.save();
+  }
+
+  getBannedEntries(): BannedEntry[] {
+    this.reload();
+    return this.data.banned_entries || [];
+  }
+
+  removeBannedEntry(id: string): boolean {
+    this.reload();
+    if (!this.data.banned_entries) return false;
+    const idx = this.data.banned_entries.findIndex((e) => e.id === id);
+    if (idx === -1) return false;
+    const entry = this.data.banned_entries[idx];
+    if (entry.type === 'IP' && this.data.banned_ips) {
+      this.data.banned_ips = this.data.banned_ips.filter((ip) => ip !== entry.value);
+    }
+    if (entry.type === 'DEVICE' && this.data.banned_devices) {
+      this.data.banned_devices = this.data.banned_devices.filter((dev) => dev !== entry.value);
+    }
+    this.data.banned_entries.splice(idx, 1);
+    this.save();
+    return true;
   }
 }
 

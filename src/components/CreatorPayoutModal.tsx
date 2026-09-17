@@ -17,6 +17,7 @@ import {
   ChevronUp,
   AlertCircle,
   ExternalLink,
+  Ban,
 } from 'lucide-react';
 import { formatCreatorPayoutInfo, FormattedPayoutInfo } from '@/lib/payoutDetails';
 
@@ -25,6 +26,7 @@ interface CreatorPayoutModalProps {
   payout?: any;
   isOpen: boolean;
   onClose: () => void;
+  onBan?: (creator: any) => void;
 }
 
 export default function CreatorPayoutModal({
@@ -32,6 +34,7 @@ export default function CreatorPayoutModal({
   payout,
   isOpen,
   onClose,
+  onBan,
 }: CreatorPayoutModalProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showRawJson, setShowRawJson] = useState(false);
@@ -242,7 +245,20 @@ export default function CreatorPayoutModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[#f2e3e8] pt-3 flex justify-end">
+        <div className="border-t border-[#f2e3e8] pt-3 flex items-center justify-between gap-3">
+          <div>
+            {onBan && creator && !creator.is_banned && (
+              <button
+                type="button"
+                onClick={() => onBan(creator)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition-colors shadow-xs"
+                title="Permanently ban this creator and blacklist their accounts"
+              >
+                <Ban className="w-3.5 h-3.5" />
+                <span>Ban & Blacklist</span>
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={onClose}

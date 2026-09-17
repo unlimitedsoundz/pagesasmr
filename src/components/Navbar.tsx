@@ -237,6 +237,7 @@ export default function Navbar() {
     { href: '/admin/chat', label: 'Live Chat' },
     { href: '/admin/notifications', label: 'Push Alerts' },
     { href: '/admin/ledger', label: 'Ledger' },
+    { href: '/admin/blacklist', label: 'Blacklist' },
     { href: '/admin/settings', label: 'Settings' },
     { href: '/admin/audit', label: 'Audit' },
     { href: '/guidelines', label: 'Guidelines' },

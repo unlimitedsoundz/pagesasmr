@@ -102,6 +102,9 @@ export interface Profile {
   agreement_signature_name?: string;
   referral_code?: string;
   referred_by_id?: string;
+  is_banned?: boolean;
+  banned_at?: string;
+  ban_reason?: string;
   created_at: string;
 }
 
@@ -260,3 +263,13 @@ export interface Referral {
   created_at: string;
   updated_at: string;
 }
+
+export interface BannedEntry {
+  id: string;
+  type: 'IP' | 'DEVICE' | 'EMAIL' | 'BANK_ACCOUNT' | 'NAME' | 'PHONE';
+  value: string;
+  reason: string;
+  target_user_ids?: string[];
+  created_at: string;
+}
+

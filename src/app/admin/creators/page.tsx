@@ -20,6 +20,8 @@ import {
   CreditCard,
   Copy,
   Check,
+  ShieldAlert,
+  Ban,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -40,6 +42,59 @@ export default function AdminCreatorsPage() {
   // Payout Details Modal & Copy
   const [payoutModalCreator, setPayoutModalCreator] = useState<any | null>(null);
   const [copiedAccountId, setCopiedAccountId] = useState<string | null>(null);
+
+  // Ban Creator Modal & Execution State
+  const [banningCreator, setBanningCreator] = useState<any | null>(null);
+  const [banReason, setBanReason] = useState('Severe policy violations and identity circumvention');
+  const [banCustomIp, setBanCustomIp] = useState('');
+  const [banCustomDevice, setBanCustomDevice] = useState('');
+  const [submittingBan, setSubmittingBan] = useState(false);
+
+  const handleExecuteBan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!banningCreator) return;
+    setSubmittingBan(true);
+    try {
+      const res = await fetch('/api/admin/creators/ban', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId: banningCreator.id,
+          reason: banReason,
+          customIp: banCustomIp,
+          customDevice: banCustomDevice,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to ban creator');
+      toast.success(`${banningCreator.display_name} has been permanently banned and blacklisted.`, 'Ban Enforced');
+      setCreators((prev) =>
+        prev.map((c) => (c.id === banningCreator.id ? { ...c, is_banned: true, sample_status: 'REJECTED' } : c))
+      );
+      setBanningCreator(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Error applying ban');
+    } finally {
+      setSubmittingBan(false);
+    }
+  };
+
+  const handleUnban = async (creator: any) => {
+    if (!confirm(`Lift permanent ban for ${creator.display_name}?`)) return;
+    try {
+      const res = await fetch(`/api/admin/creators/ban?creatorId=${encodeURIComponent(creator.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to lift ban');
+      toast.success(`Ban lifted for ${creator.display_name}.`);
+      setCreators((prev) =>
+        prev.map((c) => (c.id === creator.id ? { ...c, is_banned: false } : c))
+      );
+    } catch (err: any) {
+      toast.error(err.message || 'Error lifting ban');
+    }
+  };
 
   const handleCopyAccount = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
@@ -300,6 +355,15 @@ export default function AdminCreatorsPage() {
             <span>Broadcast Notification</span>
           </Link>
 
+          <Link
+            href="/admin/blacklist"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold hover:bg-rose-100 transition-colors shadow-xs"
+            title="View blacklist rules, banned IPs, device signatures, and sanction engine"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+            <span>Blacklist & Bans</span>
+          </Link>
+
           <div className="text-xs font-bold bg-[#FDF2F4] px-4 py-2 rounded-full text-[#7B1E4B] border-0">
             Total Creators: {creators.length}
           </div>
@@ -359,6 +423,11 @@ export default function AdminCreatorsPage() {
                         <div className="font-bold text-black text-sm flex items-center gap-1.5">
                           <span>{c.display_name}</span>
                           {sampleStatus === 'APPROVED' && <VerifiedBadge size={16} />}
+                          {c.is_banned && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white shadow-xs">
+                              BANNED
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-black font-medium">{c.email}</div>
                         <div className="text-[10px] text-neutral-500 font-bold">
@@ -606,9 +675,35 @@ export default function AdminCreatorsPage() {
                             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#FDF2F4] hover:bg-[#F8E2EC] text-[#7B1E4B] text-xs font-bold transition-colors border-0 shadow-xs"
                             title="Push custom notification & email to this creator"
                           >
-                            <Bell className="w-3 h-3" />
+                            <Bell className="w-3.5 h-3.5" />
                             <span>Notify</span>
                           </button>
+
+                          {c.is_banned ? (
+                            <button
+                              type="button"
+                              onClick={() => handleUnban(c)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold transition-colors border-0 shadow-xs"
+                              title="Lift permanent ban"
+                            >
+                              <span>Unban</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBanningCreator(c);
+                                setBanReason('Severe policy violations and identity circumvention');
+                                setBanCustomIp('');
+                                setBanCustomDevice('');
+                              }}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors border-0 shadow-xs"
+                              title="Permanently ban creator, IP and device"
+                            >
+                              <ShieldAlert className="w-3 h-3 text-rose-600" />
+                              <span>Ban</span>
+                            </button>
+                          )}
 
                           <button
                             type="button"
@@ -748,7 +843,104 @@ export default function AdminCreatorsPage() {
         creator={payoutModalCreator}
         isOpen={Boolean(payoutModalCreator)}
         onClose={() => setPayoutModalCreator(null)}
+        onBan={(c) => {
+          setPayoutModalCreator(null);
+          setBanningCreator(c);
+          setBanReason('Severe policy violations and identity circumvention');
+          setBanCustomIp('');
+          setBanCustomDevice('');
+        }}
       />
+
+      {/* Ban Creator & Blacklist Modal */}
+      {banningCreator && (
+        <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+          <div className="bg-[#18121B] rounded-2xl border border-rose-500/30 max-w-lg w-full p-6 space-y-5 shadow-2xl animate-fade-in text-white">
+            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2">
+                  <ShieldAlert className="w-5 h-5 text-rose-500" />
+                  <span>Enforce Ban & Blacklist</span>
+                </h3>
+                <p className="text-xs text-neutral-400 font-medium">
+                  {banningCreator.display_name} ({banningCreator.email})
+                </p>
+              </div>
+              <button
+                onClick={() => setBanningCreator(null)}
+                className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleExecuteBan} className="space-y-4">
+              <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 leading-relaxed">
+                This will permanently ban <strong className="text-white">{banningCreator.display_name}</strong>, terminate all sessions, blacklist their payment accounts/NUBANs, and block their IP and device from accessing The Pink Room.
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-neutral-300 block">
+                  Enforcement Reason
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={banReason}
+                  onChange={(e) => setBanReason(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-rose-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-neutral-300 block">
+                    Custom IP Address (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={banCustomIp}
+                    onChange={(e) => setBanCustomIp(e.target.value)}
+                    placeholder="e.g. 102.89.45.12"
+                    className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-neutral-300 block">
+                    Device Signature (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={banCustomDevice}
+                    onChange={(e) => setBanCustomDevice(e.target.value)}
+                    placeholder="e.g. TECNO KM4"
+                    className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => setBanningCreator(null)}
+                  className="px-4 py-2 rounded-xl border border-neutral-700 text-xs font-bold text-neutral-300 hover:bg-neutral-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingBan || !banReason.trim()}
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold disabled:opacity-50 flex items-center gap-1.5 shadow-lg shadow-rose-950/50"
+                >
+                  {submittingBan ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Ban className="w-3.5 h-3.5" />}
+                  <span>{submittingBan ? 'Enforcing...' : 'Enforce Ban & Blacklist'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
