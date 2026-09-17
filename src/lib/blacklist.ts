@@ -3,16 +3,18 @@
  * Enforces multi-layered IP, device, phone model, and identity banning.
  */
 
-// Permanent Blacklisted User IDs (Olivia and Loveth)
+// Permanent Blacklisted User IDs (Olivia, Loveth, Mulan)
 export const BLACKLISTED_USER_IDS: readonly string[] = [
   'db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1', // Olivia
   '6d8fa840-effc-4f02-8549-2b98e3c667ce', // Loveth onome
+  '63285e80-b8e9-410f-aacd-22c99c376872', // Mulan ASMR (Yemisi Olugbemi)
 ] as const;
 
 // Permanent Blacklisted Emails
 export const BLACKLISTED_EMAILS: readonly string[] = [
   'preciousolivia184@gmail.com',
   'lucylovethonome@gmail.com',
+  'copywithyemi@gmail.com',
 ] as const;
 
 // Permanent Blacklisted Bank & Mobile Money Accounts
@@ -20,6 +22,8 @@ export const BLACKLISTED_BANK_ACCOUNTS: readonly string[] = [
   '1632024222', // Access Bank (Ovwiedo Victory Ogheneriode)
   '9065277585', // OPay / Access Bank (VICTORY OGHENERIODE OVWIEDO)
   '8107287339', // Palmpay (ONOME LOVETH OVWIEDO)
+  '8065539969', // OPay (Yemisi Tosin Olugbemi / Mulan ASMR)
+  '211393277871', // Lead Bank ACH (Yemisi Olugbemi)
 ] as const;
 
 // Permanent Blacklisted Phone Numbers (any variation)
@@ -32,6 +36,10 @@ export const BLACKLISTED_PHONE_NUMBERS: readonly string[] = [
   '2348107287339',
   '+2349065277585',
   '+2348107287339',
+  '8065539969',
+  '08065539969',
+  '2348065539969',
+  '+2348065539969',
 ] as const;
 
 // Permanent Blacklisted Names / Beneficiaries
@@ -45,6 +53,10 @@ export const BLACKLISTED_NAMES: readonly string[] = [
   'victory ovwiedo',
   'onome loveth',
   'loveth ovwiedo',
+  'yemisi olugbemi',
+  'yemisi tosin olugbemi',
+  'olugbemi yemisi tosin',
+  'mulan asmr',
 ] as const;
 
 // Hardware signatures extracted from uploads (Loveth's Tecno Spark Go 2024 / KM4)
@@ -55,6 +67,14 @@ export const BLACKLISTED_HARDWARE_SIGNATURES: readonly string[] = [
   'KM4 Build',
   'TECNO KM4h',
 ] as const;
+
+/**
+ * Check if a user ID is explicitly blacklisted
+ */
+export function isUserBlacklisted(userId?: string | null): boolean {
+  if (!userId) return false;
+  return BLACKLISTED_USER_IDS.some((id) => id === userId);
+}
 
 /**
  * Normalizes strings by lowercasing, removing excess spaces and special characters.

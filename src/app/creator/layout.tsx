@@ -11,8 +11,27 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     fetch('/api/auth/me')
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 403) {
+          try {
+            localStorage.setItem('pinkroom_banned_device', '1');
+            document.cookie = 'pinkroom_banned_device=1; path=/; max-age=315360000; SameSite=Lax';
+          } catch {}
+          window.location.replace('/banned');
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!data) return;
+        if (data.isBanned || data.user?.is_banned) {
+          try {
+            localStorage.setItem('pinkroom_banned_device', '1');
+            document.cookie = 'pinkroom_banned_device=1; path=/; max-age=315360000; SameSite=Lax';
+          } catch {}
+          window.location.replace('/banned');
+          return;
+        }
         if (!data.user) {
           router.replace(`/auth/register?redirect=${encodeURIComponent(pathname)}`);
         } else {

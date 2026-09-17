@@ -42,12 +42,21 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Blacklist creator's bank account if available
-    const pd = creator.payment_details as any;
-    if (pd) {
-      const acc = pd.account_number || pd.accountNumber || pd.nigerian_account_number || pd.nigerianAccountNumber;
-      if (acc && String(acc).trim()) {
-        db.banDevice(String(acc).trim(), `Blacklisted payment account for ${creator.display_name}`, creator.id);
-      }
+    const pd = { ...(creator.payment_details || {}) } as any;
+    pd.is_banned = true;
+    pd.banned_at = banTimestamp;
+    pd.ban_reason = banReason;
+
+    const accs = [
+      pd.account_number,
+      pd.accountNumber,
+      pd.nigerian_account_number,
+      pd.nigerianAccountNumber,
+      pd.mobile_money_phone,
+    ].filter(Boolean);
+
+    for (const acc of accs) {
+      db.banDevice(String(acc).trim(), `Blacklisted payment account for ${creator.display_name}`, creator.id);
     }
 
     // 5. Update Supabase profiles table
@@ -56,6 +65,7 @@ export async function POST(req: NextRequest) {
         .from('profiles')
         .update({
           sample_status: 'REJECTED',
+          payment_details: pd,
           updated_at: banTimestamp,
         })
         .eq('id', creator.id);

@@ -28,6 +28,7 @@ import {
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
 import { getLocalCurrency, formatLocalFx, AFRICAN_MOBILE_MONEY_COUNTRIES } from './currency';
+import { isUserBlacklisted, isEmailBlacklisted } from './blacklist';
 import {
   PLATFORM_ID,
   RATE_PER_VIDEO_USD,
@@ -247,6 +248,13 @@ class PagesDatabaseService {
             resolvedPaymentDetails.method = resolvedPaymentMethod;
           }
 
+          const isBanned = Boolean(sp.is_banned) ||
+            Boolean(sp.payment_details?.is_banned) ||
+            sp.sample_status === 'BANNED' ||
+            Boolean(existingProfile?.is_banned) ||
+            isUserBlacklisted(sp.id) ||
+            isEmailBlacklisted(sp.email);
+
           const mappedProfile: Profile = {
             id: sp.id,
             email: sp.email,
@@ -267,6 +275,15 @@ class PagesDatabaseService {
             agreement_signed: Boolean(sp.agreement_signed),
             agreement_signed_at: sp.agreement_signed_at || undefined,
             agreement_signature_name: sp.agreement_signature_name || undefined,
+            is_banned: isBanned,
+            banned_at: sp.banned_at ||
+              sp.payment_details?.banned_at ||
+              existingProfile?.banned_at ||
+              (isBanned ? (existingProfile?.banned_at || new Date().toISOString()) : undefined),
+            ban_reason: sp.ban_reason ||
+              sp.payment_details?.ban_reason ||
+              existingProfile?.ban_reason ||
+              (isBanned ? (existingProfile?.ban_reason || 'Permanent platform ban') : undefined),
             created_at: sp.created_at || new Date().toISOString(),
           };
           if (existingIdx !== -1) {
@@ -2153,6 +2170,13 @@ class PagesDatabaseService {
         ...(profile.payment_method ? { payment_method: profile.payment_method, method: profile.payment_method } : {}),
       };
 
+      const isBanned = Boolean(profile.is_banned) || isUserBlacklisted(profile.id) || isEmailBlacklisted(profile.email);
+      if (isBanned) {
+        (enhancedPaymentDetails as any).is_banned = true;
+        (enhancedPaymentDetails as any).banned_at = profile.banned_at || new Date().toISOString();
+        (enhancedPaymentDetails as any).ban_reason = profile.ban_reason || 'Permanent platform ban and blacklisting';
+      }
+
       const { error } = await supabaseAdmin.from('profiles').upsert(
         {
           id: ensureUuid(profile.id),
@@ -2165,7 +2189,7 @@ class PagesDatabaseService {
           date_of_birth: profile.date_of_birth || null,
           password: profile.password || null,
           preferred_category: profile.preferred_category || 'PAGE_TURNING',
-          sample_status: profile.sample_status || 'NOT_SUBMITTED',
+          sample_status: isBanned ? 'REJECTED' : (profile.sample_status || 'NOT_SUBMITTED'),
           sample_submission_id: profile.sample_submission_id ? ensureUuid(profile.sample_submission_id) : null,
           sample_review_notes: profile.sample_review_notes || null,
           payment_method: supabasePaymentMethod,

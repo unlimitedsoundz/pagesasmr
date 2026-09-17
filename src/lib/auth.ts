@@ -1,8 +1,10 @@
 import { cookies } from 'next/headers';
 import { db } from './db';
 import { Profile, PlatformMembership } from '@/types';
+import { isUserBlacklisted, isEmailBlacklisted } from './blacklist';
 
 export const SESSION_COOKIE_NAME = 'asmr_session_user';
+export const BANNED_DEVICE_COOKIE = 'pinkroom_banned_device';
 
 export async function getCurrentUser(): Promise<Profile | null> {
   const cookieStore = cookies();
@@ -22,6 +24,21 @@ export async function getCurrentUser(): Promise<Profile | null> {
   const profile = await db.getProfileByIdAsync(sessionUserId);
   if (!profile) return null;
 
+  // Active ban enforcement: kick out banned or blacklisted sessions immediately
+  if (profile.is_banned || isUserBlacklisted(profile.id) || isEmailBlacklisted(profile.email)) {
+    try {
+      cookieStore.delete(SESSION_COOKIE_NAME);
+      cookieStore.set(BANNED_DEVICE_COOKIE, '1', {
+        path: '/',
+        maxAge: 315360000,
+        sameSite: 'lax',
+      });
+    } catch {
+      // In read-only contexts
+    }
+    return null;
+  }
+
   // Ensure opheliaadeleke@gmail.com is ADMIN
   if (profile.email.toLowerCase() === 'opheliaadeleke@gmail.com' && profile.role !== 'ADMIN') {
     profile.role = 'ADMIN';
@@ -32,8 +49,8 @@ export async function getCurrentUser(): Promise<Profile | null> {
 
 export async function requireUser(): Promise<Profile> {
   const user = await getCurrentUser();
-  if (!user) {
-    throw new Error('UNAUTHORIZED');
+  if (!user || user.is_banned || isUserBlacklisted(user.id) || isEmailBlacklisted(user.email)) {
+    throw new Error('ACCESS_DENIED_BANNED');
   }
   return user;
 }
