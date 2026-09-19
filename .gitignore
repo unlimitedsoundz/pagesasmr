@@ -40,3 +40,6 @@ supabase/.temp/
 bin/
 *.exe
 
+# temporary snapshots & analysis results
+*-snapshot.json
+*-results.json

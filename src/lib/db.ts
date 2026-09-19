@@ -310,7 +310,11 @@ class PagesDatabaseService {
         .select('*')
         .eq('platform_id', PLATFORM_ID);
       if (!mErr && memberships) {
-        this.data.platform_memberships = memberships.map((m: any) => ({
+        const supaMemIds = new Set(memberships.map((m: any) => m.id));
+        const preservedMemberships = (this.data.platform_memberships || []).filter(
+          (m) => !supaMemIds.has(m.id)
+        );
+        const mappedMemberships = memberships.map((m: any) => ({
           id: m.id,
           user_id: m.user_id,
           platform_id: m.platform_id,
@@ -320,6 +324,7 @@ class PagesDatabaseService {
           terms_signature: m.terms_signature,
           created_at: m.created_at,
         }));
+        this.data.platform_memberships = [...preservedMemberships, ...mappedMemberships];
       }
 
       // 3. Sync Submissions for pinkroom_pages (strict platform isolation + page turning)
