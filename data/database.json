@@ -8,7 +8,8 @@
       "country": "United States",
       "preferred_category": "BOTH",
       "is_adult_confirmed": true,
-      "created_at": "2026-09-11T07:28:19.433Z"
+      "created_at": "2026-09-11T07:28:19.433Z",
+      "payment_details": {}
     },
     {
       "id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
@@ -146,6 +147,7 @@
         "nigerianAccountNumber": "8065539969",
         "mobile_money_account_name": "YEMISI OLUGBEMI"
       },
+      "avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-63285e80-b8e9-410f-aacd-22c99c376872-1789308993289.jpg",
       "date_of_birth": "1997-09-18",
       "sample_status": "REJECTED",
       "sample_submission_id": "7aafa348-0a59-4df7-9a7a-b1a53f69a8b8",
@@ -155,7 +157,6 @@
       "agreement_signed_at": "2026-09-09T14:03:19.025+00:00",
       "agreement_signature_name": "Yemisi Olugbemi",
       "created_at": "2026-09-09T14:03:19.026+00:00",
-      "avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-63285e80-b8e9-410f-aacd-22c99c376872-1789308993289.jpg",
       "is_banned": true,
       "banned_at": "2026-09-17T09:30:08.961Z",
       "ban_reason": "Permanent ban for fraudulent dispute, extortion, and policy violations"
@@ -205,8 +206,8 @@
       "agreement_signed_at": "2026-09-07T20:21:29.089+00:00",
       "agreement_signature_name": "Ada Wunor",
       "created_at": "2026-09-07T14:58:43.165206+00:00",
-      "referral_code": "ADAWU-576WJ",
-      "is_banned": false
+      "is_banned": false,
+      "referral_code": "ADAWU-576WJ"
     },
     {
       "id": "c0000000-0000-4000-8000-000000000001",
@@ -347,15 +348,15 @@
       },
       "date_of_birth": "1998-09-11",
       "sample_status": "APPROVED",
+      "sample_submission_id": "7b83b172-b590-491a-919d-598edec89161",
+      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
       "password": "35971224",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T08:22:14.285+00:00",
       "agreement_signature_name": "Sharon karuri",
       "created_at": "2026-09-11T08:22:14.286+00:00",
-      "sample_submission_id": "7b83b172-b590-491a-919d-598edec89161",
-      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
-      "payment_method": "MOBILE_MONEY",
-      "is_banned": false
+      "is_banned": false,
+      "payment_method": "MOBILE_MONEY"
     },
     {
       "id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
@@ -368,13 +369,13 @@
       "payment_details": {},
       "date_of_birth": "2006-01-22",
       "sample_status": "APPROVED",
+      "sample_submission_id": "743afe46-9bed-4d5e-888e-8dae2c42167c",
+      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
       "password": "Belair006",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T11:56:04.533+00:00",
       "agreement_signature_name": "Linet Munene",
       "created_at": "2026-09-11T11:56:04.534+00:00",
-      "sample_submission_id": "743afe46-9bed-4d5e-888e-8dae2c42167c",
-      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
       "is_banned": false
     },
     {
@@ -409,8 +410,8 @@
       "agreement_signed_at": "2026-09-11T15:30:57.151+00:00",
       "agreement_signature_name": "Dencia Adeleke",
       "created_at": "2026-09-11T15:30:57.151+00:00",
-      "referral_code": "DENCIA-F69F",
-      "is_banned": false
+      "is_banned": false,
+      "referral_code": "DENCIA-F69F"
     },
     {
       "id": "8c4d7c3f-81b5-4514-aad3-50ea46acf919",
@@ -428,7 +429,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T16:15:26.073+00:00",
       "agreement_signature_name": "Effie Atieno",
-      "created_at": "2026-09-11T16:15:26.075+00:00"
+      "created_at": "2026-09-11T16:15:26.075+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "8d8e6cd6-e69b-4fe0-82a6-892f3d3df26e",
@@ -447,7 +449,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T21:48:48.772+00:00",
       "agreement_signature_name": "PRECIOUS OLUWARANTIMI AREMO",
-      "created_at": "2026-09-11T21:48:48.775+00:00"
+      "created_at": "2026-09-11T21:48:48.775+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "d672ad96-ad70-4ed8-9e9b-11106200ed4f",
@@ -504,13 +507,14 @@
       },
       "date_of_birth": "2005-06-13",
       "sample_status": "APPROVED",
+      "sample_submission_id": "24348ec7-1930-4843-b34e-6e14958eeec5",
+      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
       "password": "Faymma123@",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T19:34:33.946+00:00",
       "agreement_signature_name": "Amani",
       "created_at": "2026-09-11T19:34:33.946+00:00",
-      "sample_submission_id": "24348ec7-1930-4843-b34e-6e14958eeec5",
-      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
+      "referred_by_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
       "is_banned": false
     },
     {
@@ -529,7 +533,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T19:33:09.144+00:00",
       "agreement_signature_name": "David Njuguna kimani",
-      "created_at": "2026-09-11T19:33:09.148+00:00"
+      "created_at": "2026-09-11T19:33:09.148+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "add45a6c-11bf-4d9e-8cc1-f80ce2ef1c3f",
@@ -547,7 +552,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-14T14:47:53.432+00:00",
       "agreement_signature_name": "Timothy Tambo",
-      "created_at": "2026-09-14T14:47:53.436+00:00"
+      "created_at": "2026-09-14T14:47:53.436+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "5541cdb9-bb7e-4d1d-9a54-7037672479c9",
@@ -585,7 +591,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T20:02:07.344+00:00",
       "agreement_signature_name": "Faith kamau",
-      "created_at": "2026-09-11T20:02:07.346+00:00"
+      "created_at": "2026-09-11T20:02:07.346+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "6075bd48-e31c-4fa6-b9c7-daab49128db8",
@@ -707,7 +714,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T17:15:13.145+00:00",
       "agreement_signature_name": "Sally",
-      "created_at": "2026-09-11T17:15:13.146+00:00"
+      "created_at": "2026-09-11T17:15:13.146+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "b8c0b3dc-2f11-48bc-addd-ea6929501135",
@@ -725,7 +733,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-11T17:58:08.72+00:00",
       "agreement_signature_name": "Joy",
-      "created_at": "2026-09-11T17:58:08.722+00:00"
+      "created_at": "2026-09-11T17:58:08.722+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "d2f52579-823b-47b6-8136-1cd40bea99a1",
@@ -810,13 +819,13 @@
       "payment_details": {},
       "date_of_birth": "1998-06-12",
       "sample_status": "REVISION_REQUESTED",
+      "sample_submission_id": "d99558d8-222a-45f0-9269-93c48381b9d1",
+      "sample_review_notes": "The angle isn’t right, you need to use long press nails. Watch the sample guideline video and remake exactly as it was made there, same camera angle, use only inbetween your 2 middle fingers to flip the pages after each lick.",
       "password": "Deborah@1998",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T10:11:08.222+00:00",
       "agreement_signature_name": "Deborah Adeyinka",
       "created_at": "2026-09-12T10:11:08.222+00:00",
-      "sample_submission_id": "d99558d8-222a-45f0-9269-93c48381b9d1",
-      "sample_review_notes": "The angle isn’t right, you need to use long press nails. Watch the sample guideline video and remake exactly as it was made there, same camera angle, use only inbetween your 2 middle fingers to flip the pages after each lick.",
       "is_banned": false
     },
     {
@@ -878,13 +887,13 @@
       "avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-a332a130-ff0d-491e-8799-6f6729754933-1789244766888.jpg",
       "date_of_birth": "2006-01-09",
       "sample_status": "REVISION_REQUESTED",
+      "sample_submission_id": "a50fa20f-1962-4127-ad26-a491f8f1ca73",
+      "sample_review_notes": "Female creators o my with long press on nails!",
       "password": "@Jhaywone321",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T20:00:09.013+00:00",
       "agreement_signature_name": "Joseph",
       "created_at": "2026-09-12T20:00:09.013+00:00",
-      "sample_submission_id": "a50fa20f-1962-4127-ad26-a491f8f1ca73",
-      "sample_review_notes": "Female creators o my with long press on nails!",
       "is_banned": false
     },
     {
@@ -1030,7 +1039,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-12T18:37:32.844+00:00",
       "agreement_signature_name": "Paige",
-      "created_at": "2026-09-12T18:37:32.847+00:00"
+      "created_at": "2026-09-12T18:37:32.847+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "d1c1a5c3-a706-4050-bece-ffb30577f69c",
@@ -1062,7 +1072,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T00:02:46.723+00:00",
       "agreement_signature_name": "Mary Anne",
-      "created_at": "2026-09-13T00:02:46.725+00:00"
+      "created_at": "2026-09-13T00:02:46.725+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "492d6266-0b13-49a4-b95c-0292768535fe",
@@ -1119,13 +1130,13 @@
       },
       "date_of_birth": "2006-09-11",
       "sample_status": "APPROVED",
+      "sample_submission_id": "5bb60135-e3b8-4632-89ce-fe5a04b8def9",
+      "sample_review_notes": "Audition meets page-turning quality guidelines. Full production unlocked.",
       "password": "Kadarapatani78",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T06:46:32.634+00:00",
       "agreement_signature_name": "Night page",
       "created_at": "2026-09-13T06:46:32.634+00:00",
-      "sample_submission_id": "5bb60135-e3b8-4632-89ce-fe5a04b8def9",
-      "sample_review_notes": "Audition meets page-turning quality guidelines. Full production unlocked.",
       "is_banned": false
     },
     {
@@ -1217,7 +1228,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T15:18:03.479+00:00",
       "agreement_signature_name": "Adedapo wuraola",
-      "created_at": "2026-09-13T15:18:03.48+00:00"
+      "created_at": "2026-09-13T15:18:03.48+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "c83eff4e-571a-4175-9fd0-d0f17693fd8f",
@@ -1256,13 +1268,13 @@
       },
       "date_of_birth": "1999-03-11",
       "sample_status": "REVISION_REQUESTED",
+      "sample_submission_id": "1356fcb9-e776-4228-a8ba-9809d45c7b66",
+      "sample_review_notes": "The quality, nails and lighting are superb! However, do not include your thumbs while turning the pages after lick after each flip on the pages. Make sure you flip the pages with only inbetween your 2 middle fingers. Remake!",
       "password": "Goldfav@1965",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T09:56:15.477+00:00",
       "agreement_signature_name": "Catchy pages",
       "created_at": "2026-09-13T09:56:15.477+00:00",
-      "sample_submission_id": "1356fcb9-e776-4228-a8ba-9809d45c7b66",
-      "sample_review_notes": "The quality, nails and lighting are superb! However, do not include your thumbs while turning the pages after lick after each flip on the pages. Make sure you flip the pages with only inbetween your 2 middle fingers. Remake!",
       "is_banned": false
     },
     {
@@ -1294,7 +1306,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T16:25:28.623+00:00",
       "agreement_signature_name": "Gbolagade Fatimoh Adeola",
-      "created_at": "2026-09-13T16:25:28.625+00:00"
+      "created_at": "2026-09-13T16:25:28.625+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "1bd07e8f-6311-4101-9d54-f8477a724ff4",
@@ -1312,7 +1325,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T16:23:32.466+00:00",
       "agreement_signature_name": "Terria Raymond",
-      "created_at": "2026-09-13T16:23:32.468+00:00"
+      "created_at": "2026-09-13T16:23:32.468+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "abca91e6-99d5-490a-bcb0-f82dda1186a9",
@@ -1330,7 +1344,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T16:40:51.909+00:00",
       "agreement_signature_name": "Antwi",
-      "created_at": "2026-09-13T16:40:51.912+00:00"
+      "created_at": "2026-09-13T16:40:51.912+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "6be379c3-23a1-4bbb-a976-bd297d4be2ab",
@@ -1348,7 +1363,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T16:18:49.909+00:00",
       "agreement_signature_name": "Elizabeth Solomon",
-      "created_at": "2026-09-13T16:18:49.912+00:00"
+      "created_at": "2026-09-13T16:18:49.912+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
@@ -1356,6 +1372,7 @@
       "display_name": "Chidi lindamary Chinelo",
       "role": "CREATOR",
       "country": "United States",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -1385,15 +1402,14 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1994-11-02",
-      "password": "Toughet789@#",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "APPROVED",
+      "sample_submission_id": "662d382d-130f-4b57-9ca2-febe64806f04",
+      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
+      "password": "Toughet789@#",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T19:32:04.52+00:00",
       "agreement_signature_name": "Chidi lindamary Chinelo",
       "created_at": "2026-09-13T19:32:04.524+00:00",
-      "sample_submission_id": "662d382d-130f-4b57-9ca2-febe64806f04",
-      "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
       "is_banned": false
     },
     {
@@ -1412,7 +1428,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-13T19:39:11.374+00:00",
       "agreement_signature_name": "Sandra ojike",
-      "created_at": "2026-09-13T19:39:11.378+00:00"
+      "created_at": "2026-09-13T19:39:11.378+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "4e6b5668-3d86-4f38-984e-369d375a9f9d",
@@ -1430,7 +1447,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-14T06:47:06.88+00:00",
       "agreement_signature_name": "Osemobor miracle",
-      "created_at": "2026-09-14T06:47:06.883+00:00"
+      "created_at": "2026-09-14T06:47:06.883+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "d8961bcf-b171-48de-b725-7d2bcb6fdbbd",
@@ -1448,7 +1466,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-14T21:55:24.993+00:00",
       "agreement_signature_name": "Kindness onate",
-      "created_at": "2026-09-14T21:55:25+00:00"
+      "created_at": "2026-09-14T21:55:25+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "c87ec824-a99a-4600-ba57-cea2da02ffe5",
@@ -1466,7 +1485,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-14T14:56:07.061+00:00",
       "agreement_signature_name": "Margaret Onyukwo Oyigeya",
-      "created_at": "2026-09-14T14:56:07.066+00:00"
+      "created_at": "2026-09-14T14:56:07.066+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "6b5dee08-287c-4e0c-9b45-d409e721b5a6",
@@ -1474,6 +1494,7 @@
       "display_name": "Chepkorir Patricia",
       "role": "CREATOR",
       "country": "Kenya",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "PAYPAL",
       "payment_details": {
@@ -1503,11 +1524,10 @@
         "method": "PAYPAL"
       },
       "date_of_birth": "2002-12-24",
-      "password": "Pinkroom1%",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "APPROVED",
       "sample_submission_id": "dabb5623-62fe-4380-b943-f9826a8b069b",
       "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
+      "password": "Pinkroom1%",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-14T11:01:25.644+00:00",
       "agreement_signature_name": "Chepkorir Patricia",
@@ -1538,6 +1558,7 @@
       "display_name": "Wishful pages",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -1567,9 +1588,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1999-03-11",
-      "password": "Goldfav@1965",
-      "preferred_category": "PAGE_TURNING",
       "sample_status": "APPROVED",
+      "password": "Goldfav@1965",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T14:19:10.386+00:00",
       "agreement_signature_name": "Wishful pages",
@@ -1584,6 +1604,7 @@
       "display_name": "Daniel mweu",
       "role": "CREATOR",
       "country": "Kenya",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "PAYPAL",
       "payment_details": {
@@ -1613,15 +1634,14 @@
         "method": "PAYPAL"
       },
       "date_of_birth": "2001-01-30",
-      "password": "Dantebigi44$$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "REVISION_REQUESTED",
-      "sample_submission_id": "b7754b84-7e86-4097-b60d-89cccc9c97cb",
-      "sample_review_notes": "The angle is perfect. Don't raise your skirt. Keep skirt at knee length. Don't flap too fast and bring the camera closer a bit.",
+      "password": "Dantebigi44$$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T13:33:40.65+00:00",
       "agreement_signature_name": "Daniel mweu",
       "created_at": "2026-09-15T13:33:40.657+00:00",
+      "sample_submission_id": "b7754b84-7e86-4097-b60d-89cccc9c97cb",
+      "sample_review_notes": "The angle is perfect. Don't raise your skirt. Keep skirt at knee length. Don't flap too fast and bring the camera closer a bit.",
       "is_banned": false
     },
     {
@@ -1630,12 +1650,12 @@
       "display_name": "Victor Ezeakolam",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1998-03-16",
-      "password": "Eweremchiveeez96@",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Eweremchiveeez96@",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T18:27:09.452+00:00",
       "agreement_signature_name": "Victor Ezeakolam",
@@ -1648,6 +1668,7 @@
       "display_name": "Ihediohamma chinonso Eva",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -1677,9 +1698,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "2002-03-02",
-      "password": "163370",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "163370",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T18:48:25.134+00:00",
       "agreement_signature_name": "Ihediohamma chinonso Eva",
@@ -1692,12 +1712,12 @@
       "display_name": "Favour Christopher Sampson",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2004-06-15",
-      "password": "amani123@",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "amani123@",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T19:05:03.199+00:00",
       "agreement_signature_name": "Favour Christopher Sampson",
@@ -1710,12 +1730,12 @@
       "display_name": "Anita",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1995-06-05",
-      "password": "24Earning$",
-      "preferred_category": "PAGE_TURNING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "24Earning$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T11:53:30.505+00:00",
       "agreement_signature_name": "Anita",
@@ -1728,12 +1748,12 @@
       "display_name": "Abigail Godwin Archibong",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2005-06-15",
-      "password": "Aebee1@",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Aebee1@",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T19:07:19.44+00:00",
       "agreement_signature_name": "Abigail Godwin Archibong",
@@ -1746,12 +1766,12 @@
       "display_name": "Pink pages",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2001-10-04",
-      "password": "Ilovewhyte",
-      "preferred_category": "PAGE_TURNING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Ilovewhyte",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T03:28:50.214+00:00",
       "agreement_signature_name": "Pink pages",
@@ -1764,12 +1784,12 @@
       "display_name": "Miss page",
       "role": "CREATOR",
       "country": "United States",
+      "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2000-10-12",
-      "password": "Ajifa@16.",
-      "preferred_category": "PAGE_TURNING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Ajifa@16.",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T13:46:52.008+00:00",
       "agreement_signature_name": "Miss page",
@@ -1782,12 +1802,12 @@
       "display_name": "Bukola Ayoola",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1998-10-29",
-      "password": "Ayoola98",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Ayoola98",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T16:35:34.533+00:00",
       "agreement_signature_name": "Bukola Ayoola",
@@ -1810,7 +1830,8 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T05:19:05.711+00:00",
       "agreement_signature_name": "Rosita",
-      "created_at": "2026-09-15T05:19:05.716+00:00"
+      "created_at": "2026-09-15T05:19:05.716+00:00",
+      "platform_id": "pinkroom_main"
     },
     {
       "id": "ade06454-8547-46d2-9aaf-1e0fba1e1721",
@@ -1818,12 +1839,12 @@
       "display_name": "Bisola Adeniyi",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1999-09-02",
-      "password": "Adeniyi2success!",
-      "preferred_category": "PAGE_TURNING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Adeniyi2success!",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T06:07:24.713+00:00",
       "agreement_signature_name": "Bisola Adeniyi",
@@ -1836,12 +1857,12 @@
       "display_name": "Lyzbeth",
       "role": "CREATOR",
       "country": "Other",
+      "preferred_category": "PAGE_TURNING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1999-05-27",
-      "password": "lizy8006",
-      "preferred_category": "PAGE_TURNING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "lizy8006",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T13:50:45.817+00:00",
       "agreement_signature_name": "Lyzbeth",
@@ -1854,12 +1875,12 @@
       "display_name": "Adie DivineFavour",
       "role": "CREATOR",
       "country": "United States",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2003-01-31",
-      "password": "090savage",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "090savage",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T22:53:21.423+00:00",
       "agreement_signature_name": "Adie DivineFavour",
@@ -1872,12 +1893,12 @@
       "display_name": "Faithful Isiguzoro",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2001-11-14",
-      "password": "Conono135$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Conono135$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T15:35:57.357+00:00",
       "agreement_signature_name": "Faithful Isiguzoro",
@@ -1890,12 +1911,12 @@
       "display_name": "Victoria Ekanem",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2003-03-09",
-      "password": "Getmoney3",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Getmoney3",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T22:55:25.362+00:00",
       "agreement_signature_name": "Victoria Ekanem",
@@ -1908,6 +1929,7 @@
       "display_name": "Phoebe Vindigh",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {
         "method": "NIGERIA_BANK",
@@ -1936,15 +1958,14 @@
         "mobile_money_account_name": "PHOEBE KPADOO VINDIGH"
       },
       "date_of_birth": "1994-06-26",
-      "password": "Phoebe@30",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Phoebe@30",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T06:48:00.467+00:00",
       "agreement_signature_name": "Phoebe Vindigh",
       "created_at": "2026-09-17T06:48:00.475+00:00",
-      "payment_method": "NIGERIA_BANK",
-      "is_banned": false
+      "is_banned": false,
+      "payment_method": "NIGERIA_BANK"
     },
     {
       "id": "3aabd32a-b836-4384-9a11-0892b2a9ef84",
@@ -1952,17 +1973,17 @@
       "display_name": "Onyeji Chiamaka Princess",
       "role": "CREATOR",
       "country": "United States",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1998-04-06",
-      "password": "@Trea1998",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "@Trea1998",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T07:17:50.172+00:00",
       "agreement_signature_name": "Onyeji Chiamaka Princess",
-      "created_at": "2026-09-17T07:17:50.177+00:00",
-      "is_banned": false
+      "is_banned": false,
+      "created_at": "2026-09-17T07:17:50.177+00:00"
     },
     {
       "id": "0b94bc3f-e07c-4ca9-8849-02d351415e2e",
@@ -1970,12 +1991,12 @@
       "display_name": "Blessing Udochukwu Nwusulor",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1995-10-18",
-      "password": "Pink@2026",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Pink@2026",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T19:59:35.867+00:00",
       "agreement_signature_name": "Blessing Udochukwu Nwusulor",
@@ -1988,6 +2009,7 @@
       "display_name": "SONOWO",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2017,9 +2039,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1989-05-31",
-      "password": "Sonowo31$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Sonowo31$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T22:31:30.962+00:00",
       "agreement_signature_name": "SONOWO",
@@ -2032,12 +2053,12 @@
       "display_name": "Susan Ogidan",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2001-10-16",
-      "password": "goodgirl20",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "goodgirl20",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T00:27:57.847+00:00",
       "agreement_signature_name": "Susan Ogidan",
@@ -2050,12 +2071,12 @@
       "display_name": "Mitchelle  Maxwell",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2004-01-16",
-      "password": "Stella555",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Stella555",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T15:51:56.713+00:00",
       "agreement_signature_name": "Mitchelle  Maxwell",
@@ -2068,6 +2089,7 @@
       "display_name": "Balogun Mistura",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2097,11 +2119,10 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1999-06-13",
-      "password": "Shoemaker",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "APPROVED",
       "sample_submission_id": "732cd92b-ee0c-4dca-a83d-21d127f5a502",
       "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
+      "password": "Shoemaker",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T10:29:02.031+00:00",
       "agreement_signature_name": "Balogun Mistura",
@@ -2114,6 +2135,7 @@
       "display_name": "Victoria Eze",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2143,9 +2165,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1992-09-01",
-      "password": "011992",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "011992",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T21:36:10.315+00:00",
       "agreement_signature_name": "Victoria Eze",
@@ -2158,6 +2179,7 @@
       "display_name": "Favour omonigho",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2187,9 +2209,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "2004-11-23",
-      "password": "123456",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "123456",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T12:22:19.231+00:00",
       "agreement_signature_name": "Favour omonigho",
@@ -2202,12 +2223,12 @@
       "display_name": "Nzube Ezika",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2002-06-16",
-      "password": "Nzubechukwu",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Nzubechukwu",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T20:06:39.801+00:00",
       "agreement_signature_name": "Nzube Ezika",
@@ -2220,6 +2241,7 @@
       "display_name": "Juliet Okon Andem",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2249,9 +2271,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "2005-12-05",
-      "password": "Pinky600$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Pinky600$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T22:47:46.531+00:00",
       "agreement_signature_name": "Juliet Okon Andem",
@@ -2264,12 +2285,12 @@
       "display_name": "Victoria Pobee-Orleans",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2000-04-17",
-      "password": "098Mokosh",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "098Mokosh",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T02:02:27.7+00:00",
       "agreement_signature_name": "Victoria Pobee-Orleans",
@@ -2282,6 +2303,7 @@
       "display_name": "Ifeyinwa Vivian Nwachukwu",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2311,11 +2333,10 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1987-09-04",
-      "password": "olaedo78983700",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "APPROVED",
       "sample_submission_id": "3fe3dc9b-9b06-483e-8cc7-91df79388051",
       "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
+      "password": "olaedo78983700",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T10:22:39.031+00:00",
       "agreement_signature_name": "Ifeyinwa Vivian Nwachukwu",
@@ -2328,12 +2349,12 @@
       "display_name": "Grace",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1999-09-08",
-      "password": "blessing,2015.",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "blessing,2015.",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T13:47:12.535+00:00",
       "agreement_signature_name": "Grace",
@@ -2346,12 +2367,12 @@
       "display_name": "Peace Odili",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1999-12-26",
-      "password": "Peace1665.",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Peace1665.",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T22:17:41.401+00:00",
       "agreement_signature_name": "Peace Odili",
@@ -2364,12 +2385,12 @@
       "display_name": "Jewelstar Essien",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2001-01-22",
-      "password": "Starr1221_",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Starr1221_",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T16:50:15.32+00:00",
       "agreement_signature_name": "Jewelstar Essien",
@@ -2382,6 +2403,7 @@
       "display_name": "Blessing Ajisegbede",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2411,9 +2433,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "2001-08-20",
-      "password": "B@midele20",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "B@midele20",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T15:08:50.363+00:00",
       "agreement_signature_name": "Blessing Ajisegbede",
@@ -2426,12 +2447,12 @@
       "display_name": "Omata Joy",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1999-01-16",
-      "password": "Omata1042",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Omata1042",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T20:20:19.745+00:00",
       "agreement_signature_name": "Omata Joy",
@@ -2444,12 +2465,12 @@
       "display_name": "Okhioya miracle",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2002-09-16",
-      "password": "Wisdom2024%",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Wisdom2024%",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T23:36:33.596+00:00",
       "agreement_signature_name": "Okhioya miracle",
@@ -2462,12 +2483,12 @@
       "display_name": "Amarachi Shakira Akuegbonwu",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2003-03-27",
-      "password": "mara2727",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "mara2727",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T05:55:04.446+00:00",
       "agreement_signature_name": "Amarachi Shakira Akuegbonwu",
@@ -2480,17 +2501,17 @@
       "display_name": "Martha",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2003-10-26",
-      "password": "martha2003$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "martha2003$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T07:28:56.07+00:00",
       "agreement_signature_name": "Martha",
-      "created_at": "2026-09-17T07:28:56.075+00:00",
-      "is_banned": false
+      "is_banned": false,
+      "created_at": "2026-09-17T07:28:56.075+00:00"
     },
     {
       "id": "0caed8ec-8bae-4782-b174-711207aa5e8d",
@@ -2498,12 +2519,12 @@
       "display_name": "Chinonso charity Toochukwu",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2002-11-07",
-      "password": "Booboo7#",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Booboo7#",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T05:15:34.295+00:00",
       "agreement_signature_name": "Chinonso charity Toochukwu",
@@ -2516,12 +2537,12 @@
       "display_name": "Toria",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2001-11-02",
-      "password": "071382",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "071382",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T00:24:30.015+00:00",
       "agreement_signature_name": "Toria",
@@ -2534,12 +2555,12 @@
       "display_name": "Chidike Jennifer onyinyechi",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2008-07-04",
-      "password": "splendor",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "splendor",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T19:07:28.957+00:00",
       "agreement_signature_name": "Chidike Jennifer onyinyechi",
@@ -2552,6 +2573,7 @@
       "display_name": "ADEWUNMI",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2581,9 +2603,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1994-02-25",
-      "password": "Wunmi@1985",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Wunmi@1985",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T15:32:56.128+00:00",
       "agreement_signature_name": "ADEWUNMI",
@@ -2596,12 +2617,12 @@
       "display_name": "Temitope Osunleye",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2002-04-30",
-      "password": "@Remotejobs1",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "@Remotejobs1",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T19:14:17.044+00:00",
       "agreement_signature_name": "Temitope Osunleye",
@@ -2614,12 +2635,12 @@
       "display_name": "Chinaza Marycynthia Aniagolu",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1999-05-16",
-      "password": "StalkerT",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "StalkerT",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T20:52:27.523+00:00",
       "agreement_signature_name": "Chinaza Marycynthia Aniagolu",
@@ -2632,6 +2653,7 @@
       "display_name": "Grace Enefiok Isong",
       "role": "CREATOR",
       "country": "Other",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2661,9 +2683,8 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "2002-04-17",
-      "password": "09095973469ADa$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "09095973469ADa$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T06:22:58.702+00:00",
       "agreement_signature_name": "Grace Enefiok Isong",
@@ -2676,12 +2697,12 @@
       "display_name": "Vivian",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "1992-10-02",
-      "password": "Giles@/12",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Giles@/12",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T14:35:54.773+00:00",
       "agreement_signature_name": "Vivian",
@@ -2694,12 +2715,12 @@
       "display_name": "Michelle Emmanuel",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2001-09-19",
-      "password": "Godisgood2$",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Godisgood2$",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-16T11:31:05.297+00:00",
       "agreement_signature_name": "Michelle Emmanuel",
@@ -2712,17 +2733,17 @@
       "display_name": "Idongesit Edet",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2000-06-09",
-      "password": "Haidee1497",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Haidee1497",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T07:33:56.364+00:00",
       "agreement_signature_name": "Idongesit Edet",
-      "created_at": "2026-09-17T07:33:56.369+00:00",
-      "is_banned": false
+      "is_banned": false,
+      "created_at": "2026-09-17T07:33:56.369+00:00"
     },
     {
       "id": "df1081f7-cdb2-442a-a39c-f744e8cb8c08",
@@ -2730,6 +2751,7 @@
       "display_name": "Goodness Lawrence",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2759,16 +2781,15 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "2005-08-22",
-      "password": "Goodness@69",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "REVISION_REQUESTED",
+      "password": "Goodness@69",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T07:20:02.15+00:00",
       "agreement_signature_name": "Goodness Lawrence",
+      "is_banned": false,
       "created_at": "2026-09-17T07:20:02.158+00:00",
       "sample_submission_id": "bb53303f-1369-47ab-b05f-bf669c05dd73",
-      "sample_review_notes": "Kindly wear a fitted knee length skirt or dress. Not a flare skirt. Also face the light as the area is dark. Kindly remake!",
-      "is_banned": false
+      "sample_review_notes": "Kindly wear a fitted knee length skirt or dress. Not a flare skirt. Also face the light as the area is dark. Kindly remake!"
     },
     {
       "id": "5b4f041c-7fce-4468-a371-20670904d471",
@@ -2776,17 +2797,17 @@
       "display_name": "Emem Elijah",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_details": {},
       "date_of_birth": "2006-12-05",
-      "password": "Emmie2008",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "Emmie2008",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T08:19:44.18+00:00",
       "agreement_signature_name": "Emem Elijah",
-      "created_at": "2026-09-17T08:19:44.186+00:00",
-      "is_banned": false
+      "is_banned": false,
+      "created_at": "2026-09-17T08:19:44.186+00:00"
     },
     {
       "id": "df8a62fb-628f-490c-ae66-c313c7f0a527",
@@ -2794,6 +2815,7 @@
       "display_name": "Okoh Micheal unimke",
       "role": "CREATOR",
       "country": "Nigeria",
+      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
       "payment_method": "NIGERIA_BANK",
       "payment_details": {
@@ -2823,14 +2845,13 @@
         "method": "NIGERIA_BANK"
       },
       "date_of_birth": "1999-10-10",
-      "password": "crossriver1",
-      "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "sample_status": "NOT_SUBMITTED",
+      "password": "crossriver1",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-17T08:54:05.432+00:00",
       "agreement_signature_name": "Okoh Micheal unimke",
-      "created_at": "2026-09-17T08:54:05.443+00:00",
-      "is_banned": false
+      "is_banned": false,
+      "created_at": "2026-09-17T08:54:05.443+00:00"
     }
   ],
   "submissions": [
@@ -4216,6 +4237,2327 @@
   ],
   "chat_messages": [
     {
+      "id": "197f4a91-9b21-453f-93b6-db3ee0728255",
+      "platform_id": "pinkroom_main",
+      "creator_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "sender_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "sender_name": "Ada Wunor",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-08T00:52:52.339+00:00"
+    },
+    {
+      "id": "52c360a6-4a18-4da2-918a-0a1273c1039b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "41dacfba-ac10-4ba7-86eb-2387939b1786",
+      "sender_id": "41dacfba-ac10-4ba7-86eb-2387939b1786",
+      "sender_name": "Sandyboo",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-08T09:38:19.906+00:00"
+    },
+    {
+      "id": "528cce96-5bb5-4d54-9eb9-afd98cdab11a",
+      "platform_id": "pinkroom_main",
+      "creator_id": "41dacfba-ac10-4ba7-86eb-2387939b1786",
+      "sender_id": "41dacfba-ac10-4ba7-86eb-2387939b1786",
+      "sender_name": "Sandyboo",
+      "sender_role": "CREATOR",
+      "message": "Hey",
+      "is_read": true,
+      "created_at": "2026-09-08T09:39:33.691+00:00"
+    },
+    {
+      "id": "5e7ccc28-40fe-43ef-a574-3ca764525296",
+      "platform_id": "pinkroom_main",
+      "creator_id": "41dacfba-ac10-4ba7-86eb-2387939b1786",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "hello",
+      "is_read": false,
+      "created_at": "2026-09-08T10:02:05.57+00:00"
+    },
+    {
+      "id": "f9d4c2cc-88c3-4b77-b908-798158b22e16",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Is this a new website",
+      "is_read": true,
+      "created_at": "2026-09-10T04:28:43.95+00:00"
+    },
+    {
+      "id": "3ac7c144-c885-49ed-9484-7bc308a18bd7",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Audition",
+      "is_read": true,
+      "created_at": "2026-09-10T04:29:09.137+00:00"
+    },
+    {
+      "id": "113cf9d7-7a1b-4ee6-aac2-2d5fbc541bc4",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Loveth. Pink Room is not a new website.",
+      "is_read": false,
+      "created_at": "2026-09-10T06:49:07.02+00:00"
+    },
+    {
+      "id": "d128a04e-7b50-4c3c-9c0a-b8a5491e4116",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "But I'm not seeing it online",
+      "is_read": true,
+      "created_at": "2026-09-10T07:45:03.085+00:00"
+    },
+    {
+      "id": "a521947c-9513-40cf-8654-ef331c46af26",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay",
+      "is_read": true,
+      "created_at": "2026-09-10T09:27:48.557+00:00"
+    },
+    {
+      "id": "a37e3e09-8cbd-4a7d-9dcf-fad4e8e49dce",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Kindly proceed with your videos. You have been approved. Make sure you ready the guidelines before proceeding.",
+      "is_read": false,
+      "created_at": "2026-09-10T09:56:19.844+00:00"
+    },
+    {
+      "id": "97e6703a-efc4-48a0-aa13-f5fee48abec3",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "How long does payout review take",
+      "is_read": true,
+      "created_at": "2026-09-11T08:56:14.013+00:00"
+    },
+    {
+      "id": "baf2ddff-1957-4439-bbf3-1a4a85354db2",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Within 24 hours",
+      "is_read": false,
+      "created_at": "2026-09-11T09:08:33.55+00:00"
+    },
+    {
+      "id": "d970e4f7-921d-454d-90d2-e0fe967093a0",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay",
+      "is_read": true,
+      "created_at": "2026-09-11T09:14:14.607+00:00"
+    },
+    {
+      "id": "7a15982a-70f3-441e-8161-630ad813bda3",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "hello, i am having issues when i am uploading the videos, it moves fast then stop at 80% and restarts uploading and when it restarts and finish loading it says error",
+      "is_read": true,
+      "created_at": "2026-09-11T11:51:59.36+00:00"
+    },
+    {
+      "id": "01b48039-716f-4a94-9d0c-e7044cf0a749",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello, Could you try to refresh your browser and try again?",
+      "is_read": false,
+      "created_at": "2026-09-11T11:57:26.13+00:00"
+    },
+    {
+      "id": "dcacc1f8-3ca8-4cf7-87c6-c04515877d4f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Alright, I will do that",
+      "is_read": true,
+      "created_at": "2026-09-11T11:58:27.088+00:00"
+    },
+    {
+      "id": "7612fe98-bfc8-4d99-b877-ae2a7090d64a",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Okay",
+      "is_read": false,
+      "created_at": "2026-09-11T12:07:56.392+00:00"
+    },
+    {
+      "id": "b85b1d75-b314-4a52-ad87-addc6e392a62",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "It is still the same thing it doesn't load pass 80% and it restarts then show verification failed. I used another browser",
+      "is_read": true,
+      "created_at": "2026-09-11T12:22:26.841+00:00"
+    },
+    {
+      "id": "9eca022c-ae4c-48b1-b87e-b99c93a79253",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Validation failed I mean",
+      "is_read": true,
+      "created_at": "2026-09-11T12:22:46.991+00:00"
+    },
+    {
+      "id": "6884c6cc-f99f-49e5-9fb2-5bacb9ab7cd3",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "We apologize for the inconvenience caused. Kindly hold while the IT team rectified it. You will be notified once it's completed",
+      "is_read": false,
+      "created_at": "2026-09-11T12:24:26.829+00:00"
+    },
+    {
+      "id": "4e239783-fc14-4234-9e6c-dea7ba408cee",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Rectifies*",
+      "is_read": false,
+      "created_at": "2026-09-11T12:24:45.623+00:00"
+    },
+    {
+      "id": "73ce781a-5b10-4098-a8b9-a4c6a5e9927c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Alright,thank you",
+      "is_read": true,
+      "created_at": "2026-09-11T12:50:51.792+00:00"
+    },
+    {
+      "id": "e213c2bd-fdc9-4932-8964-630e765755a5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "I haven't received yet",
+      "is_read": true,
+      "created_at": "2026-09-11T22:04:45.884+00:00"
+    },
+    {
+      "id": "24b20dd3-d00e-4eb2-bb69-d8c1da04c529",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Will I earn of I inivte people",
+      "is_read": true,
+      "created_at": "2026-09-12T01:32:11.44+00:00"
+    },
+    {
+      "id": "a2ab5e4e-0a76-474a-8eda-f3e405db3bbc",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Payout is usually processed in 3 business days. Also you will earn  if you invite more people.",
+      "is_read": false,
+      "created_at": "2026-09-12T04:43:29.086+00:00"
+    },
+    {
+      "id": "213143e4-fcc6-4d2c-be19-49a6b3a56ca0",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Where do I get my referral link to give to my friends",
+      "is_read": true,
+      "created_at": "2026-09-12T04:44:45.194+00:00"
+    },
+    {
+      "id": "d68ec913-a7cb-4e83-bc3b-1b333f443cfc",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Your referral link would be sent soon",
+      "is_read": false,
+      "created_at": "2026-09-12T20:02:43.761+00:00"
+    },
+    {
+      "id": "541cc4b6-13d2-47e3-9ed6-d1fca494fd01",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay please send it to me so I can inivite friends",
+      "is_read": true,
+      "created_at": "2026-09-12T20:04:57.596+00:00"
+    },
+    {
+      "id": "ce8c7c0e-a6a1-4061-9b30-5945c35bb486",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "They can join and you let us know thier registered namea, and the bonus will be applied to your balance!",
+      "is_read": false,
+      "created_at": "2026-09-12T20:11:54.741+00:00"
+    },
+    {
+      "id": "3bc644e1-5825-4c2e-87b9-e8a48490478c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Alright",
+      "is_read": true,
+      "created_at": "2026-09-12T20:17:21.505+00:00"
+    },
+    {
+      "id": "7c9e7135-ebcf-4a0c-9774-754bc70556dc",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "How much bouns per inivite please",
+      "is_read": true,
+      "created_at": "2026-09-12T20:19:15.525+00:00"
+    },
+    {
+      "id": "72ba3c6b-4a63-4677-90a4-4ecfe701ad05",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "$35 per each verified creator invite",
+      "is_read": false,
+      "created_at": "2026-09-12T20:23:35.173+00:00"
+    },
+    {
+      "id": "ac63901e-51d8-40cd-a588-ef79398a0bc5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Alright",
+      "is_read": true,
+      "created_at": "2026-09-12T20:24:08.317+00:00"
+    },
+    {
+      "id": "a17e3ba5-b9fa-45a7-a485-0ce2887d1920",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-13T05:18:57.659+00:00"
+    },
+    {
+      "id": "a8d99f0f-21f4-46be-9c27-8708e3b06619",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "You don't work on weekends?",
+      "is_read": true,
+      "created_at": "2026-09-13T05:19:09.263+00:00"
+    },
+    {
+      "id": "c8e2f5d2-4bac-4c68-b0e9-b8bdacbaace3",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-13T05:30:31.529+00:00"
+    },
+    {
+      "id": "f778dbbf-1713-4924-8f45-de98edb81b7e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Olivia, welcome to the Pink Room.",
+      "is_read": false,
+      "created_at": "2026-09-13T05:32:40.152+00:00"
+    },
+    {
+      "id": "cecec89b-33b2-4bea-b7bc-8d96cf035eb8",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "We work on weekends as well",
+      "is_read": false,
+      "created_at": "2026-09-13T05:33:18.348+00:00"
+    },
+    {
+      "id": "ce4f3d44-1345-4e38-95da-c8c85ae972c8",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay",
+      "is_read": true,
+      "created_at": "2026-09-13T05:33:53.614+00:00"
+    },
+    {
+      "id": "5e35b2cb-7e51-436d-a177-4f9348d09099",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Does this have a app I want to download it",
+      "is_read": true,
+      "created_at": "2026-09-13T12:28:06.163+00:00"
+    },
+    {
+      "id": "6ad0eff1-2278-47a9-b75a-4fb737eac44e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "I'm trying to upload a video and it's not working",
+      "is_read": true,
+      "created_at": "2026-09-13T12:45:26.471+00:00"
+    },
+    {
+      "id": "2467a4de-89aa-4aae-a904-28a1ff863345",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "It could network issues. Please refresh and try again!",
+      "is_read": false,
+      "created_at": "2026-09-13T12:49:34.139+00:00"
+    },
+    {
+      "id": "40df30b9-ed17-4e0f-805e-0883fa7cf697",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Are you using an android or an iPhone?",
+      "is_read": false,
+      "created_at": "2026-09-13T12:50:34.371+00:00"
+    },
+    {
+      "id": "1b6e85f4-fec3-4f97-ba72-9affef8817f5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Android",
+      "is_read": true,
+      "created_at": "2026-09-13T13:04:41.237+00:00"
+    },
+    {
+      "id": "2125b290-9eba-412a-b7ec-6f72e21ce244",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Open Chrome and go to the website you want to save.Tap the three vertical dots in the top-right corner of the screen.Look for \"Install app\" or \"Add to Home screen\" in the menu. (Note: Some sites use \"Install\" to provide a full app-like experience without browser bars).Change the name of the shortcut if you want to make it shorter.Tap \"Add\" or \"Install\".Choose \"Add Automatically\" or long-press the icon from your app list to drag it onto your home screen.",
+      "is_read": false,
+      "created_at": "2026-09-13T13:06:49.865+00:00"
+    },
+    {
+      "id": "92fcc5c1-7247-4b0a-a310-9aa157bb560d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay thanks",
+      "is_read": true,
+      "created_at": "2026-09-13T13:10:31.209+00:00"
+    },
+    {
+      "id": "f661fad2-8607-4d95-8afb-f1ebd9386a37",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Good day, I requested for a payout and it shows completed what does that mean",
+      "is_read": true,
+      "created_at": "2026-09-13T15:15:58.073+00:00"
+    },
+    {
+      "id": "83020551-7901-4ec6-82e4-1ee76e204502",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Yes. Your payout was successful. Allow 3 working days for processing.",
+      "is_read": false,
+      "created_at": "2026-09-13T15:18:01.773+00:00"
+    },
+    {
+      "id": "bc39f5a4-2977-40ba-97f3-5a22a8c4fd53",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Okay,thank you",
+      "is_read": true,
+      "created_at": "2026-09-13T15:18:29.093+00:00"
+    },
+    {
+      "id": "4f678694-11a1-4bc0-97c8-92b56010294d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "I can continue making new content right?",
+      "is_read": true,
+      "created_at": "2026-09-13T15:19:03.549+00:00"
+    },
+    {
+      "id": "9460ba21-7207-453e-8eb7-e11e08e8d22b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Absolutely! You can also refer your female creators and you’ll get bonuses for each creator that registers suceasdully, passes their audition and complete their 8 videos milestone!",
+      "is_read": false,
+      "created_at": "2026-09-13T15:21:18.296+00:00"
+    },
+    {
+      "id": "9e5caa9c-b433-46f7-8687-b93db94063bd",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Oh okay, Is there a referral link to refer?",
+      "is_read": true,
+      "created_at": "2026-09-13T15:22:47.671+00:00"
+    },
+    {
+      "id": "bef7b9cf-8711-488f-aa06-97e120cb02ec",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "https://pinkroom.online/creator/referrals",
+      "is_read": false,
+      "created_at": "2026-09-13T16:12:50.687+00:00"
+    },
+    {
+      "id": "280a06a1-22be-43f5-9d4f-ef7a8e50b309",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Visist here to see your refferal link and share to your fellow creators!",
+      "is_read": false,
+      "created_at": "2026-09-13T16:13:38.649+00:00"
+    },
+    {
+      "id": "3d5803b1-f56f-46b6-9252-ab0b3fbc24bc",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Alright,thank you",
+      "is_read": true,
+      "created_at": "2026-09-13T16:18:16.794+00:00"
+    },
+    {
+      "id": "0296ef59-ecce-47fd-8375-51d032e12a96",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "The uploading is now very slow ,I perfer the fast compressor and uploading",
+      "is_read": true,
+      "created_at": "2026-09-14T00:53:29.759+00:00"
+    },
+    {
+      "id": "d8fca5ac-8d2e-4b41-9f61-7440fb5eacc5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "You don't work on Mondays?",
+      "is_read": true,
+      "created_at": "2026-09-14T05:34:58.631+00:00"
+    },
+    {
+      "id": "5e95d267-0abe-4d98-b5b1-2d9e3e58eb1b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-14T06:46:02.172+00:00"
+    },
+    {
+      "id": "2608add5-2610-425a-9169-c486f027d692",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Please my request payout is not working",
+      "is_read": true,
+      "created_at": "2026-09-14T06:46:17.062+00:00"
+    },
+    {
+      "id": "3b282f05-1618-435e-aaa3-3aa446bf3911",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "I've tried it, it's not working",
+      "is_read": true,
+      "created_at": "2026-09-14T07:10:27.416+00:00"
+    },
+    {
+      "id": "eae54c15-a80e-470a-9fbb-a6950f6a3fa9",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello, what exactly is the issue or error you are receiving?",
+      "is_read": false,
+      "created_at": "2026-09-14T07:15:30.443+00:00"
+    },
+    {
+      "id": "249b7399-f3a1-4fcd-8d93-23ac0fe4a327",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "I tried requesting payout and it's not working",
+      "is_read": true,
+      "created_at": "2026-09-14T07:16:03.928+00:00"
+    },
+    {
+      "id": "e5ac6ccb-ebc3-4c2a-b4cd-f8d1f82f8e09",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "And one of my videos need revision",
+      "is_read": true,
+      "created_at": "2026-09-14T07:16:19.674+00:00"
+    },
+    {
+      "id": "59354c1e-3cec-4242-808f-1801a9c208a1",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "I uploaded 8 videos and it was approved but I can't request payout",
+      "is_read": true,
+      "created_at": "2026-09-14T07:16:58.117+00:00"
+    },
+    {
+      "id": "3fa3ac13-65fe-4915-9ff2-f0941954217c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "My available balance there's nothing there",
+      "is_read": true,
+      "created_at": "2026-09-14T07:26:01.629+00:00"
+    },
+    {
+      "id": "00a6f0d7-ec2c-4c1a-a484-b2a6c75a8512",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-14T08:06:38.609+00:00"
+    },
+    {
+      "id": "746cbbd5-fcd2-4d3f-95dc-a45d872f1516",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-14T11:19:11.139+00:00"
+    },
+    {
+      "id": "f9dc24cb-4d48-4902-bfee-04e4db16446f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "How and where can I upload my video",
+      "is_read": true,
+      "created_at": "2026-09-14T11:19:33.545+00:00"
+    },
+    {
+      "id": "7b37a374-8c70-4577-96f2-2e11772add91",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Amani",
+      "is_read": false,
+      "created_at": "2026-09-14T11:19:49.559+00:00"
+    },
+    {
+      "id": "92d84fbd-04bd-488d-8d0d-2bbabc7a435d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Go to the upload pgae and upload your 30s audtiton sample recording following the guideline sample.",
+      "is_read": false,
+      "created_at": "2026-09-14T11:20:48.595+00:00"
+    },
+    {
+      "id": "fe41f813-42c7-4ccc-83c8-844a07486910",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "I just posted 1 video but it has not been approved so I can’t know if I should continue with it",
+      "is_read": true,
+      "created_at": "2026-09-14T11:20:48.706+00:00"
+    },
+    {
+      "id": "bbe3e248-d519-416f-92c6-142b0f97b960",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "you have not submitted any sample, upload it and submit",
+      "is_read": false,
+      "created_at": "2026-09-14T11:29:27.857+00:00"
+    },
+    {
+      "id": "667c41f1-b705-4307-b95f-296a95598079",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Submitted",
+      "is_read": true,
+      "created_at": "2026-09-14T11:30:39.138+00:00"
+    },
+    {
+      "id": "44d38faa-0cfc-4f8a-a9bc-f4299cc4b71b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "So can I go ahead with the 8 videos",
+      "is_read": true,
+      "created_at": "2026-09-14T11:31:31.605+00:00"
+    },
+    {
+      "id": "8c28770d-e47e-4a5c-87a7-b016c0f46e1c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Hello, I received the $1 for the audition sample but I haven't received my commission and it is showing paid. Please can you check this. Thank you",
+      "is_read": true,
+      "created_at": "2026-09-14T11:32:49.749+00:00"
+    },
+    {
+      "id": "09c8ac47-d00d-4e4f-9669-51cbde4ca8c1",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "We are currently reviewing your sample and a decision will made shortly. Thank you!",
+      "is_read": false,
+      "created_at": "2026-09-14T11:33:27.692+00:00"
+    },
+    {
+      "id": "d5fd36b1-b77d-42ad-a569-5c4671eb35a4",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "My commission is $800 and it is showing paid that it was disbursed but it was only $1 that was disbursed to my Nigeria account.",
+      "is_read": true,
+      "created_at": "2026-09-14T11:33:56.479+00:00"
+    },
+    {
+      "id": "716ffa1f-a5d0-4394-b075-cc112fdaa42d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "It was not disbursed*",
+      "is_read": true,
+      "created_at": "2026-09-14T11:34:18.429+00:00"
+    },
+    {
+      "id": "44970b93-b18c-40e4-bcb4-db01caca2e12",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Ok",
+      "is_read": true,
+      "created_at": "2026-09-14T11:35:03.055+00:00"
+    },
+    {
+      "id": "6161592a-87cc-4e75-9a9b-3adc51c5fb5f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Mulan, for all 8 completed videos payout, please allow up to 3 business days for processing.",
+      "is_read": false,
+      "created_at": "2026-09-14T11:35:42.347+00:00"
+    },
+    {
+      "id": "6bf79d8b-8fe8-4641-955c-06d9d6b05bb7",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Olivia, your payout has been completed. Please allow 3 busiiness days for processing.",
+      "is_read": false,
+      "created_at": "2026-09-14T11:36:57.685+00:00"
+    },
+    {
+      "id": "04eead74-e2b8-4c5b-bc5e-fbdaf27f49c9",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Okay, I understand you.",
+      "is_read": true,
+      "created_at": "2026-09-14T11:37:00.934+00:00"
+    },
+    {
+      "id": "d0fb4cf1-08c3-44e3-ba42-cbaed0cc628d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "My video keep getting Cancelled when I try to upload them why and I have network",
+      "is_read": true,
+      "created_at": "2026-09-14T16:45:03.126+00:00"
+    },
+    {
+      "id": "5a4645ca-88c3-424c-ac14-875489ab74d4",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-14T16:45:27.619+00:00"
+    },
+    {
+      "id": "a068f180-1bce-44ed-931c-e68580585c94",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "My video keep getting Cancelled when I try to upload them why and I have network",
+      "is_read": true,
+      "created_at": "2026-09-14T16:45:51.29+00:00"
+    },
+    {
+      "id": "ffeb2323-fcb4-4258-9d0d-d1e0549eef79",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "c0000000-0000-4000-8000-000000000001",
+      "sender_name": "Ophelia Adeleke",
+      "sender_role": "ADMIN",
+      "message": "Hello Night. Sorry you’re experiencing that. To ensure you have a smooth uploading process, please ensure you have a steady network connection and try again.",
+      "is_read": false,
+      "created_at": "2026-09-14T16:48:45.544+00:00"
+    },
+    {
+      "id": "c0fa7c3e-071f-4cab-9048-b446d7a83bc6",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay.",
+      "is_read": true,
+      "created_at": "2026-09-14T17:11:43.937+00:00"
+    },
+    {
+      "id": "ac6feeed-7e75-48a8-9ba4-4d4293a88b17",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "I have network I have spend 2GB of Data and yet I can't upload",
+      "is_read": true,
+      "created_at": "2026-09-14T17:12:05.491+00:00"
+    },
+    {
+      "id": "afceb926-137f-4c21-9ac0-0912a2f26ce7",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "c0000000-0000-4000-8000-000000000001",
+      "sender_name": "Ophelia Adeleke",
+      "sender_role": "ADMIN",
+      "message": "What percentage does it get to and gets canceled?",
+      "is_read": false,
+      "created_at": "2026-09-14T17:13:31.344+00:00"
+    },
+    {
+      "id": "0a780825-d632-48b5-b3eb-fa33f34855e2",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "90%",
+      "is_read": true,
+      "created_at": "2026-09-14T17:14:16.087+00:00"
+    },
+    {
+      "id": "2d10bd3f-ea4b-46c7-b448-94f5583c6346",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "c0000000-0000-4000-8000-000000000001",
+      "sender_name": "Ophelia Adeleke",
+      "sender_role": "ADMIN",
+      "message": "Okay please do not try to upload again. I’ll ask the technical team to look into this issue and we will let you know when it has been resolved!",
+      "is_read": false,
+      "created_at": "2026-09-14T17:15:35.3+00:00"
+    },
+    {
+      "id": "e04a4514-63a6-4962-92af-016c92e31657",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay Thank you 😊",
+      "is_read": true,
+      "created_at": "2026-09-14T17:17:23.18+00:00"
+    },
+    {
+      "id": "10ff8879-ec75-4a34-8966-88e2991ae400",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay thank you 😊",
+      "is_read": true,
+      "created_at": "2026-09-14T17:18:13.658+00:00"
+    },
+    {
+      "id": "9af03be1-a02f-4a64-a7bf-22f8cee19f7a",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "c0000000-0000-4000-8000-000000000001",
+      "sender_name": "Ophelia Adeleke",
+      "sender_role": "ADMIN",
+      "message": "Hello Night! The issue has been resolved, you could try your upload again and it should go through.",
+      "is_read": false,
+      "created_at": "2026-09-14T23:06:03.023+00:00"
+    },
+    {
+      "id": "5a267caa-21a3-4516-a1dc-984cf69265e5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-15T05:04:21.177+00:00"
+    },
+    {
+      "id": "15dc3f6d-eb25-4394-825c-35d04367dea5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "I received my $1 sample Audio payment yesterday , but my $400 haven't arrived yet",
+      "is_read": true,
+      "created_at": "2026-09-15T05:04:59.257+00:00"
+    },
+    {
+      "id": "8661d57d-01e2-4865-ba47-5daa08093d1d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay thank you ma",
+      "is_read": true,
+      "created_at": "2026-09-15T05:37:40.259+00:00"
+    },
+    {
+      "id": "e3280422-6551-4d35-a48f-e2f4a663566a",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Loveth, Weekend doesn't count for payout processing. Please allow 3 working days from the date you initiated your payout.",
+      "is_read": false,
+      "created_at": "2026-09-15T07:30:21.5+00:00"
+    },
+    {
+      "id": "fed92566-5d8e-41c0-844b-3acbb16a816d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Alright",
+      "is_read": true,
+      "created_at": "2026-09-15T07:31:18.583+00:00"
+    },
+    {
+      "id": "4bce4f3a-9b10-4f07-80a5-b226cbd3e465",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-15T08:28:28.792+00:00"
+    },
+    {
+      "id": "ac01005a-3e61-4918-8442-a8618bc78935",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Have submitted my audition please check it out and let me know if it’s approved so I can proceed",
+      "is_read": true,
+      "created_at": "2026-09-15T08:28:56.356+00:00"
+    },
+    {
+      "id": "8d847b41-a0bd-40e9-b51a-8ceaa56c676f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-15T09:15:16.701+00:00"
+    },
+    {
+      "id": "4a4e3479-1879-41f9-ac45-81b9392e9770",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Hellooooo",
+      "is_read": true,
+      "created_at": "2026-09-15T09:29:45.307+00:00"
+    },
+    {
+      "id": "0b68383c-3f35-4af7-b55b-32072e82c449",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-15T09:29:48.788+00:00"
+    },
+    {
+      "id": "709868ec-f8ae-4217-a8e9-0fc4b599a659",
+      "platform_id": "pinkroom_main",
+      "creator_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "sender_name": "Amani",
+      "sender_role": "CREATOR",
+      "message": "Hello please where do I upload my 8 videos",
+      "is_read": true,
+      "created_at": "2026-09-15T10:44:12.257+00:00"
+    },
+    {
+      "id": "ce10e0db-4b8f-4f86-9ef0-55444c516cc3",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "I haven't received my $1 payment yet",
+      "is_read": true,
+      "created_at": "2026-09-15T13:37:30.903+00:00"
+    },
+    {
+      "id": "d1be3e61-b34a-41f0-91f6-5a08b9a37d0f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Olivia! We noticed you and another user “Loveth Onome” share the same payout details. We sent your bonus to the same details you registered on the platform.",
+      "is_read": false,
+      "created_at": "2026-09-15T13:40:51.051+00:00"
+    },
+    {
+      "id": "1c4dac18-c11a-4c79-ac96-3e0f0ea88ebf",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "But I wanted to use a different account,or is opay not accepted",
+      "is_read": true,
+      "created_at": "2026-09-15T13:50:52.627+00:00"
+    },
+    {
+      "id": "621ca5bb-9b94-494f-abed-994f3b516954",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Your Audition Sample bonus has been processed. Kindly confirm if you have received it.",
+      "is_read": false,
+      "created_at": "2026-09-15T14:00:59.659+00:00"
+    },
+    {
+      "id": "bc0d19a8-d7c6-41ea-8de7-c1cfaa7dbe10",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "You don't have bybit in payment wallet",
+      "is_read": true,
+      "created_at": "2026-09-15T14:09:54.051+00:00"
+    },
+    {
+      "id": "966aadf9-ced9-4369-b983-ebd4fdf5f92f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Good day how many days does my payment request takes to process and how many days does it take to arrive in my bank. Thank you",
+      "is_read": true,
+      "created_at": "2026-09-15T14:47:05.286+00:00"
+    },
+    {
+      "id": "512df98e-55db-4ec6-b1b1-884e9f89178d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Yes I did thank you",
+      "is_read": true,
+      "created_at": "2026-09-15T14:54:46.12+00:00"
+    },
+    {
+      "id": "5ccfdc67-c7cc-4b46-a98a-58164706b3fa",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "I invited Amani and she have completed her videos and. Requested a payout,I haven't gotten my referral bouns",
+      "is_read": true,
+      "created_at": "2026-09-15T15:17:49.8+00:00"
+    },
+    {
+      "id": "f9cac357-5ac4-473f-92e9-27a80e860e74",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Loveth, unfortunately we do not have crypto payouts. Also did Amani use your referral link to sign up, it should automatically send your bonus once it’s passed all the eligible checks",
+      "is_read": false,
+      "created_at": "2026-09-15T15:30:27.808+00:00"
+    },
+    {
+      "id": "f1276232-ca2f-4074-b9d1-d8b95e1a1c92",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Night! It takes 3 business days for your payouts to be completed to your bank.",
+      "is_read": false,
+      "created_at": "2026-09-15T15:36:02.991+00:00"
+    },
+    {
+      "id": "15b6aed5-bb84-4d9b-9f3f-fd6495b529b8",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay. Thank you 😊",
+      "is_read": true,
+      "created_at": "2026-09-15T15:37:19.813+00:00"
+    },
+    {
+      "id": "ae75f19e-a5e7-4bf8-9963-7265223469df",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "After this 8 can I still do more videos. Thank you",
+      "is_read": true,
+      "created_at": "2026-09-15T15:37:39.017+00:00"
+    },
+    {
+      "id": "299b6bf0-1d07-40f8-a333-abc043d6308e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Absolutely! As many as you can. 8 minimum and you get paid! Use your referral link to invite more creators like yourself and get paid $35 bonus per referral link",
+      "is_read": false,
+      "created_at": "2026-09-15T15:40:27.103+00:00"
+    },
+    {
+      "id": "0d497c11-870b-4279-a429-2b856ef28e2b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay, thank you ma 😊",
+      "is_read": true,
+      "created_at": "2026-09-15T15:43:14.701+00:00"
+    },
+    {
+      "id": "2766f33b-d712-4db6-b30c-dbf199097e6f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Yes she did",
+      "is_read": true,
+      "created_at": "2026-09-15T16:05:15.281+00:00"
+    },
+    {
+      "id": "e45081a4-752d-4265-a4f1-79bca861a7f4",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "What’s your referral code and link",
+      "is_read": false,
+      "created_at": "2026-09-15T16:07:54.999+00:00"
+    },
+    {
+      "id": "030c1ca7-d4a6-43c7-86c2-a3a9ec912b70",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "https://pinkroom.online/auth/register?ref=LOVET-8VWFS",
+      "is_read": true,
+      "created_at": "2026-09-15T16:12:29.367+00:00"
+    },
+    {
+      "id": "fe8ecf61-ea28-4377-8cb0-24711b27b568",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Your referral bonus has been updated. Kindly confirm this!",
+      "is_read": false,
+      "created_at": "2026-09-15T16:18:15.011+00:00"
+    },
+    {
+      "id": "7591259f-cb27-4e2f-b649-1c9715cf539e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "I haven't seen it",
+      "is_read": true,
+      "created_at": "2026-09-15T16:20:54.608+00:00"
+    },
+    {
+      "id": "02a15d80-d7e2-49ed-b9e1-0c9d11268701",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "The money has no reelected,or was it paid directly to my bank account",
+      "is_read": true,
+      "created_at": "2026-09-15T16:37:44.551+00:00"
+    },
+    {
+      "id": "0a243f70-700f-42ec-a0f0-0d3ee8cbe5e9",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "It’s just been updated, kindly check and verify",
+      "is_read": false,
+      "created_at": "2026-09-15T17:20:45.703+00:00"
+    },
+    {
+      "id": "f829df4a-f39d-40d4-b22c-904ec7a04e9c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "You keep changing my link",
+      "is_read": true,
+      "created_at": "2026-09-15T17:45:11.147+00:00"
+    },
+    {
+      "id": "b7fe9149-9f10-419f-a046-125f605e11bd",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Check if the bonus has been credited!",
+      "is_read": false,
+      "created_at": "2026-09-15T17:46:40.683+00:00"
+    },
+    {
+      "id": "ba5dc8c4-4e9d-4905-b2be-68ee3926300d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Yes it has been credited",
+      "is_read": true,
+      "created_at": "2026-09-15T17:47:00.148+00:00"
+    },
+    {
+      "id": "2bbb0748-8585-4edd-902c-5fbeb8316d2c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
+      "sender_id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
+      "sender_name": "Linet Munene",
+      "sender_role": "CREATOR",
+      "message": "Heey it's been three bussiness days but i haven't received my pay yet.",
+      "is_read": true,
+      "created_at": "2026-09-16T01:19:38.679+00:00"
+    },
+    {
+      "id": "bde2f6b1-ccff-466c-8aea-145960104aec",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-16T05:58:10.068+00:00"
+    },
+    {
+      "id": "d0ed9f7c-9b88-4b2c-9825-ba16ac6b1f96",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Today is the 3 working day I requested for my payment,when will I get it , during bank working hours? Or when cause I haven't received",
+      "is_read": true,
+      "created_at": "2026-09-16T05:58:59.772+00:00"
+    },
+    {
+      "id": "c0d2bc8e-d72c-49c8-9d29-676d3255f6a6",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-16T07:25:39.613+00:00"
+    },
+    {
+      "id": "0e2559f5-86a2-43eb-a9ed-a5c85e5a4241",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Please when will I receive my payment",
+      "is_read": true,
+      "created_at": "2026-09-16T07:53:43.197+00:00"
+    },
+    {
+      "id": "c6baa88b-20cc-4a3a-bec4-ae5ba9ea4403",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Good day since it's three business days if I my request was approved on Tuesday meaning I would receive the alert on  Friday or Saturday. Thank you ma 😊",
+      "is_read": true,
+      "created_at": "2026-09-16T08:27:54.59+00:00"
+    },
+    {
+      "id": "0b1d1913-ef86-44bc-b8c6-3c4993bfee94",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Night Page, Absolutely correct! You can still make more videos and earn wihile awaiting your first payout.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:45:46.889+00:00"
+    },
+    {
+      "id": "872d5a21-ec8b-43e8-bbc3-27b5b39e74a4",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Loveth, Before the end of the day you should receive your payout.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:47:42.302+00:00"
+    },
+    {
+      "id": "aac4af72-c14a-4b5a-869f-1e913bcc5cad",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Okay, Thank you I would 😊",
+      "is_read": true,
+      "created_at": "2026-09-16T08:48:27.94+00:00"
+    },
+    {
+      "id": "ff18008f-ecb7-446d-8f76-c8cf16448211",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "If after 24 hours you didn't receive it. Get in touch with us and we will initiate a manual payout.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:48:55.943+00:00"
+    },
+    {
+      "id": "2efaf3b9-e6a1-4433-b3ce-0a6fe19d6955",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay",
+      "is_read": true,
+      "created_at": "2026-09-16T08:50:05.022+00:00"
+    },
+    {
+      "id": "8d0f74a4-cfd3-425c-b7bf-3078e7b3e567",
+      "platform_id": "pinkroom_main",
+      "creator_id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Please allow 24 hours. If you didn't receive it. Kindly get in touch with us to initiate a manual payout method.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:50:10.315+00:00"
+    },
+    {
+      "id": "420309d8-f939-4d71-920f-1186fce743cd",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "How does manual payout work",
+      "is_read": true,
+      "created_at": "2026-09-16T08:50:19.688+00:00"
+    },
+    {
+      "id": "7b37338f-d349-4929-9667-c3bfef6d42f8",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Through a 3rd party agent in Nigeria to send it like a Nigerian Naira to Naira method.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:51:46.484+00:00"
+    },
+    {
+      "id": "6965cb3d-2b8b-457f-ba90-a4620a4a8c1b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Olivia, are not yet due. Please allow 3 working days.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:52:33.008+00:00"
+    },
+    {
+      "id": "900d887e-4b47-4e2a-b75a-f1f9f54ea640",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Oooh you have agent",
+      "is_read": true,
+      "created_at": "2026-09-16T08:52:48.419+00:00"
+    },
+    {
+      "id": "c927661c-7942-4f2e-93d8-4982a3ae4fc9",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Can  you make me an agent I have girls",
+      "is_read": true,
+      "created_at": "2026-09-16T08:54:17.161+00:00"
+    },
+    {
+      "id": "6d84b362-1053-4da5-b3bd-e649f4ec8675",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Yes the Audition Sample Bonus payout of $1 that you received was made by our 3rd party agents in Nigeria.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:54:26.471+00:00"
+    },
+    {
+      "id": "87bcf9db-352e-416d-8293-1d8d333231df",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Oh wow ,you can make me an agent too please",
+      "is_read": true,
+      "created_at": "2026-09-16T08:55:08.805+00:00"
+    },
+    {
+      "id": "8129e04e-8044-492a-99f6-d8889d38a9a5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Do you mean an ambassador? Agents are are strictly for payments.",
+      "is_read": false,
+      "created_at": "2026-09-16T08:55:54.186+00:00"
+    },
+    {
+      "id": "85c6a56b-1e03-4061-b47b-770696e5e823",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "What about ambassador",
+      "is_read": true,
+      "created_at": "2026-09-16T08:57:33.021+00:00"
+    },
+    {
+      "id": "7cec0752-ba7f-4105-bc27-5c28bab473b2",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Please don't give any agent to pay me , they will reduce my payment,the $1 was reduced way too much",
+      "is_read": true,
+      "created_at": "2026-09-16T08:58:55.633+00:00"
+    },
+    {
+      "id": "628c8bd4-41a9-434b-b370-d39dfb399de7",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "To be eligible for to become an ambassador, you are required to bring a minimum of 5 girls aged 18  or above. You will have an ambassadorial fee you will be receiving.",
+      "is_read": false,
+      "created_at": "2026-09-16T09:01:43.754+00:00"
+    },
+    {
+      "id": "0f3cd4c9-680c-42d9-8e2b-b9244eda60a0",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Yes I will bring girls once I receive my first payment ,they want to be convince that is really paying before they join I have girl ,upto 10 girls",
+      "is_read": true,
+      "created_at": "2026-09-16T09:03:15.153+00:00"
+    },
+    {
+      "id": "afeb2220-3c8b-44fb-ae3d-d5c054d19e6b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "OK kindly allow 24 hours to receive your first payout.",
+      "is_read": false,
+      "created_at": "2026-09-16T09:06:54.202+00:00"
+    },
+    {
+      "id": "82f1cb07-ae11-4e5d-8236-19593309172b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Okay ma thanks for your time",
+      "is_read": true,
+      "created_at": "2026-09-16T09:08:39.703+00:00"
+    },
+    {
+      "id": "c088e60c-a980-41ab-8598-3a047fd8fbcb",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Do have a lovely day.",
+      "is_read": false,
+      "created_at": "2026-09-16T09:09:14.652+00:00"
+    },
+    {
+      "id": "e1f302dd-3acf-4f7d-bd1a-695409464402",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Do payment take time like this all the time",
+      "is_read": true,
+      "created_at": "2026-09-16T10:36:03.089+00:00"
+    },
+    {
+      "id": "dfcba002-696c-49ce-bd39-1c405be047f5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-16T12:09:10.892+00:00"
+    },
+    {
+      "id": "057e9346-270e-49f2-9488-248fc61865b6",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Won't they pay me",
+      "is_read": true,
+      "created_at": "2026-09-16T12:10:49.322+00:00"
+    },
+    {
+      "id": "6bf25205-6d33-43a5-a27c-566cc25cd128",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "You’ve been told to allow 24 hours! I’ve you keep harassing, you’ll be removed from the platform.",
+      "is_read": false,
+      "created_at": "2026-09-16T12:21:53.998+00:00"
+    },
+    {
+      "id": "5ff58076-f29e-40e9-9fd3-2103c3459dc2",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "So sorry",
+      "is_read": true,
+      "created_at": "2026-09-16T12:40:07.586+00:00"
+    },
+    {
+      "id": "765dad27-9aa8-4f4f-8b09-f0f61970127e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Alright",
+      "is_read": true,
+      "created_at": "2026-09-16T12:54:28.717+00:00"
+    },
+    {
+      "id": "cb5a16a3-7c9f-4cb4-9838-7081d5fa36a8",
+      "platform_id": "pinkroom_main",
+      "creator_id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "sender_id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "sender_name": "Chidi lindamary Chinelo",
+      "sender_role": "CREATOR",
+      "message": "Hi I uploaded my 8 videos yesterday and $400 was sent to my Nigerian account but I haven't see it in my bank yet",
+      "is_read": true,
+      "created_at": "2026-09-16T13:37:32.134+00:00"
+    },
+    {
+      "id": "48b98dc5-8168-4a99-93ff-a5956e72ffbe",
+      "platform_id": "pinkroom_main",
+      "creator_id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Chidi, kindly note, allow 3 business days to process your payout.",
+      "is_read": false,
+      "created_at": "2026-09-16T13:56:01.346+00:00"
+    },
+    {
+      "id": "f9c7aca1-0cd3-4fec-8cc1-c41eec9d6209",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Hello, I have referred three creators and they will join this weekend.",
+      "is_read": true,
+      "created_at": "2026-09-16T14:06:42.284+00:00"
+    },
+    {
+      "id": "0a0c2487-7e78-450b-b98f-79caae36dbaf",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Mulan! That’s beautiful to hear. Make sure they use your referral link to to join so you earn your bonus of $35 per referral",
+      "is_read": false,
+      "created_at": "2026-09-16T14:09:01.729+00:00"
+    },
+    {
+      "id": "50dabf76-6d3c-4612-892d-d0b857f75c91",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Yes, I did that. Sorry to bother you. I just wanted to ask about the payout processing. You mentioned that it could take up to 3 business days. Can it sometimes take longer than 3 business days?  The creator i refer were just curious about the payout processing. I told them that mine is still processing and that I haven’t received it yet but soon.",
+      "is_read": true,
+      "created_at": "2026-09-16T14:15:02.898+00:00"
+    },
+    {
+      "id": "b16a6881-30f1-497c-ba64-db71f31b426b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "The average timeframe for processing payouts are 3 working days, it could be more if there’re network issues between banks!",
+      "is_read": false,
+      "created_at": "2026-09-16T14:19:33.083+00:00"
+    },
+    {
+      "id": "c1637b06-e95f-4025-a95b-869ca5abd743",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Ha! Okay when I receive mine I will inform them, so they'll be rest assured. Thank you.",
+      "is_read": true,
+      "created_at": "2026-09-16T14:22:12.862+00:00"
+    },
+    {
+      "id": "12cdc06a-c6da-4755-8b77-a46aa79cf92b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "sender_id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "sender_name": "Chidi lindamary Chinelo",
+      "sender_role": "CREATOR",
+      "message": "Ok thanks",
+      "is_read": true,
+      "created_at": "2026-09-16T14:45:52.633+00:00"
+    },
+    {
+      "id": "7c749f3c-d362-453f-9c86-8ef048dc15cc",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0529d9f-cdfe-4e59-932e-67e45928cd2f",
+      "sender_id": "f0529d9f-cdfe-4e59-932e-67e45928cd2f",
+      "sender_name": "Mitchelle  Maxwell",
+      "sender_role": "CREATOR",
+      "message": "how do i delete my account",
+      "is_read": true,
+      "created_at": "2026-09-16T15:58:28.033+00:00"
+    },
+    {
+      "id": "5b4602c6-0df1-454a-aacd-9add0647ffeb",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0529d9f-cdfe-4e59-932e-67e45928cd2f",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello. Is there a reason why you what your account deleted?",
+      "is_read": false,
+      "created_at": "2026-09-16T16:03:05.184+00:00"
+    },
+    {
+      "id": "bca40a44-b9aa-445c-bd94-53b9cf915b17",
+      "platform_id": "pinkroom_main",
+      "creator_id": "527c089f-fe80-4485-812a-164357d95df3",
+      "sender_id": "527c089f-fe80-4485-812a-164357d95df3",
+      "sender_name": "Okhioya miracle",
+      "sender_role": "CREATOR",
+      "message": "Can a married woman do it",
+      "is_read": true,
+      "created_at": "2026-09-16T23:53:13.5+00:00"
+    },
+    {
+      "id": "14ba45a6-311b-4aad-a288-e3d4e185b958",
+      "platform_id": "pinkroom_main",
+      "creator_id": "527c089f-fe80-4485-812a-164357d95df3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello  Miracle! Absolutely! It’s faceless ASMR, so privacy is important.",
+      "is_read": false,
+      "created_at": "2026-09-16T23:56:13.541+00:00"
+    },
+    {
+      "id": "9e5729fc-1986-479e-a2bc-ba6bd44650aa",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "Hi ma , I'm really sorry about yesterday",
+      "is_read": true,
+      "created_at": "2026-09-17T02:49:12.394+00:00"
+    },
+    {
+      "id": "45e06a07-1c67-4146-91cc-6ded4354717f",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "I want to tell you that I still didn't receive the payment ma, you can pay me manual",
+      "is_read": true,
+      "created_at": "2026-09-17T02:50:19.909+00:00"
+    },
+    {
+      "id": "ee3fe03c-4846-4bbf-b15f-e6c70bbae4f6",
+      "platform_id": "pinkroom_main",
+      "creator_id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
+      "sender_id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
+      "sender_name": "Linet Munene",
+      "sender_role": "CREATOR",
+      "message": "Heey it's been 24 hrs already still nothing",
+      "is_read": true,
+      "created_at": "2026-09-17T05:19:52.983+00:00"
+    },
+    {
+      "id": "68ac3bae-9931-48d3-b711-90d8b55733c4",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Hi",
+      "is_read": true,
+      "created_at": "2026-09-17T06:16:02.225+00:00"
+    },
+    {
+      "id": "2f8d1e98-c4e5-4829-a53c-ce6b25bebaed",
+      "platform_id": "pinkroom_main",
+      "creator_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "sender_name": "Olivia",
+      "sender_role": "CREATOR",
+      "message": "Today is the completion of the three working days and I've not received my payment",
+      "is_read": true,
+      "created_at": "2026-09-17T06:16:55.917+00:00"
+    },
+    {
+      "id": "cbf1c862-24ec-4523-987d-32cc755095e5",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello, and we sincerely apologize for the inconvenience caused by the delay with your payout.  Since the automatic payment has not been received, you may request a manual payout through our third party payment agent in Nigeria.  Please note that the agent charges a service fee of ₦30,000 for processing the manual payout. According to the rate provided by the agent, your $400 payout will be converted to approximately ₦702,000.  The ₦30,000 service fee must be paid before the agent processes and releases the manual payout.  We apologize again for the delay and inconvenience caused.",
+      "is_read": false,
+      "created_at": "2026-09-17T06:33:17.748+00:00"
+    },
+    {
+      "id": "230e3e5f-c47a-4e89-95ef-c5412aa0c6d2",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "I should pay 30k before receiving my payment",
+      "is_read": true,
+      "created_at": "2026-09-17T06:44:27.348+00:00"
+    },
+    {
+      "id": "f8c4672e-7eb6-45da-88fd-fbdeaa0b6dd9",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "sender_name": "Loveth onome",
+      "sender_role": "CREATOR",
+      "message": "So the agent can't take the 30,000 from my payment and send the rest",
+      "is_read": true,
+      "created_at": "2026-09-17T06:46:55.358+00:00"
+    },
+    {
+      "id": "ff25580d-3514-42dc-9373-2bd76da16fcd",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "So a friend told me you guys requested for a processing fee of 30000. Is that true",
+      "is_read": true,
+      "created_at": "2026-09-17T06:56:42.099+00:00"
+    },
+    {
+      "id": "63eab384-0927-45a4-9905-bf9c6422aa8e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Hello, good morning.  It has been more than 3 business days, and I still haven’t received the payout from the company. The only amount I received was the $1 verification payment that was sent to my Nigerian bank account on Monday.  Transfers to my OPay account usually don’t take this long, so I’m concerned about the delay. Could you please clarify what might be causing the delay and confirm whether the payout is legitimate and still being processed?  Thank you.",
+      "is_read": true,
+      "created_at": "2026-09-17T07:12:11.882+00:00"
+    },
+    {
+      "id": "857662f7-c761-4faf-8315-6b1d3c3ead05",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_name": "Sharon karuri",
+      "sender_role": "CREATOR",
+      "message": "Hello I have already  added my payout details and still saying I should add",
+      "is_read": true,
+      "created_at": "2026-09-17T08:36:29.117+00:00"
+    },
+    {
+      "id": "20048ba6-b8e4-4bbd-a18e-ee677fbb8681",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_name": "Sharon karuri",
+      "sender_role": "CREATOR",
+      "message": "And it's saying I have  added successfully  but when I try pay out  and still saying the same",
+      "is_read": true,
+      "created_at": "2026-09-17T08:37:42.059+00:00"
+    },
+    {
+      "id": "2a600f57-6006-4939-acb3-98b19852d4a6",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Sharon, What payout option did you select?",
+      "is_read": false,
+      "created_at": "2026-09-17T08:39:19.301+00:00"
+    },
+    {
+      "id": "20f5dc69-4d70-4ee8-ab34-80bf0d5a0aa3",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_name": "Sharon karuri",
+      "sender_role": "CREATOR",
+      "message": "Airtel money",
+      "is_read": true,
+      "created_at": "2026-09-17T08:39:31.824+00:00"
+    },
+    {
+      "id": "17353c5f-c328-4d74-afc9-4ce8e32b0c47",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_name": "Sharon karuri",
+      "sender_role": "CREATOR",
+      "message": "Or should I change to mpesa ?",
+      "is_read": true,
+      "created_at": "2026-09-17T08:39:53.126+00:00"
+    },
+    {
+      "id": "6bf80052-836e-4bd6-a32f-cd8694d10a03",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Please hold while I confirm this.",
+      "is_read": false,
+      "created_at": "2026-09-17T08:41:03.24+00:00"
+    },
+    {
+      "id": "0431e42e-c401-4851-93ae-7aa7c37bf7da",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_name": "Sharon karuri",
+      "sender_role": "CREATOR",
+      "message": "Okay",
+      "is_read": true,
+      "created_at": "2026-09-17T08:41:19.082+00:00"
+    },
+    {
+      "id": "19c48b52-fc04-41c6-8a2b-3cf372344936",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello MulanASMR, good morning.  We sincerely apologize for the delay and inconvenience this has caused. We understand your concern, especially since the $1 verification payment was successfully received on Monday.  Your $400 payout is legitimate and is still being processed. However, the transfer is currently experiencing a delay through the normal payout channel.  Since it has exceeded the expected processing period, we can initiate a manual payout through our third party payment agent in Nigeria. According to the agent, the current conversion for the $400 payout is approximately ₦702,000.  Please note that the third party agent charges a ₦30,000 service fee for processing the manual payout. Once the required processing is completed, the agent will proceed with the payout to your Nigerian account.  We sincerely apologize again for the inconvenience and appreciate your patience.",
+      "is_read": false,
+      "created_at": "2026-09-17T08:42:55.101+00:00"
+    },
+    {
+      "id": "8c807335-2abf-40bc-82a4-6791d6f17798",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Thank you for your response. I just need to clarify something so I can fully understand the payment I should be expecting. I completed four normal videos at $50 per video, which comes to $200. I also completed four in-office/under-table videos at $150 per video, which comes to $600. Therefore, all eight videos amount to a total of $800. Could you please clarify whether the payment I am currently receiving is $400 or the full $800? I just want to make sure I understand the payment calculation and know exactly what to expect. Thank you for your timely response.",
+      "is_read": true,
+      "created_at": "2026-09-17T08:55:33.332+00:00"
+    },
+    {
+      "id": "036e6bf5-1040-4ac7-91a8-1be0463f2476",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Thank you for the clarification.  You are correct. Your total payout is $800, not $400.  The payment calculation is as follows:  Four normal videos at $50 each = $200  Four in office/under table videos at $150 each = $600  Total payout = $800  Using our third party agent’s rate of ₦1,320 per $1, your $800 payout is equivalent to ₦1,056,000.  Since the normal payout has been delayed beyond the expected processing period, you can proceed with a manual payout through our third party payment agent in Nigeria.  Please note that the agent charges a ₦30,000 service fee for processing the manual payout. This service fee is separate from your $800 payout and must be paid before the agent processes the manual payout.  We apologize for the earlier reference to $400 and for any confusion or inconvenience this may have caused. If you are okay with this. Kindly acknowledge.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:00:04.393+00:00"
+    },
+    {
+      "id": "b1837e11-238e-4c40-bcb5-f3e2b7486c4e",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello, I apologize for the delay. Kindly try again. The issue has been resolved.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:09:34.257+00:00"
+    },
+    {
+      "id": "9fe0a744-92ff-4c8b-bbd1-457739d6f13c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "It’s alright with me if you prefer to initiate the transfer through a third party here. That may help make the payment to Nigeria faster. You can remove the #30,000 transfer fee should be deducted from the $800 , since the third party is the one that will send it. I have no issue with that. Let me receive the rest amount. Thank you",
+      "is_read": true,
+      "created_at": "2026-09-17T09:10:34.329+00:00"
+    },
+    {
+      "id": "2e277928-5482-4512-8426-b844ad9a1871",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "The agent should remove it's charges from the $800. I have no issues with it.",
+      "is_read": true,
+      "created_at": "2026-09-17T09:11:33.325+00:00"
+    },
+    {
+      "id": "d7e5cbff-8862-4868-aeb8-14579335ee4c",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Unfortunately, the ₦30,000 service fee cannot be deducted from the $800 payout. It has to be sent separately to the third party agent for documentation and payment reconciliation purposes.  When making the payment, please use “Service Fee” as the payment description/reference. Once processed, your $800 payout will remain separate.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:13:14.406+00:00"
+    },
+    {
+      "id": "1c15a0f7-5e52-4d39-b737-1f0ee84e88f8",
+      "platform_id": "pinkroom_main",
+      "creator_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "sender_name": "Sharon karuri",
+      "sender_role": "CREATOR",
+      "message": "Okay thank you",
+      "is_read": true,
+      "created_at": "2026-09-17T09:13:28.124+00:00"
+    },
+    {
+      "id": "cbe18e6d-c69c-4f37-9721-0a6e40680858",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "This is scam then, thank you for wasting my time because there is nothing like this in Nigeria. Service fee are always deducted from the amount that is meant to be sent why will I work and pay for me to receive payment. It means it is not legitimate. Thank you",
+      "is_read": true,
+      "created_at": "2026-09-17T09:15:00.124+00:00"
+    },
+    {
+      "id": "0c68dccd-13dc-47eb-9aa4-625041fa9321",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "You know what I will like to receive it in dollars then",
+      "is_read": true,
+      "created_at": "2026-09-17T09:16:22.083+00:00"
+    },
+    {
+      "id": "7aa01b46-c14f-4572-83d4-6e4fc3c79489",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "At least that can be sent without an agent",
+      "is_read": true,
+      "created_at": "2026-09-17T09:16:38.844+00:00"
+    },
+    {
+      "id": "9e326373-9f7d-4ac7-ac90-7886d55a1e6d",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "We understand your concern. However, please refrain from making allegations of fraud without evidence.  The third party agent is our only manual payout method for payments to Nigeria. The ₦30,000 service fee is required separately by the agent and cannot be deducted from the $800 payout.  You are not obligated to proceed with the manual payout if you are uncomfortable with the fee. However, we cannot alter the agent’s required processing procedure.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:17:02.976+00:00"
+    },
+    {
+      "id": "8c139020-7fff-4220-9144-bb5e3904c1c1",
+      "platform_id": "pinkroom_main",
+      "creator_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "sender_name": "Mulan ASMR",
+      "sender_role": "CREATOR",
+      "message": "Okay,sorry. no problem I will like to opt for an ACH transfer then",
+      "is_read": true,
+      "created_at": "2026-09-17T09:18:27.447+00:00"
+    },
+    {
+      "id": "a0faf4cd-fc5a-478c-a516-ab2d4450291b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Hello",
+      "is_read": true,
+      "created_at": "2026-09-17T09:19:39.124+00:00"
+    },
+    {
+      "id": "dce0ac63-1711-455b-a783-6f754e74e7f1",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Yes, that is correct. The ₦30,000 is the processing/service fee charged by our third party agent in Nigeria for the manual payout method. It is separate from the payout amount and is required before the agent processes the payment.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:21:30.612+00:00"
+    },
+    {
+      "id": "189d4439-08a2-49b7-bf96-ee7731bbd97b",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "Am I the one paying that. Or you would deduct it from my payment",
+      "is_read": true,
+      "created_at": "2026-09-17T09:23:14.732+00:00"
+    },
+    {
+      "id": "54908ccd-ae6b-444f-a4b1-9484bb1032a1",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_name": "Night page",
+      "sender_role": "CREATOR",
+      "message": "And also why didn't you guys inform us before now.  I thought I wouldn't pay. Well.",
+      "is_read": true,
+      "created_at": "2026-09-17T09:23:55.747+00:00"
+    },
+    {
+      "id": "87998f57-ed6f-4cea-8fd3-e70f660d81ae",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Yes, you would need to pay the ₦30,000 service fee separately to the third party agent. It cannot be deducted from your payout because the agent requires the fee separately for processing and documentation.  Regarding your friend, she chose not to pay the required fee and referred to the service as a scam. We take allegations of fraud seriously and do not tolerate false accusations.  For transparency, our records show over 112 successful manual payouts and 401 automatic payouts to date.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:25:42.178+00:00"
+    },
+    {
+      "id": "e97fbade-cc05-4a39-bb06-39a5c87e7db6",
+      "platform_id": "pinkroom_main",
+      "creator_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "We understand your concern. The ₦30,000 fee was not mentioned earlier because it does not apply to automatic payouts.  The automatic payment system determines whether a transfer can be processed based on the receiving bank’s risk and payment policies. When an automatic payout cannot be completed, we use the manual payout method through our third party agent.  The ₦30,000 service fee applies only to this manual method, which is why you are being informed about it now.",
+      "is_read": false,
+      "created_at": "2026-09-17T09:27:39.234+00:00"
+    },
+    {
+      "id": "c82f2bb8-bec9-4af1-b9de-a15c5d2e2a13",
+      "platform_id": "pinkroom_main",
+      "creator_id": "6e1a0536-a071-4fb1-8f40-d3d456924553",
+      "sender_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "sender_name": "Unlymited Soundz",
+      "sender_role": "ADMIN",
+      "message": "Hello Prudence",
+      "created_at": "2026-09-19T06:41:21.418Z",
+      "is_read": false
+    },
+    {
       "id": "27748022-bb7f-417b-bf11-83096264ec6d",
       "platform_id": "pinkroom_pages",
       "creator_id": "0727414c-2cb0-41ef-a314-2c45d84be39a",
@@ -4284,6 +6626,96 @@
   ],
   "referrals": [],
   "platform_memberships": [
+    {
+      "id": "fd75a409-da07-4382-91c9-38b7924705e7",
+      "user_id": "6d8fa840-effc-4f02-8549-2b98e3c667ce",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-09T17:51:09.171+00:00",
+      "terms_signature": "Loveth onome",
+      "created_at": "2026-09-09T17:51:09.171+00:00"
+    },
+    {
+      "id": "5cdf3fd9-71ef-4f88-9a6c-92db78ba948d",
+      "user_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
+      "platform_id": "pinkroom_main",
+      "role": "ADMIN",
+      "terms_agreed": false,
+      "terms_agreed_at": "2026-09-07T19:47:46.164+00:00",
+      "terms_signature": "Unlymited Soundz",
+      "created_at": "2026-09-07T19:47:46.164+00:00"
+    },
+    {
+      "id": "70d97425-b2b2-4173-8501-7ff4da82d9b5",
+      "user_id": "41dacfba-ac10-4ba7-86eb-2387939b1786",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-07T20:26:23.17+00:00",
+      "terms_signature": "Sandra Vesga",
+      "created_at": "2026-09-07T20:26:23.171+00:00"
+    },
+    {
+      "id": "21a6ea87-9e56-477d-b65c-139e40513a96",
+      "user_id": "63285e80-b8e9-410f-aacd-22c99c376872",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-09T14:03:19.025+00:00",
+      "terms_signature": "Yemisi Olugbemi",
+      "created_at": "2026-09-09T14:03:19.026+00:00"
+    },
+    {
+      "id": "168227ed-f434-48c1-a123-cbb6607fd142",
+      "user_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-07T20:21:29.089+00:00",
+      "terms_signature": "Ada Wunor",
+      "created_at": "2026-09-07T14:58:43.165206+00:00"
+    },
+    {
+      "id": "2e012c87-e52a-41d7-83fc-bae5c1150e26",
+      "user_id": "c0000000-0000-4000-8000-000000000001",
+      "platform_id": "pinkroom_main",
+      "role": "ADMIN",
+      "terms_agreed": false,
+      "terms_agreed_at": "2026-09-10T14:58:38.77+00:00",
+      "terms_signature": "Ophelia Adeleke",
+      "created_at": "2026-09-10T14:58:38.77+00:00"
+    },
+    {
+      "id": "4f22a206-e0bc-4bf3-bd6c-cd94e516da5f",
+      "user_id": "17bdc0df-e75c-42e1-85ff-a24c9377eb0e",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-10T17:31:04.874+00:00",
+      "terms_signature": "Lee99",
+      "created_at": "2026-09-10T17:31:04.875+00:00"
+    },
+    {
+      "id": "1543fbb1-1703-4c8a-93c9-1ca8631bfaf4",
+      "user_id": "4bf675fa-fb07-4619-81ae-c43cbe458b0e",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-10T08:03:01.119+00:00",
+      "terms_signature": "phan thi bich ngoc",
+      "created_at": "2026-09-10T08:03:01.124+00:00"
+    },
+    {
+      "id": "18a35bdd-c382-42e6-920e-3b7a0fdea2d7",
+      "user_id": "d4f9f968-7feb-439e-b612-746ca30b055c",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-09T17:02:34.43+00:00",
+      "terms_signature": "Raphaella",
+      "created_at": "2026-09-09T17:02:34.431+00:00"
+    },
     {
       "id": "34392c93-2713-408b-9ca7-a84a494f9345",
       "user_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
@@ -4395,6 +6827,26 @@
       "created_at": "2026-09-15T13:50:45.817+00:00"
     },
     {
+      "id": "9982f77d-0223-42b1-b800-ee065437b225",
+      "user_id": "596b2cc2-70dc-4d1d-b539-597cb582e9c3",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-13T06:46:32.634+00:00",
+      "terms_signature": "Night page",
+      "created_at": "2026-09-13T06:46:32.634+00:00"
+    },
+    {
+      "id": "8d9a12f2-67c0-4f71-b0c6-fc0dd3386f32",
+      "user_id": "569a46ac-0d52-4fae-925c-ff22d52a69f1",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "terms_agreed": true,
+      "terms_agreed_at": "2026-09-11T19:34:33.946+00:00",
+      "terms_signature": "Amani",
+      "created_at": "2026-09-11T19:34:33.946+00:00"
+    },
+    {
       "id": "d1096eb7-6e03-4323-902f-9c275ce8aa57",
       "user_id": "0de679b3-b437-478e-9f34-36f004a45728",
       "platform_id": "pinkroom_pages",
@@ -4403,6 +6855,629 @@
       "terms_agreed_at": "2026-09-15T14:19:10.386+00:00",
       "terms_signature": "Wishful pages",
       "created_at": "2026-09-15T14:19:10.386+00:00"
+    },
+    {
+      "id": "mem_f0910b38-1b35-49db-a8f3-f6b26e06d848_main",
+      "user_id": "f0910b38-1b35-49db-a8f3-f6b26e06d848",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T08:22:14.286+00:00"
+    },
+    {
+      "id": "mem_8bda5373-099d-44e1-adef-970a1ceb4e42_main",
+      "user_id": "8bda5373-099d-44e1-adef-970a1ceb4e42",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T11:56:04.534+00:00"
+    },
+    {
+      "id": "mem_8c4d7c3f-81b5-4514-aad3-50ea46acf919_main",
+      "user_id": "8c4d7c3f-81b5-4514-aad3-50ea46acf919",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T16:15:26.075+00:00"
+    },
+    {
+      "id": "mem_8d8e6cd6-e69b-4fe0-82a6-892f3d3df26e_main",
+      "user_id": "8d8e6cd6-e69b-4fe0-82a6-892f3d3df26e",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T21:48:48.775+00:00"
+    },
+    {
+      "id": "mem_d672ad96-ad70-4ed8-9e9b-11106200ed4f_pages",
+      "user_id": "d672ad96-ad70-4ed8-9e9b-11106200ed4f",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T01:27:43.918+00:00"
+    },
+    {
+      "id": "mem_e6c96387-cdf6-47a2-b87e-ab1a36c9de86_main",
+      "user_id": "e6c96387-cdf6-47a2-b87e-ab1a36c9de86",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T19:33:09.148+00:00"
+    },
+    {
+      "id": "mem_add45a6c-11bf-4d9e-8cc1-f80ce2ef1c3f_main",
+      "user_id": "add45a6c-11bf-4d9e-8cc1-f80ce2ef1c3f",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-14T14:47:53.436+00:00"
+    },
+    {
+      "id": "mem_5541cdb9-bb7e-4d1d-9a54-7037672479c9_main",
+      "user_id": "5541cdb9-bb7e-4d1d-9a54-7037672479c9",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T18:08:24.978+00:00"
+    },
+    {
+      "id": "mem_6c85d3df-c431-40a2-949e-22178de51aa3_main",
+      "user_id": "6c85d3df-c431-40a2-949e-22178de51aa3",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T20:02:07.346+00:00"
+    },
+    {
+      "id": "mem_6075bd48-e31c-4fa6-b9c7-daab49128db8_pages",
+      "user_id": "6075bd48-e31c-4fa6-b9c7-daab49128db8",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T22:19:15.796+00:00"
+    },
+    {
+      "id": "mem_d1c84b98-a2ef-49b5-abc2-c8efd53f497a_main",
+      "user_id": "d1c84b98-a2ef-49b5-abc2-c8efd53f497a",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T18:57:47.632+00:00"
+    },
+    {
+      "id": "mem_36d2aefe-c452-457b-a2c5-cb9c91823596_pages",
+      "user_id": "36d2aefe-c452-457b-a2c5-cb9c91823596",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T00:58:52.447+00:00"
+    },
+    {
+      "id": "mem_db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1_main",
+      "user_id": "db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T18:23:13.731+00:00"
+    },
+    {
+      "id": "mem_e7e3ad88-b3c8-458d-947f-243f075f4e7b_main",
+      "user_id": "e7e3ad88-b3c8-458d-947f-243f075f4e7b",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T17:15:13.146+00:00"
+    },
+    {
+      "id": "mem_b8c0b3dc-2f11-48bc-addd-ea6929501135_main",
+      "user_id": "b8c0b3dc-2f11-48bc-addd-ea6929501135",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-11T17:58:08.722+00:00"
+    },
+    {
+      "id": "mem_d2f52579-823b-47b6-8136-1cd40bea99a1_pages",
+      "user_id": "d2f52579-823b-47b6-8136-1cd40bea99a1",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T06:11:43.743+00:00"
+    },
+    {
+      "id": "mem_29a51718-09f1-4c08-8cef-8080bc7c7dce_pages",
+      "user_id": "29a51718-09f1-4c08-8cef-8080bc7c7dce",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T06:13:39.297+00:00"
+    },
+    {
+      "id": "mem_e6f4d4a4-90ed-44ca-af8a-2a6212ea520b_pages",
+      "user_id": "e6f4d4a4-90ed-44ca-af8a-2a6212ea520b",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T06:14:19.555+00:00"
+    },
+    {
+      "id": "mem_c0e824e4-8714-47b6-872e-615950d3330a_pages",
+      "user_id": "c0e824e4-8714-47b6-872e-615950d3330a",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T08:49:12.445+00:00"
+    },
+    {
+      "id": "mem_b9046d86-0cfd-4ba9-81d5-3278971c63b9_pages",
+      "user_id": "b9046d86-0cfd-4ba9-81d5-3278971c63b9",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T00:14:38.693+00:00"
+    },
+    {
+      "id": "mem_75c9bd8c-974e-4569-98a6-3712211baf2d_pages",
+      "user_id": "75c9bd8c-974e-4569-98a6-3712211baf2d",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T17:05:19.721+00:00"
+    },
+    {
+      "id": "mem_6f70a997-0a73-4379-baf6-e113fe8fe8e0_pages",
+      "user_id": "6f70a997-0a73-4379-baf6-e113fe8fe8e0",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T17:53:35.05+00:00"
+    },
+    {
+      "id": "mem_be062a09-42cc-4375-a040-9647a881aee1_pages",
+      "user_id": "be062a09-42cc-4375-a040-9647a881aee1",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T21:35:01.029+00:00"
+    },
+    {
+      "id": "mem_89115f1c-ccc2-4571-8c9d-fdba38df9952_pages",
+      "user_id": "89115f1c-ccc2-4571-8c9d-fdba38df9952",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T01:02:45.951+00:00"
+    },
+    {
+      "id": "mem_62e9d5df-8c18-43fd-9ab9-ecc3f997612d_pages",
+      "user_id": "62e9d5df-8c18-43fd-9ab9-ecc3f997612d",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T17:53:48.726+00:00"
+    },
+    {
+      "id": "mem_cce05330-58bc-4695-a0f4-0128ca61baba_pages",
+      "user_id": "cce05330-58bc-4695-a0f4-0128ca61baba",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T21:56:22.793+00:00"
+    },
+    {
+      "id": "mem_af03a16a-b537-4c8f-b60e-935ed9d39c35_pages",
+      "user_id": "af03a16a-b537-4c8f-b60e-935ed9d39c35",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T14:17:10.57+00:00"
+    },
+    {
+      "id": "mem_14206a2f-170e-4f71-9a82-b4315e2b2fe8_main",
+      "user_id": "14206a2f-170e-4f71-9a82-b4315e2b2fe8",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-12T18:37:32.847+00:00"
+    },
+    {
+      "id": "mem_d1c1a5c3-a706-4050-bece-ffb30577f69c_main",
+      "user_id": "d1c1a5c3-a706-4050-bece-ffb30577f69c",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T00:02:46.725+00:00"
+    },
+    {
+      "id": "mem_492d6266-0b13-49a4-b95c-0292768535fe_pages",
+      "user_id": "492d6266-0b13-49a4-b95c-0292768535fe",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T06:06:36.456+00:00"
+    },
+    {
+      "id": "mem_99ac3c68-c56f-48b9-b9cb-22258b7db276_pages",
+      "user_id": "99ac3c68-c56f-48b9-b9cb-22258b7db276",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T08:25:40.007+00:00"
+    },
+    {
+      "id": "mem_6e1a0536-a071-4fb1-8f40-d3d456924553_main",
+      "user_id": "6e1a0536-a071-4fb1-8f40-d3d456924553",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T06:59:40.632+00:00"
+    },
+    {
+      "id": "mem_0d11bc5e-79fb-4188-a6bd-f75d7cf5d2c5_main",
+      "user_id": "0d11bc5e-79fb-4188-a6bd-f75d7cf5d2c5",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T15:18:03.48+00:00"
+    },
+    {
+      "id": "mem_c83eff4e-571a-4175-9fd0-d0f17693fd8f_pages",
+      "user_id": "c83eff4e-571a-4175-9fd0-d0f17693fd8f",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T09:56:15.477+00:00"
+    },
+    {
+      "id": "mem_b761390c-0e37-4198-855b-b02e82dda6be_main",
+      "user_id": "b761390c-0e37-4198-855b-b02e82dda6be",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T16:25:28.625+00:00"
+    },
+    {
+      "id": "mem_1bd07e8f-6311-4101-9d54-f8477a724ff4_main",
+      "user_id": "1bd07e8f-6311-4101-9d54-f8477a724ff4",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T16:23:32.468+00:00"
+    },
+    {
+      "id": "mem_abca91e6-99d5-490a-bcb0-f82dda1186a9_main",
+      "user_id": "abca91e6-99d5-490a-bcb0-f82dda1186a9",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T16:40:51.912+00:00"
+    },
+    {
+      "id": "mem_6be379c3-23a1-4bbb-a976-bd297d4be2ab_main",
+      "user_id": "6be379c3-23a1-4bbb-a976-bd297d4be2ab",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T16:18:49.912+00:00"
+    },
+    {
+      "id": "mem_dc77efe8-87fd-43a1-9134-a8c61caf3c89_main",
+      "user_id": "dc77efe8-87fd-43a1-9134-a8c61caf3c89",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T19:32:04.524+00:00"
+    },
+    {
+      "id": "mem_2e356046-80e0-4e6e-b050-744b5a91eec8_main",
+      "user_id": "2e356046-80e0-4e6e-b050-744b5a91eec8",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-13T19:39:11.378+00:00"
+    },
+    {
+      "id": "mem_4e6b5668-3d86-4f38-984e-369d375a9f9d_main",
+      "user_id": "4e6b5668-3d86-4f38-984e-369d375a9f9d",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-14T06:47:06.883+00:00"
+    },
+    {
+      "id": "mem_d8961bcf-b171-48de-b725-7d2bcb6fdbbd_main",
+      "user_id": "d8961bcf-b171-48de-b725-7d2bcb6fdbbd",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-14T21:55:25+00:00"
+    },
+    {
+      "id": "mem_c87ec824-a99a-4600-ba57-cea2da02ffe5_main",
+      "user_id": "c87ec824-a99a-4600-ba57-cea2da02ffe5",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-14T14:56:07.066+00:00"
+    },
+    {
+      "id": "mem_6b5dee08-287c-4e0c-9b45-d409e721b5a6_main",
+      "user_id": "6b5dee08-287c-4e0c-9b45-d409e721b5a6",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-14T11:01:25.646+00:00"
+    },
+    {
+      "id": "mem_24f0988b-4c57-4c1c-9ae4-9918e86acce2_pages",
+      "user_id": "24f0988b-4c57-4c1c-9ae4-9918e86acce2",
+      "platform_id": "pinkroom_pages",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T18:49:07.377+00:00"
+    },
+    {
+      "id": "mem_bab7ac55-a298-487a-9cfa-ed5ac2a7d5dd_main",
+      "user_id": "bab7ac55-a298-487a-9cfa-ed5ac2a7d5dd",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T13:33:40.657+00:00"
+    },
+    {
+      "id": "mem_c661ed7a-d41f-4695-bcab-0263cbd55ae6_main",
+      "user_id": "c661ed7a-d41f-4695-bcab-0263cbd55ae6",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T18:27:09.458+00:00"
+    },
+    {
+      "id": "mem_7bb80c8e-9e04-4ccb-920c-2ae9ea97f48c_main",
+      "user_id": "7bb80c8e-9e04-4ccb-920c-2ae9ea97f48c",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T18:48:25.139+00:00"
+    },
+    {
+      "id": "mem_660c2c88-f630-4a79-b7a8-554eac38990b_main",
+      "user_id": "660c2c88-f630-4a79-b7a8-554eac38990b",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T19:05:03.206+00:00"
+    },
+    {
+      "id": "mem_2dc5070c-83d0-4ec2-ba77-b55c1eab5adf_main",
+      "user_id": "2dc5070c-83d0-4ec2-ba77-b55c1eab5adf",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T19:07:19.444+00:00"
+    },
+    {
+      "id": "mem_66a3396b-9026-49c6-937f-96fb259547ed_main",
+      "user_id": "66a3396b-9026-49c6-937f-96fb259547ed",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T16:35:34.541+00:00"
+    },
+    {
+      "id": "mem_3b4e26c8-d7da-4c12-933c-9daf343fbb8f_main",
+      "user_id": "3b4e26c8-d7da-4c12-933c-9daf343fbb8f",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T05:19:05.716+00:00"
+    },
+    {
+      "id": "mem_33016ffc-6640-46de-a6b9-00202c0d9b2a_main",
+      "user_id": "33016ffc-6640-46de-a6b9-00202c0d9b2a",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-15T22:53:21.427+00:00"
+    },
+    {
+      "id": "mem_d199f3e0-6a2a-4193-9fa8-7a3de25f0591_main",
+      "user_id": "d199f3e0-6a2a-4193-9fa8-7a3de25f0591",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T15:35:57.362+00:00"
+    },
+    {
+      "id": "mem_b09d93cf-6805-4bc4-a48d-b079491c6499_main",
+      "user_id": "b09d93cf-6805-4bc4-a48d-b079491c6499",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T22:55:25.37+00:00"
+    },
+    {
+      "id": "mem_99a7224f-1d2b-4e06-90da-3d20a521cbdd_main",
+      "user_id": "99a7224f-1d2b-4e06-90da-3d20a521cbdd",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T06:48:00.475+00:00"
+    },
+    {
+      "id": "mem_3aabd32a-b836-4384-9a11-0892b2a9ef84_main",
+      "user_id": "3aabd32a-b836-4384-9a11-0892b2a9ef84",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T07:17:50.177+00:00"
+    },
+    {
+      "id": "mem_0b94bc3f-e07c-4ca9-8849-02d351415e2e_main",
+      "user_id": "0b94bc3f-e07c-4ca9-8849-02d351415e2e",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T19:59:35.875+00:00"
+    },
+    {
+      "id": "mem_a8b110c4-e499-4460-a3db-755066c560b6_main",
+      "user_id": "a8b110c4-e499-4460-a3db-755066c560b6",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T22:31:30.968+00:00"
+    },
+    {
+      "id": "mem_60cd5641-d6ed-46ed-aa80-32519951cd8c_main",
+      "user_id": "60cd5641-d6ed-46ed-aa80-32519951cd8c",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T00:27:57.851+00:00"
+    },
+    {
+      "id": "mem_f0529d9f-cdfe-4e59-932e-67e45928cd2f_main",
+      "user_id": "f0529d9f-cdfe-4e59-932e-67e45928cd2f",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T15:51:56.717+00:00"
+    },
+    {
+      "id": "mem_c1a7b1dd-e60f-48c7-b7ea-ed479494c900_main",
+      "user_id": "c1a7b1dd-e60f-48c7-b7ea-ed479494c900",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T10:29:02.037+00:00"
+    },
+    {
+      "id": "mem_b1051fdc-5c0f-4790-8e92-c9d61338d042_main",
+      "user_id": "b1051fdc-5c0f-4790-8e92-c9d61338d042",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T21:36:10.322+00:00"
+    },
+    {
+      "id": "mem_2a536a34-4b5b-422b-96e1-8a1b33de05bf_main",
+      "user_id": "2a536a34-4b5b-422b-96e1-8a1b33de05bf",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T12:22:19.24+00:00"
+    },
+    {
+      "id": "mem_5ba5a2ba-060c-491a-95ba-3580ad8d5914_main",
+      "user_id": "5ba5a2ba-060c-491a-95ba-3580ad8d5914",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T20:06:39.806+00:00"
+    },
+    {
+      "id": "mem_c22050c8-ba02-460a-bc29-3ddfed927cb3_main",
+      "user_id": "c22050c8-ba02-460a-bc29-3ddfed927cb3",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T22:47:46.538+00:00"
+    },
+    {
+      "id": "mem_fb366e0b-b19f-4129-88b9-ccf0ad9933cc_main",
+      "user_id": "fb366e0b-b19f-4129-88b9-ccf0ad9933cc",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T02:02:27.705+00:00"
+    },
+    {
+      "id": "mem_b3256074-8210-4d85-abd8-b37590b6b20f_main",
+      "user_id": "b3256074-8210-4d85-abd8-b37590b6b20f",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T10:22:39.037+00:00"
+    },
+    {
+      "id": "mem_3e37cbbf-44a8-446c-a2d5-f6e1f2219c54_main",
+      "user_id": "3e37cbbf-44a8-446c-a2d5-f6e1f2219c54",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T13:47:12.541+00:00"
+    },
+    {
+      "id": "mem_3510557f-0c09-4a6d-814e-e8768319b879_main",
+      "user_id": "3510557f-0c09-4a6d-814e-e8768319b879",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T22:17:41.405+00:00"
+    },
+    {
+      "id": "mem_d9499827-f86b-48aa-8953-e5608f89500b_main",
+      "user_id": "d9499827-f86b-48aa-8953-e5608f89500b",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T16:50:15.326+00:00"
+    },
+    {
+      "id": "mem_2cb246a8-7c63-4cce-aeb5-a9f40e846ba1_main",
+      "user_id": "2cb246a8-7c63-4cce-aeb5-a9f40e846ba1",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T15:08:50.369+00:00"
+    },
+    {
+      "id": "mem_43379374-38ef-4230-8ee2-c45ba5fb8940_main",
+      "user_id": "43379374-38ef-4230-8ee2-c45ba5fb8940",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T20:20:19.75+00:00"
+    },
+    {
+      "id": "mem_527c089f-fe80-4485-812a-164357d95df3_main",
+      "user_id": "527c089f-fe80-4485-812a-164357d95df3",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T23:36:33.603+00:00"
+    },
+    {
+      "id": "mem_f98a8844-b26e-46c3-8c19-176ebccb1967_main",
+      "user_id": "f98a8844-b26e-46c3-8c19-176ebccb1967",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T05:55:04.452+00:00"
+    },
+    {
+      "id": "mem_8beacfa1-fb48-4b73-b1fc-71c1ef2f45b0_main",
+      "user_id": "8beacfa1-fb48-4b73-b1fc-71c1ef2f45b0",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T07:28:56.075+00:00"
+    },
+    {
+      "id": "mem_0caed8ec-8bae-4782-b174-711207aa5e8d_main",
+      "user_id": "0caed8ec-8bae-4782-b174-711207aa5e8d",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T05:15:34.3+00:00"
+    },
+    {
+      "id": "mem_04b17058-0d14-48cb-a2f4-ae57a74fd6ba_main",
+      "user_id": "04b17058-0d14-48cb-a2f4-ae57a74fd6ba",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T00:24:30.022+00:00"
+    },
+    {
+      "id": "mem_e8991e01-be14-4e62-b748-b7feb94ae027_main",
+      "user_id": "e8991e01-be14-4e62-b748-b7feb94ae027",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T19:07:28.962+00:00"
+    },
+    {
+      "id": "mem_eeb5966e-3ea0-4a9a-917b-c0d9b6757357_main",
+      "user_id": "eeb5966e-3ea0-4a9a-917b-c0d9b6757357",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T15:32:56.133+00:00"
+    },
+    {
+      "id": "mem_14e09fb0-14aa-4aaf-8239-c57d16c9faf5_main",
+      "user_id": "14e09fb0-14aa-4aaf-8239-c57d16c9faf5",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T19:14:17.051+00:00"
+    },
+    {
+      "id": "mem_f582b88c-6316-4927-85e9-64434efb858d_main",
+      "user_id": "f582b88c-6316-4927-85e9-64434efb858d",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T20:52:27.528+00:00"
+    },
+    {
+      "id": "mem_5f3d96de-3928-4282-ae00-50a6b169c52c_main",
+      "user_id": "5f3d96de-3928-4282-ae00-50a6b169c52c",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T06:22:58.709+00:00"
+    },
+    {
+      "id": "mem_dcf0ca53-ca2a-48c1-91b3-2bc16b5dc455_main",
+      "user_id": "dcf0ca53-ca2a-48c1-91b3-2bc16b5dc455",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T14:35:54.777+00:00"
+    },
+    {
+      "id": "mem_fd34deea-9d21-4b65-8fcb-688dc534d8b8_main",
+      "user_id": "fd34deea-9d21-4b65-8fcb-688dc534d8b8",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-16T11:31:05.303+00:00"
+    },
+    {
+      "id": "mem_ba9aa920-2def-46fc-a6ff-eb017a66467f_main",
+      "user_id": "ba9aa920-2def-46fc-a6ff-eb017a66467f",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T07:33:56.369+00:00"
+    },
+    {
+      "id": "mem_df1081f7-cdb2-442a-a39c-f744e8cb8c08_main",
+      "user_id": "df1081f7-cdb2-442a-a39c-f744e8cb8c08",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T07:20:02.158+00:00"
+    },
+    {
+      "id": "mem_5b4f041c-7fce-4468-a371-20670904d471_main",
+      "user_id": "5b4f041c-7fce-4468-a371-20670904d471",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T08:19:44.186+00:00"
+    },
+    {
+      "id": "mem_df8a62fb-628f-490c-ae66-c313c7f0a527_main",
+      "user_id": "df8a62fb-628f-490c-ae66-c313c7f0a527",
+      "platform_id": "pinkroom_main",
+      "role": "CREATOR",
+      "enrolled_at": "2026-09-17T08:54:05.443+00:00"
     }
   ]
 }

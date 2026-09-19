@@ -199,6 +199,8 @@ class PagesDatabaseService {
     this.data.referrals = diskData.referrals || [];
     this.data.earnings_ledger = diskData.earnings_ledger || [];
     this.data.notifications = diskData.notifications || [];
+    this.data.platform_memberships = diskData.platform_memberships || [];
+    this.data.payout_requests = diskData.payout_requests || [];
 
     // Refresh and merge chat_messages from disk so concurrent requests/workers immediately see new messages
     if (diskData.chat_messages) {
@@ -211,14 +213,11 @@ class PagesDatabaseService {
       this.data.chat_messages = Array.from(diskMsgMap.values());
     }
 
-    for (const diskProfile of diskData.profiles || []) {
-      const idx = this.data.profiles.findIndex((p) => p.id === diskProfile.id);
-      if (idx !== -1) {
-        this.data.profiles[idx] = { ...this.data.profiles[idx], ...diskProfile };
-      } else {
-        this.data.profiles.push(diskProfile);
-      }
-    }
+    const memProfilesMap = new Map(this.data.profiles.map((p) => [p.id, p]));
+    this.data.profiles = (diskData.profiles || []).map((dp) => {
+      const mem = memProfilesMap.get(dp.id);
+      return mem ? { ...dp, ...mem } : dp;
+    });
 
     const existingSubIds = new Set(this.data.submissions.map((s) => s.id));
     for (const sub of diskData.submissions) {
@@ -670,7 +669,7 @@ class PagesDatabaseService {
 
     return this.data.profiles.filter((p) => {
       if (p.role !== 'CREATOR') return false;
-      return validCreatorIds.has(p.id) || p.preferred_category === 'PAGE_TURNING';
+      return validCreatorIds.has(p.id) || p.preferred_category === 'PAGE_TURNING' || p.preferred_category === 'BOTH';
     });
   }
 

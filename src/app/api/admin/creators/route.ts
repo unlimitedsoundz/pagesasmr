@@ -3,22 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-// Run auto-cleanup at most once per 6 hours per server process
-let lastCleanupAt = 0;
-const CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000;
-
 export async function GET(req: NextRequest) {
   try {
     await requireAdmin();
-
-    // Lazily sweep stale creators (registered 48h+ ago with no audition sample)
-    const now = Date.now();
-    if (now - lastCleanupAt > CLEANUP_INTERVAL_MS) {
-      lastCleanupAt = now;
-      db.removeStaleCreators(172_800_000).catch((e) =>
-        console.warn('[Pages] Stale creator sweep warning:', e)
-      );
-    }
 
     // Always sync latest state from Supabase
     await db.syncFromSupabase();
