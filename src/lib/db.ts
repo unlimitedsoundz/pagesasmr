@@ -200,6 +200,17 @@ class PagesDatabaseService {
     this.data.earnings_ledger = diskData.earnings_ledger || [];
     this.data.notifications = diskData.notifications || [];
 
+    // Refresh and merge chat_messages from disk so concurrent requests/workers immediately see new messages
+    if (diskData.chat_messages) {
+      const diskMsgMap = new Map(diskData.chat_messages.map((m) => [m.id, m]));
+      for (const memMsg of (this.data.chat_messages || [])) {
+        if (!diskMsgMap.has(memMsg.id)) {
+          diskMsgMap.set(memMsg.id, memMsg);
+        }
+      }
+      this.data.chat_messages = Array.from(diskMsgMap.values());
+    }
+
     for (const diskProfile of diskData.profiles || []) {
       const idx = this.data.profiles.findIndex((p) => p.id === diskProfile.id);
       if (idx !== -1) {
@@ -506,26 +517,36 @@ class PagesDatabaseService {
         .filter((s) => s.platform_id === PLATFORM_ID)
         .forEach((s) => pagesCreatorIds.add(s.creator_id));
 
-      // 4. Live sync Chat Messages for pinkroom_pages ONLY
-      const { data: chats, error: cErr } = await supabaseAdmin
-        .from('chat_messages')
-        .select('*')
-        .eq('platform_id', PLATFORM_ID)
-        .order('created_at', { ascending: true });
-      if (!cErr && chats && chats.length > 0) {
-        this.data.chat_messages = chats.map((c: any) => ({
-          id: c.id,
-          platform_id: PLATFORM_ID,
-          creator_id: c.creator_id,
-          sender_id: c.sender_id,
-          sender_name: c.sender_name,
-          sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
-          message: c.message,
-          is_read: Boolean(c.is_read),
-          created_at: c.created_at,
-        }));
-      } else if (!cErr) {
-        this.data.chat_messages = [];
+      // 4. Live sync Chat Messages for pinkroom_pages ONLY - safely merge, never wipe out local
+      try {
+        const { data: chats, error: cErr } = await supabaseAdmin
+          .from('chat_messages')
+          .select('*')
+          .eq('platform_id', PLATFORM_ID)
+          .order('created_at', { ascending: true });
+        if (!cErr && chats && chats.length > 0) {
+          if (!this.data.chat_messages) this.data.chat_messages = [];
+          const existingIds = new Set(this.data.chat_messages.map((m) => m.id));
+          for (const c of chats) {
+            const mappedMsg: ChatMessage = {
+              id: c.id,
+              platform_id: PLATFORM_ID,
+              creator_id: c.creator_id,
+              sender_id: c.sender_id,
+              sender_name: c.sender_name,
+              sender_role: c.sender_role as 'CREATOR' | 'ADMIN',
+              message: c.message,
+              is_read: Boolean(c.is_read),
+              created_at: c.created_at,
+            };
+            if (!existingIds.has(c.id)) {
+              this.data.chat_messages.push(mappedMsg);
+              existingIds.add(c.id);
+            }
+          }
+        }
+      } catch (chatSyncErr) {
+        console.warn('[Pages DB] Chat Supabase sync warning:', chatSyncErr);
       }
 
       this.save();
@@ -580,7 +601,7 @@ class PagesDatabaseService {
             !s.platform_id || s.platform_id === PLATFORM_ID || s.category === 'PAGE_TURNING'
           );
         }
-        // Filter chat messages to only those belonging to pinkroom_pages creators
+        // Filter chat messages to only those belonging to pinkroom_pages
         const pagesMemberIds = new Set<string>([
           ...(parsed.platform_memberships || [])
             .filter((m) => m.platform_id === PLATFORM_ID && m.role === 'CREATOR')
@@ -589,11 +610,11 @@ class PagesDatabaseService {
             .filter((s) => s.platform_id === PLATFORM_ID)
             .map((s) => s.creator_id),
         ]);
-        if (parsed.chat_messages && pagesMemberIds.size > 0) {
+        if (parsed.chat_messages) {
           parsed.chat_messages = parsed.chat_messages.filter((m) =>
-            pagesMemberIds.has(m.creator_id)
+            m.platform_id === PLATFORM_ID || pagesMemberIds.has(m.creator_id)
           );
-        } else if (!parsed.chat_messages) {
+        } else {
           parsed.chat_messages = [];
         }
         return parsed;
@@ -2832,6 +2853,7 @@ class PagesDatabaseService {
   }
 
   getChatMessages(creatorId: string): ChatMessage[] {
+    this.reload();
     if (!this.data.chat_messages) this.data.chat_messages = [];
     return this.data.chat_messages
       .filter((m) => m.creator_id === creatorId && m.platform_id === PLATFORM_ID)
@@ -2839,18 +2861,42 @@ class PagesDatabaseService {
   }
 
   getChatConversations(): { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] {
+    this.reload();
     if (!this.data.chat_messages) this.data.chat_messages = [];
-    // Use getPlatformCreators() to ensure only pinkroom_pages creators are shown
-    const creators = this.getPlatformCreators();
+
+    // Discover all unique creator conversations directly from chat_messages for pinkroom_pages
+    const pagesMessages = this.data.chat_messages.filter(
+      (m) => m.platform_id === PLATFORM_ID
+    );
+
+    const messagesByCreator = new Map<string, ChatMessage[]>();
+    for (const msg of pagesMessages) {
+      if (!msg.creator_id) continue;
+      const list = messagesByCreator.get(msg.creator_id) || [];
+      list.push(msg);
+      messagesByCreator.set(msg.creator_id, list);
+    }
+
     const result: { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] = [];
 
-    for (const creator of creators) {
-      const messages = this.getChatMessages(creator.id);
-      if (messages.length > 0) {
-        const lastMessage = messages[messages.length - 1];
-        const unreadCount = messages.filter((m) => !m.is_read && m.sender_role === 'CREATOR').length;
-        result.push({ creator, lastMessage, unreadCount });
-      }
+    for (const [creatorId, messages] of messagesByCreator.entries()) {
+      if (messages.length === 0) continue;
+      messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      const lastMessage = messages[messages.length - 1];
+      const unreadCount = messages.filter((m) => !m.is_read && m.sender_role === 'CREATOR').length;
+
+      const resolvedCreator: Profile = this.getProfileById(creatorId) || {
+        id: creatorId,
+        email: 'creator@pages.pinkroom.online',
+        display_name: lastMessage.sender_role === 'CREATOR' ? lastMessage.sender_name : 'Creator',
+        role: 'CREATOR',
+        country: 'Nigeria',
+        preferred_category: 'PAGE_TURNING',
+        is_adult_confirmed: true,
+        created_at: lastMessage.created_at,
+      };
+
+      result.push({ creator: resolvedCreator, lastMessage, unreadCount });
     }
 
     return result.sort(
@@ -2859,6 +2905,7 @@ class PagesDatabaseService {
   }
 
   sendChatMessage(creatorId: string, sender: Profile, messageText: string): ChatMessage {
+    this.reload();
     if (!this.data.chat_messages) this.data.chat_messages = [];
     const newMsg: ChatMessage = {
       id: ensureUuid(),
@@ -2900,6 +2947,7 @@ class PagesDatabaseService {
   }
 
   markChatRead(creatorId: string, readerRole: 'CREATOR' | 'ADMIN'): void {
+    this.reload();
     if (!this.data.chat_messages) return;
     let changed = false;
     const updated: ChatMessage[] = [];

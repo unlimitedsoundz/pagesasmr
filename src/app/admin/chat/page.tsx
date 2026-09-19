@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   MessageSquare,
   Send,
@@ -23,13 +24,17 @@ interface ConversationItem {
   unreadCount: number;
 }
 
-export default function AdminChatPage() {
+function PagesAdminChatContent() {
+  const searchParams = useSearchParams();
+  const queryCreatorId = searchParams.get('creatorId');
+
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
-  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(null);
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(queryCreatorId);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [creatorName, setCreatorName] = useState('Creator');
   const [replyText, setReplyText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -39,14 +44,23 @@ export default function AdminChatPage() {
   const prevMsgCountRef = useRef<number>(0);
   const { toast } = useToast();
 
-  const loadConversations = async () => {
+  useEffect(() => {
+    if (queryCreatorId && queryCreatorId !== selectedCreatorId) {
+      setSelectedCreatorId(queryCreatorId);
+    }
+  }, [queryCreatorId]);
+
+  const loadConversations = async (targetId?: string) => {
     try {
       const res = await fetch('/api/chat?conversations=true');
       const data = await res.json();
       if (data.conversations) {
         setConversations(data.conversations);
-        if (!selectedCreatorId && data.conversations.length > 0) {
+        const activeId = targetId || selectedCreatorId || queryCreatorId;
+        if (!activeId && data.conversations.length > 0) {
           setSelectedCreatorId(data.conversations[0].creator.id);
+        } else if (activeId && !selectedCreatorId) {
+          setSelectedCreatorId(activeId);
         }
       }
     } catch (e) {
@@ -59,18 +73,18 @@ export default function AdminChatPage() {
   const loadMessages = async (creatorId: string, markRead = false) => {
     try {
       const url = markRead
-        ? `/api/chat?creatorId=${creatorId}&markRead=true`
-        : `/api/chat?creatorId=${creatorId}`;
+        ? `/api/chat?creatorId=${encodeURIComponent(creatorId)}&markRead=true`
+        : `/api/chat?creatorId=${encodeURIComponent(creatorId)}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.messages) {
         setMessages((prev) => {
-          // Avoid triggering re-renders if messages haven't changed
-          if (
-            prev.length === data.messages.length &&
-            prev[prev.length - 1]?.id === data.messages[data.messages.length - 1]?.id
-          ) {
-            return prev;
+          if (prev.length === data.messages.length) {
+            const isIdentical = prev.every((m, i) => {
+              const dm = data.messages[i];
+              return dm && m.id === dm.id && m.is_read === dm.is_read && m.message === dm.message;
+            });
+            if (isIdentical) return prev;
           }
           return data.messages;
         });
@@ -90,15 +104,29 @@ export default function AdminChatPage() {
     }
   };
 
+  const handleManualRefresh = async () => {
+    setRefreshing(true);
+    await loadConversations();
+    if (selectedCreatorId) {
+      await loadMessages(selectedCreatorId, true);
+    }
+    setTimeout(() => setRefreshing(false), 500);
+  };
+
+  const selectConversation = (creatorId: string) => {
+    if (creatorId === selectedCreatorId) return;
+    setSelectedCreatorId(creatorId);
+    setMessages([]);
+  };
+
   useEffect(() => {
     loadConversations();
-    const interval = setInterval(loadConversations, 3500);
+    const interval = setInterval(() => loadConversations(), 3500);
     return () => clearInterval(interval);
   }, [selectedCreatorId]);
 
   useEffect(() => {
     if (selectedCreatorId) {
-      // First load marks messages as read; subsequent polls do not (to avoid thrashing)
       loadMessages(selectedCreatorId, true);
       const interval = setInterval(() => loadMessages(selectedCreatorId), 2500);
       return () => clearInterval(interval);
@@ -121,7 +149,6 @@ export default function AdminChatPage() {
     // If new messages arrived during polling
     if (messages.length > prevMsgCountRef.current) {
       prevMsgCountRef.current = messages.length;
-      // Only scroll down if user is already near the bottom (within 120px)
       const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
       if (isNearBottom) {
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
@@ -151,7 +178,6 @@ export default function AdminChatPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to send message');
 
       setMessages((prev) => [...prev, data.chatMessage]);
-      // Mark conversation as read after admin sends a reply (they've seen all messages)
       setConversations((prev) =>
         prev.map((c) =>
           c.creator.id === selectedCreatorId ? { ...c, unreadCount: 0 } : c
@@ -159,7 +185,6 @@ export default function AdminChatPage() {
       );
       loadConversations();
 
-      // Scroll to bottom when admin posts a message
       setTimeout(() => {
         if (chatContainerRef.current) {
           chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
@@ -198,6 +223,16 @@ export default function AdminChatPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className="px-3.5 py-2 rounded-none bg-white border border-neutral-300 text-xs font-bold text-black hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+            title="Refresh conversations and messages"
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
           <Link
             href="/admin/submissions"
             className="px-4 py-2 rounded-none bg-white border border-neutral-300 text-xs font-bold text-black hover:bg-neutral-100 transition-colors"
@@ -245,18 +280,18 @@ export default function AdminChatPage() {
                   <button
                     key={conv.creator.id}
                     type="button"
-                    onClick={() => setSelectedCreatorId(conv.creator.id)}
+                    onClick={() => selectConversation(conv.creator.id)}
                     data-chat-conversation="true"
                     className={`chat-conversation-item w-full text-left p-4 transition-colors flex items-start justify-between gap-3 rounded-none cursor-pointer ${
                       isSelected ? 'bg-neutral-200 border-l-4 border-black' : 'hover:bg-neutral-100'
                     }`}
                   >
                     <div className="space-y-1 flex-1 min-w-0">
-                      <div className="flex-1 min-w-0">
-                      <div className="font-bold text-black text-sm truncate flex items-center gap-1.5">
-                        <span>{conv.creator.display_name}</span>
-                        {conv.creator.sample_status === 'APPROVED' && <VerifiedBadge size={15} />}
-                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="font-bold text-black text-sm truncate flex items-center gap-1.5">
+                          <span>{conv.creator.display_name}</span>
+                          {conv.creator.sample_status === 'APPROVED' && <VerifiedBadge size={15} />}
+                        </div>
                         <span className="text-[10px] text-black font-bold">{time}</span>
                       </div>
                       <p className="text-xs text-black truncate">
@@ -389,5 +424,19 @@ export default function AdminChatPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminChatPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex items-center justify-center text-xs font-bold text-neutral-500">
+          Loading Creator Direct Messages...
+        </div>
+      }
+    >
+      <PagesAdminChatContent />
+    </Suspense>
   );
 }

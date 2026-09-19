@@ -17,20 +17,27 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
+    db.reload();
+
+    const noCacheHeaders = {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    };
 
     // If asking for unread count only
     if (searchParams.get('unreadOnly') === 'true') {
       const unreadCount = user.role === 'ADMIN'
         ? db.getAdminUnreadChatCount()
         : db.getCreatorUnreadChatCount(user.id);
-      return NextResponse.json({ unreadCount });
+      return NextResponse.json({ unreadCount }, { headers: noCacheHeaders });
     }
 
     // If admin asking for conversation list
     if (user.role === 'ADMIN' && searchParams.get('conversations') === 'true') {
       const conversations = db.getChatConversations();
       const totalUnread = db.getAdminUnreadChatCount();
-      return NextResponse.json({ conversations, totalUnread });
+      return NextResponse.json({ conversations, totalUnread }, { headers: noCacheHeaders });
     }
 
     // Determine target creator conversation
@@ -63,7 +70,7 @@ export async function GET(req: NextRequest) {
       creatorName: creator?.display_name || 'Creator',
       messages,
       unreadCount,
-    });
+    }, { headers: noCacheHeaders });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Unauthorized' }, { status: 401 });
   }
