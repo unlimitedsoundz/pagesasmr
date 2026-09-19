@@ -271,10 +271,13 @@ function PagesAdminChatContent() {
             ) : (
               filteredConversations.map((conv) => {
                 const isSelected = conv.creator.id === selectedCreatorId;
-                const time = new Date(conv.lastMessage.created_at).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
+                const hasRealMessages = !conv.lastMessage.id.startsWith('empty-');
+                const time = hasRealMessages
+                  ? new Date(conv.lastMessage.created_at).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : '';
 
                 return (
                   <button
@@ -292,10 +295,10 @@ function PagesAdminChatContent() {
                           <span>{conv.creator.display_name}</span>
                           {conv.creator.sample_status === 'APPROVED' && <VerifiedBadge size={15} />}
                         </div>
-                        <span className="text-[10px] text-black font-bold">{time}</span>
+                        {time && <span className="text-[10px] text-black font-bold">{time}</span>}
                       </div>
-                      <p className="text-xs text-black truncate">
-                        {conv.lastMessage.sender_role === 'ADMIN' ? 'You: ' : ''}
+                      <p className={`text-xs truncate ${hasRealMessages ? 'text-black' : 'text-neutral-500 italic'}`}>
+                        {hasRealMessages && conv.lastMessage.sender_role === 'ADMIN' ? 'You: ' : ''}
                         {conv.lastMessage.message}
                       </p>
                       <div className="flex items-center gap-1.5 pt-0.5 text-[10px] text-black font-medium">

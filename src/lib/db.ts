@@ -2864,7 +2864,7 @@ class PagesDatabaseService {
     this.reload();
     if (!this.data.chat_messages) this.data.chat_messages = [];
 
-    // Discover all unique creator conversations directly from chat_messages for pinkroom_pages
+    // 1. Group existing pinkroom_pages messages by creator_id
     const pagesMessages = this.data.chat_messages.filter(
       (m) => m.platform_id === PLATFORM_ID
     );
@@ -2877,10 +2877,12 @@ class PagesDatabaseService {
       messagesByCreator.set(msg.creator_id, list);
     }
 
-    const result: { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] = [];
+    const activeConvs: { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] = [];
+    const seenCreatorIds = new Set<string>();
 
     for (const [creatorId, messages] of messagesByCreator.entries()) {
       if (messages.length === 0) continue;
+      seenCreatorIds.add(creatorId);
       messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       const lastMessage = messages[messages.length - 1];
       const unreadCount = messages.filter((m) => !m.is_read && m.sender_role === 'CREATOR').length;
@@ -2896,12 +2898,43 @@ class PagesDatabaseService {
         created_at: lastMessage.created_at,
       };
 
-      result.push({ creator: resolvedCreator, lastMessage, unreadCount });
+      activeConvs.push({ creator: resolvedCreator, lastMessage, unreadCount });
     }
 
-    return result.sort(
+    // Sort active conversations by latest message timestamp descending
+    activeConvs.sort(
       (a, b) => new Date(b.lastMessage.created_at).getTime() - new Date(a.lastMessage.created_at).getTime()
     );
+
+    // 2. Include all platform creators who haven't messaged yet so admin can initiate conversations
+    const platformCreators = this.getPlatformCreators();
+    const emptyConvs: { creator: Profile; lastMessage: ChatMessage; unreadCount: number }[] = [];
+
+    for (const creator of platformCreators) {
+      if (!seenCreatorIds.has(creator.id)) {
+        seenCreatorIds.add(creator.id);
+        emptyConvs.push({
+          creator,
+          lastMessage: {
+            id: `empty-${creator.id}`,
+            platform_id: PLATFORM_ID,
+            creator_id: creator.id,
+            sender_id: creator.id,
+            sender_name: creator.display_name,
+            sender_role: 'CREATOR',
+            message: 'No messages yet — click to start chatting',
+            created_at: creator.created_at || '1970-01-01T00:00:00.000Z',
+            is_read: true,
+          },
+          unreadCount: 0,
+        });
+      }
+    }
+
+    // Sort empty conversations alphabetically by display name
+    emptyConvs.sort((a, b) => (a.creator.display_name || '').localeCompare(b.creator.display_name || ''));
+
+    return [...activeConvs, ...emptyConvs];
   }
 
   sendChatMessage(creatorId: string, sender: Profile, messageText: string): ChatMessage {
