@@ -48,20 +48,6 @@ export async function GET(req: NextRequest) {
     primarySample = samples[0];
   }
 
-  // 2.5 If still no sample, check for an approved valid audition sample
-  if (!primarySample || !primarySample.video_url) {
-    const approvedAudition = db.getSubmissions().find(
-      (s) => s.is_sample && s.status === 'APPROVED' && Boolean(s.file_url)
-    );
-    if (approvedAudition) {
-      primarySample = {
-        id: approvedAudition.id,
-        video_url: approvedAudition.file_url,
-        title: approvedAudition.title || 'Official Sample Guideline: Page Turning',
-        duration_seconds: approvedAudition.duration_seconds || 30,
-      };
-    }
-  }
 
   if (!primarySample || !primarySample.video_url) {
     return new NextResponse(
