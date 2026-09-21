@@ -553,6 +553,38 @@ class PagesDatabaseService {
         console.warn('[Pages DB] Chat Supabase sync warning:', chatSyncErr);
       }
 
+      // 8. Live sync Notifications for pinkroom_pages
+      try {
+        const { data: notifs, error: nErr } = await supabaseAdmin
+          .from('notifications')
+          .select('*')
+          .eq('platform_id', PLATFORM_ID)
+          .order('created_at', { ascending: false })
+          .limit(200);
+        if (!nErr && notifs && notifs.length > 0) {
+          if (!this.data.notifications) this.data.notifications = [];
+          const existingIds = new Set(this.data.notifications.map((n) => n.id));
+          for (const n of notifs) {
+            if (!existingIds.has(n.id)) {
+              this.data.notifications.push({
+                id: n.id,
+                user_id: n.user_id,
+                platform_id: PLATFORM_ID,
+                title: n.title,
+                message: n.message,
+                type: n.type,
+                link: n.link || undefined,
+                is_read: Boolean(n.is_read),
+                created_at: n.created_at,
+              });
+              existingIds.add(n.id);
+            }
+          }
+        }
+      } catch (notifSyncErr) {
+        console.warn('[Pages DB] Notifications Supabase sync warning:', notifSyncErr);
+      }
+
       this.save();
     } catch (err) {
       console.warn('[Pages DB] Supabase live sync exception:', err);
@@ -2061,27 +2093,33 @@ class PagesDatabaseService {
   getNotifications(userId: string): NotificationItem[] {
     this.reload();
 
-    // Ensure verified creators receive their congratulatory notification bell item
+    const notifs = (this.data.notifications || []).filter(
+      (n) => n.user_id === userId && n.platform_id === PLATFORM_ID
+    );
+
+    // Ensure verified creators see their congratulatory notification bell item in UI without side-effect mutations or email spam
     const profile = this.getProfileById(userId);
     if (profile && profile.role === 'CREATOR' && profile.sample_status === 'APPROVED') {
-      const hasVerifiedNotif = (this.data.notifications || []).some(
-        (n) => n.user_id === userId && n.platform_id === PLATFORM_ID && (n.title.includes('Verified Creator') || n.title.includes('Verified Badge') || n.title.includes('Audition Approved'))
+      const hasVerifiedNotif = notifs.some(
+        (n) => (n.title.includes('Verified') || n.title.includes('Audition'))
       );
       if (!hasVerifiedNotif) {
-        this.createNotification({
+        notifs.unshift({
+          id: `verified-badge-${userId}`,
           user_id: userId,
+          platform_id: PLATFORM_ID,
           title: 'Audition Approved — Verified Creator Badge Added',
           message:
             'Congratulations! You are now an official Verified Creator. Your audition sample has been approved, and your official Verified Creator Badge is now live beside your name across the platform.',
           type: 'REVIEW',
           link: '/creator',
+          is_read: true,
+          created_at: profile.created_at || new Date().toISOString(),
         });
       }
     }
 
-    return this.data.notifications.filter(
-      (n) => n.user_id === userId && n.platform_id === PLATFORM_ID
-    );
+    return notifs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 
   markNotificationRead(id: string, userId?: string): void {
@@ -2527,7 +2565,7 @@ class PagesDatabaseService {
       message: 'Your 30-second audition sample has been received. Once approved, you will earn a $1.00 bonus deposited directly to your payout account!',
       type: 'REVIEW',
       link: '/creator/upload',
-    });
+    }, { skipEmail: true });
 
     this.notifyAdmins({
       title: `Audition Sample Submitted: ${creator.display_name}`,
