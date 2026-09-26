@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'How It Works | From First Recording to First Payout | The Pink Room',
   description:
-    'Five clear stages. No fees, no subscription, and no hidden rate changes. You create original faceless page-turning ASMR; we verify, review, and pay $50 per approved video.',
+    'Five clear stages. No fees, no subscription, and no hidden rate changes. You create original faceless page-turning ASMR; we verify, review, and pay $10 per approved video.',
   alternates: {
     canonical: '/how-it-works',
   },
@@ -35,14 +35,14 @@ export default function HowItWorksPage() {
     {
       num: '04',
       title: 'Editorial Quality Review',
-      desc: 'The review team checks sound quality, background noise, lighting, framing, and guideline compliance. Approval immediately credits $50 to your ledger.',
-      meta: ['$50 rate locks permanently', 'Specific revision notes when needed', 'Re-upload revisions without losing submission history'],
+      desc: 'The review team checks sound quality, background noise, lighting, framing, and guideline compliance. Approval immediately credits $10 to your ledger.',
+      meta: ['$10 rate locks permanently', 'Specific revision notes when needed', 'Re-upload revisions without losing submission history'],
     },
     {
       num: '05',
       title: 'Reach 8 Videos & Request Payout',
-      desc: 'At eight approved, unpaid videos, your $400 payout button unlocks. Request payment for eight, ten, sixteen, or more approved videos.',
-      meta: ['8 videos = $400 minimum', 'Direct Deposit, PayPal, Mobile Money, or Local Bank', 'Earnings reserved during processing', 'Official transaction reference recorded'],
+      desc: 'At eight approved, unpaid videos, your $80 payout button unlocks. Request payment for eight, ten, sixteen, or more approved videos.',
+      meta: ['8 videos = $80 minimum', 'Direct Deposit, PayPal, Mobile Money, or Local Bank', 'Earnings reserved during processing', 'Official transaction reference recorded'],
     },
   ];
 
@@ -110,7 +110,7 @@ export default function HowItWorksPage() {
             <div className="bg-white dark:bg-[#221C28] border border-neutral-200/80 dark:border-neutral-700/60 rounded-2xl p-7 sm:p-8 flex flex-col justify-between shadow-xs reveal-on-scroll reveal-delay-1">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1520] dark:text-white mb-3">
-                  $50 flat rate
+                  $10 flat rate
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   The agreed rate is locked onto every submission when uploaded.
@@ -153,7 +153,7 @@ export default function HowItWorksPage() {
             first recording?
           </h2>
           <p className="text-sm sm:text-base !text-pink-100/90 max-w-xl mx-auto leading-relaxed">
-            Join free, review the guidelines, and start building toward your first $400 payout.
+            Join free, review the guidelines, and start building toward your first $80 payout.
           </p>
           <div className="pt-2">
             <Link

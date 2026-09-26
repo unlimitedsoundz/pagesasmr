@@ -251,7 +251,7 @@ export default function AdminDashboardPage() {
         <div data-admin-card="true" style={{ borderRadius: 0 }} className="admin-card bg-white p-4 rounded-none border border-neutral-200 flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-black uppercase">Rate / Video</div>
-            <div className="text-2xl font-bold text-black">${settings?.rate_per_video_usd || 50}</div>
+            <div className="text-2xl font-bold text-black">${settings?.rate_per_video_usd || 10}</div>
           </div>
           <DollarSign className="w-5 h-5 text-black" />
         </div>
@@ -443,7 +443,7 @@ export default function AdminDashboardPage() {
             Configuration & Rules
           </h3>
           <p className="text-xs text-black leading-relaxed font-bold">
-            ${settings?.rate_per_video_usd || 50}/video rate • {settings?.min_payout_videos || 8} min video threshold • {settings?.min_duration_seconds || 180}s min duration.
+            ${settings?.rate_per_video_usd || 10}/video rate • {settings?.min_payout_videos || 8} min video threshold • {settings?.min_duration_seconds || 180}s min duration.
           </p>
           <div className="text-xs font-bold text-black flex items-center gap-1 pt-1">
             <span>Edit Configuration</span>

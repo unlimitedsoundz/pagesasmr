@@ -17,6 +17,29 @@ export const BLACKLISTED_EMAILS: readonly string[] = [
   'copywithyemi@gmail.com',
 ] as const;
 
+// Platform Super-Admins with Absolute Immunity from all bans
+export const ADMIN_EMAILS: readonly string[] = [
+  'unlymitedsoundz@gmail.com',
+  'admin@asmrcreator.com',
+] as const;
+
+export const ADMIN_USER_IDS: readonly string[] = [
+  '694d15ea-ff2c-43ff-967d-80b7817534a8', // Unlymited Soundz
+  'a0000000-0000-4000-8000-000000000001', // Platform Operations Admin
+  'c0000000-0000-4000-8000-000000000001', // Ophelia Adeleke
+  'admin-001',
+  'admin-unlymitedsoundz-001',
+] as const;
+
+export function isAdminUser(idOrEmail?: string | null): boolean {
+  if (!idOrEmail) return false;
+  const clean = idOrEmail.toLowerCase().trim();
+  return (
+    ADMIN_USER_IDS.some((id) => id.toLowerCase() === clean) ||
+    ADMIN_EMAILS.some((email) => email.toLowerCase() === clean)
+  );
+}
+
 // Permanent Blacklisted Bank & Mobile Money Accounts
 export const BLACKLISTED_BANK_ACCOUNTS: readonly string[] = [
   '1632024222', // Access Bank (Ovwiedo Victory Ogheneriode)
@@ -73,6 +96,7 @@ export const BLACKLISTED_HARDWARE_SIGNATURES: readonly string[] = [
  */
 export function isUserBlacklisted(userId?: string | null): boolean {
   if (!userId) return false;
+  if (isAdminUser(userId)) return false;
   return BLACKLISTED_USER_IDS.some((id) => id === userId);
 }
 
@@ -94,6 +118,7 @@ export function normalizeString(str?: string | null): string {
 export function isEmailBlacklisted(email?: string | null): boolean {
   if (!email) return false;
   const normalized = email.toLowerCase().trim();
+  if (ADMIN_EMAILS.some((b) => b.toLowerCase() === normalized)) return false;
   return BLACKLISTED_EMAILS.some((b) => b.toLowerCase() === normalized);
 }
 
@@ -177,6 +202,10 @@ export function checkRegistrationAgainstBlacklist(details: {
   phone?: string;
   userAgent?: string;
 }): { blocked: boolean; reason?: string } {
+  if (details.email && isAdminUser(details.email)) {
+    return { blocked: false };
+  }
+
   if (isEmailBlacklisted(details.email)) {
     return { blocked: true, reason: 'This email is permanently banned from the platform.' };
   }

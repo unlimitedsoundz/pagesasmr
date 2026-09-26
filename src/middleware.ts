@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { isUserBlacklisted } from '@/lib/blacklist';
+import { isUserBlacklisted, isAdminUser } from '@/lib/blacklist';
 
 export const SESSION_COOKIE_NAME = 'asmr_session_user';
 export const BANNED_DEVICE_COOKIE = 'pinkroom_banned_device';
@@ -14,8 +14,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // 0. Admin immunity
+  if (sessionCookie && isAdminUser(sessionCookie)) {
+    const response = NextResponse.next();
+    if (isDeviceFlaggedBanned) {
+      response.cookies.delete(BANNED_DEVICE_COOKIE);
+      response.cookies.set(BANNED_DEVICE_COOKIE, '', { path: '/', maxAge: 0 });
+    }
+    return response;
+  }
+
+  // Allow auth routes
+  const isAuthRoute =
+    pathname.startsWith('/auth/login') ||
+    pathname.startsWith('/api/auth/login');
+
   // Blacklist check
-  if ((sessionCookie && isUserBlacklisted(sessionCookie)) || isDeviceFlaggedBanned) {
+  if (!isAuthRoute && ((sessionCookie && isUserBlacklisted(sessionCookie)) || isDeviceFlaggedBanned)) {
     const isApi = pathname.startsWith('/api/');
     const response = isApi
       ? NextResponse.json(

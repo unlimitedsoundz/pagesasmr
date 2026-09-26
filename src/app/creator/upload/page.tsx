@@ -120,7 +120,7 @@ export default function CreatorUploadPage() {
 
   const minRequired = stats?.minRequired ?? settings?.min_payout_videos ?? 8;
   const eligibleCount = stats?.eligibleCount || 0;
-  const ratePerVideo = settings?.rate_per_video_usd ?? 50;
+  const ratePerVideo = settings?.rate_per_video_usd ?? 10;
 
   const loadCreatorStatus = async () => {
     try {

@@ -133,6 +133,12 @@ export default function Navbar() {
         .then((data) => {
           setUser(data.user);
           if (data.user) {
+            if (data.user.role === 'ADMIN' || data.user.email === 'unlymitedsoundz@gmail.com' || data.user.email === 'admin@asmrcreator.com') {
+              try {
+                localStorage.removeItem('pinkroom_banned_device');
+                document.cookie = 'pinkroom_banned_device=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0';
+              } catch {}
+            }
             fetchNotifications();
             fetchSubmissionCount();
           }

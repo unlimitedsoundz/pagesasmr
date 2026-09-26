@@ -32,7 +32,7 @@ export default function TermsPage() {
     {
       num: '04',
       title: 'Guaranteed Compensation & Minimum Threshold',
-      desc: 'Every accepted video earns a guaranteed, flat rate of $50.00 USD, permanently stored with your submission record. First withdrawal unlocks upon accumulating at least 8 approved, unpaid videos ($400.00 USD). Subsequent payouts also require 8 approved videos.',
+      desc: 'Every accepted video earns a guaranteed, flat rate of $10.00 USD, permanently stored with your submission record. First withdrawal unlocks upon accumulating at least 8 approved, unpaid videos ($80.00 USD). Subsequent payouts also require 8 approved videos.',
     },
     {
       num: '05',
@@ -114,7 +114,7 @@ export default function TermsPage() {
             service.
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            Transparent legal commitments: complete copyright retention, guaranteed $50 rates, and ethical standards.
+            Transparent legal commitments: complete copyright retention, guaranteed $10 rates, and ethical standards.
           </p>
         </div>
       </section>
@@ -156,7 +156,7 @@ export default function TermsPage() {
             <div className="bg-white dark:bg-[#221C28] border border-neutral-200/80 dark:border-neutral-700/60 rounded-2xl p-7 sm:p-8 flex flex-col justify-between shadow-xs reveal-on-scroll reveal-delay-1">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1520] dark:text-white mb-3">
-                  $50 flat rate
+                  $10 flat rate
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   The agreed rate is locked onto every submission when uploaded.
@@ -197,7 +197,7 @@ export default function TermsPage() {
             first recording?
           </h2>
           <p className="text-sm sm:text-base !text-pink-100/90 max-w-xl mx-auto leading-relaxed">
-            Join free, review the guidelines, and start building toward your first $400 payout.
+            Join free, review the guidelines, and start building toward your first $80 payout.
           </p>
           <div className="pt-2">
             <Link

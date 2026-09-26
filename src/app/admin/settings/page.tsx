@@ -14,7 +14,7 @@ export default function AdminSettingsPage() {
   const [errorMsg, setErrorMsg] = useState('');
 
   // Form states
-  const [ratePerVideo, setRatePerVideo] = useState(50);
+  const [ratePerVideo, setRatePerVideo] = useState(10);
   const [minPayoutVideos, setMinPayoutVideos] = useState(8);
   const [minDurationSeconds, setMinDurationSeconds] = useState(180);
   const [maxUploadMb, setMaxUploadMb] = useState(500);
@@ -26,7 +26,7 @@ export default function AdminSettingsPage() {
         const s: PlatformSettings = data.settings;
         if (s) {
           setSettings(s);
-          setRatePerVideo(s.rate_per_video_usd || 50);
+          setRatePerVideo(s.rate_per_video_usd || 10);
           setMinPayoutVideos(s.min_payout_videos || 8);
           setMinDurationSeconds(s.min_duration_seconds || 180);
           setMaxUploadMb(Math.round((s.max_upload_size_bytes || 524288000) / (1024 * 1024)));

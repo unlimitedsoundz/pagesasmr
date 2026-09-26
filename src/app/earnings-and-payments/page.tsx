@@ -12,9 +12,9 @@ import {
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Earnings & Payments | Guaranteed $50/Video Payouts | The Pink Room — Page Turning',
+  title: 'Earnings & Payments | Guaranteed $10/Video Payouts | The Pink Room — Page Turning',
   description:
-    'Transparent compensation model: Earn flat $50 USD per approved page-turning video. Minimum 8-video ($400) payout threshold via PayPal, Mobile Money, Local Bank Transfer, or Direct Deposit.',
+    'Transparent compensation model: Earn flat $10 USD per approved page-turning video. Minimum 8-video ($80) payout threshold via PayPal, Mobile Money, Local Bank Transfer, or Direct Deposit.',
   alternates: {
     canonical: '/earnings-and-payments',
   },
@@ -24,15 +24,15 @@ export default function EarningsAndPaymentsPage() {
   const pillars = [
     {
       num: '01',
-      title: '$50.00 Rate Locked Per Submission',
-      desc: 'When you upload a video, the agreed platform rate ($50.00 USD) is permanently recorded with that submission. Even if platform rates fluctuate in the future, existing submissions are guaranteed their locked rate.',
+      title: '$10.00 Rate Locked Per Submission',
+      desc: 'When you upload a video, the agreed platform rate ($10.00 USD) is permanently recorded with that submission. Even if platform rates fluctuate in the future, existing submissions are guaranteed their locked rate.',
       meta: ['Immutable rate ledger', 'Never affected by market rate updates', 'Zero platform fees deducted'],
     },
     {
       num: '02',
-      title: '8 Approved Videos Minimum Payout ($400)',
-      desc: 'To ensure sustainable banking batch transfers, creators accumulate at least 8 approved, unpaid videos before submitting a withdrawal request. 8 approved videos = $400.00; 10 = $500.00; 16 = $800.00.',
-      meta: ['8 videos = $400 minimum', '10 videos = $500 payout', '16 videos = $800 payout'],
+      title: '8 Approved Videos Minimum Payout ($80)',
+      desc: 'To ensure sustainable banking batch transfers, creators accumulate at least 8 approved, unpaid videos before submitting a withdrawal request. 8 approved videos = $80.00; 10 = $100.00; 16 = $160.00.',
+      meta: ['8 videos = $80 minimum', '10 videos = $100 payout', '16 videos = $800 payout'],
     },
     {
       num: '03',
@@ -89,7 +89,7 @@ export default function EarningsAndPaymentsPage() {
             Direct payouts.
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            We pay $50 for every accepted faceless video. Direct bank deposits via PayPal, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($400).
+            We pay $10 for every accepted faceless video. Direct bank deposits via PayPal, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($80).
           </p>
         </div>
       </section>
@@ -119,7 +119,7 @@ export default function EarningsAndPaymentsPage() {
                   STARTER BATCH
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium !text-white tracking-tight my-4">
-                  $400
+                  $80
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-300 font-medium">
@@ -133,7 +133,7 @@ export default function EarningsAndPaymentsPage() {
                   10 VIDEOS
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $500
+                  $100
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
@@ -259,7 +259,7 @@ export default function EarningsAndPaymentsPage() {
             <div className="bg-white dark:bg-[#221C28] border border-neutral-200/80 dark:border-neutral-700/60 rounded-2xl p-7 sm:p-8 flex flex-col justify-between shadow-xs reveal-on-scroll reveal-delay-1">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1520] dark:text-white mb-3">
-                  $50 flat rate
+                  $10 flat rate
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   The agreed rate is locked onto every submission when uploaded.
@@ -297,10 +297,10 @@ export default function EarningsAndPaymentsPage() {
         <div className="max-w-4xl mx-auto space-y-6 reveal-on-scroll">
           <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-medium !text-white tracking-tight leading-[1.15]">
             Start building toward your <br className="hidden sm:inline" />
-            first $400 payout.
+            first $80 payout.
           </h2>
           <p className="text-sm sm:text-base !text-pink-100/90 max-w-xl mx-auto leading-relaxed">
-            Record original 3-minute ASMR. Earn $50 per approved video with reliable direct bank deposits.
+            Record original 3-minute ASMR. Earn $10 per approved video with reliable direct bank deposits.
           </p>
           <div className="pt-2">
             <Link

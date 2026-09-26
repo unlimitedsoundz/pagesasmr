@@ -96,6 +96,12 @@ export interface Profile {
     mobile_money_phone?: string;
     mobile_money_account_name?: string;
     notes?: string;
+    referral_code?: string;
+    referred_by_id?: string;
+    is_banned?: boolean;
+    banned_at?: string;
+    ban_reason?: string;
+    [key: string]: any;
   };
   agreement_signed?: boolean;
   agreement_signed_at?: string;

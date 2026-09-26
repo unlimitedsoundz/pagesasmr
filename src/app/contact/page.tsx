@@ -71,7 +71,7 @@ export default function ContactPage() {
               <div className="bg-[#FDF2F7] dark:bg-[#2A1725] p-6 rounded-2xl border border-[#FCE7F3] dark:border-[#4E213E] text-xs text-[#5B1B38] dark:text-pink-200 space-y-2">
                 <div className="font-bold text-sm">Quick Checklist</div>
                 <p>• Videos must be at least 180 seconds unbroken.</p>
-                <p>• Payout unlocks at 8 approved videos ($400).</p>
+                <p>• Payout unlocks at 8 approved videos ($80).</p>
                 <p>• 100% original, faceless page turning recorded with care.</p>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function ContactPage() {
             <div className="bg-white dark:bg-[#221C28] border border-neutral-200/80 dark:border-neutral-700/60 rounded-2xl p-7 sm:p-8 flex flex-col justify-between shadow-xs reveal-on-scroll reveal-delay-1">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1520] dark:text-white mb-3">
-                  $50 flat rate
+                  $10 flat rate
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   The agreed rate is locked onto every submission when uploaded.
@@ -228,7 +228,7 @@ export default function ContactPage() {
             first recording?
           </h2>
           <p className="text-sm sm:text-base !text-pink-100/90 max-w-xl mx-auto leading-relaxed">
-            Join free, review the guidelines, and start building toward your first $400 payout.
+            Join free, review the guidelines, and start building toward your first $80 payout.
           </p>
           <div className="pt-2">
             <Link

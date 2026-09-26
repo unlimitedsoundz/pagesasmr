@@ -1348,7 +1348,7 @@ export default function CreatorSettingsPage() {
         {/* ─── Bottom Summary Bar ──────────────────────────────────── */}
         <div className="pt-8 border-t border-neutral-200/70 dark:border-neutral-800">
           <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 font-medium tracking-wide">
-            <span>$50 flat rate.</span>
+            <span>$10 flat rate.</span>
             <span>·</span>
             <span>8-video minimum.</span>
             <span>·</span>

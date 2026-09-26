@@ -10,7 +10,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Turn Pages. Create Calming ASMR. Earn Beautifully. | The Pink Room',
   description:
-    'Join The Pink Room. Record authentic faceless page-turning ASMR. Earn $50 USD per approved video with reliable direct bank, Mobile Money & PayPal payouts.',
+    'Join The Pink Room. Record authentic faceless page-turning ASMR. Earn $10 USD per approved video with reliable direct bank, Mobile Money & PayPal payouts.',
   alternates: {
     canonical: '/',
   },
@@ -35,7 +35,7 @@ export default function HomePage() {
 
           {/* Subtitle */}
           <p className="text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            A quiet, respectful creator studio. Keep 100% of your copyright while earning $50 per approved 3-minute video.
+            A quiet, respectful creator studio. Keep 100% of your copyright while earning $10 per approved 3-minute video.
           </p>
 
           {/* Dual CTAs */}
@@ -59,7 +59,7 @@ export default function HomePage() {
           <div className="pt-3 text-xs text-neutral-500 dark:text-neutral-400 font-medium flex flex-wrap items-center justify-center gap-3 sm:gap-6">
             <span>3-minute minimum</span>
             <span className="text-neutral-300 dark:text-neutral-700">•</span>
-            <span>8 videos = $400 payout</span>
+            <span>8 videos = $80 payout</span>
             <span className="text-neutral-300 dark:text-neutral-700">•</span>
             <span>100% face-free option</span>
           </div>
@@ -73,14 +73,14 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 reveal-on-scroll">
             <div>
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium text-[#1C1520] dark:text-white leading-[1.12]">
-                $50. Every<br />
+                $10. Every<br />
                 approved video.<br />
                 No mystery math.
               </h2>
             </div>
             <div className="md:max-w-md">
               <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                We pay $50 for every accepted faceless video. Direct bank deposits via PayPal, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($400).
+                We pay $10 for every accepted faceless video. Direct bank deposits via PayPal, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($80).
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@ export default function HomePage() {
                   STARTER BATCH
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium !text-white tracking-tight my-4">
-                  $400
+                  $80
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-300 font-medium">
@@ -109,7 +109,7 @@ export default function HomePage() {
                   10 VIDEOS
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $500
+                  $100
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
@@ -282,7 +282,7 @@ export default function HomePage() {
                 Earn the credit
               </h3>
               <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                Editorial review for audio quality and sound compliance. Each approved video adds $50 credit to your creator balance.
+                Editorial review for audio quality and sound compliance. Each approved video adds $10 credit to your creator balance.
               </p>
             </div>
 
@@ -296,7 +296,7 @@ export default function HomePage() {
                 Request your money
               </h3>
               <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                Reach 8 approved videos to request your $400 payout via PayPal, Mobile Money, local bank transfer, or direct deposit straight to your account.
+                Reach 8 approved videos to request your $80 payout via PayPal, Mobile Money, local bank transfer, or direct deposit straight to your account.
               </p>
             </div>
           </div>
@@ -314,7 +314,7 @@ export default function HomePage() {
             your next income stream.
           </h2>
           <p className="text-sm sm:text-base !text-pink-100/90 max-w-xl mx-auto leading-relaxed">
-            Studio approval in 24 hours. Keep 100% of your rights and earn $50 per approved recording.
+            Studio approval in 24 hours. Keep 100% of your rights and earn $10 per approved recording.
           </p>
           <div className="pt-2">
             <Link

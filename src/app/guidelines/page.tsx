@@ -196,7 +196,7 @@ export default function RecordingGuidelinesPage() {
             <div className="bg-white dark:bg-[#221C28] border border-neutral-200/80 dark:border-neutral-700/60 rounded-2xl p-7 sm:p-8 flex flex-col justify-between shadow-xs reveal-on-scroll reveal-delay-1">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1520] dark:text-white mb-3">
-                  $50 flat rate
+                  $10 flat rate
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   The agreed rate is locked onto every submission when uploaded.

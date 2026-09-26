@@ -4,9 +4,9 @@ export const BRAND_SHORT = 'The Pink Room Pages';
 export const PUBLIC_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://pages.pinkroom.online';
 export const CONTENT_CATEGORY = 'PAGE_TURNING';
 
-export const RATE_PER_VIDEO_USD = 50.0;
+export const RATE_PER_VIDEO_USD = 10.0;
 export const MIN_PAYOUT_VIDEOS = 8;
-export const MIN_PAYOUT_AMOUNT_USD = 400.0;
+export const MIN_PAYOUT_AMOUNT_USD = 80.0;
 export const MIN_VIDEO_DURATION_SECONDS = 180; // 3 minutes strictly
 export const MAX_UPLOAD_SIZE_BYTES = 524288000; // 500 MB
 

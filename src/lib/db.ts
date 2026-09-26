@@ -200,6 +200,7 @@ class PagesDatabaseService {
     this.data.earnings_ledger = diskData.earnings_ledger || [];
     this.data.notifications = diskData.notifications || [];
     this.data.platform_memberships = diskData.platform_memberships || [];
+    this.data.settings = diskData.settings || this.data.settings || DEFAULT_SETTINGS;
     this.data.payout_requests = diskData.payout_requests || [];
 
     // Refresh and merge chat_messages from disk so concurrent requests/workers immediately see new messages
@@ -268,6 +269,8 @@ class PagesDatabaseService {
           const mappedProfile: Profile = {
             id: sp.id,
             email: sp.email,
+            referral_code: (sp.payment_details?.referral_code || existingProfile?.referral_code || undefined) as string | undefined,
+            referred_by_id: (sp.payment_details?.referred_by_id || existingProfile?.referred_by_id || undefined) as string | undefined,
             display_name: sp.display_name,
             role: sp.role as any,
             country: sp.country,
@@ -1566,7 +1569,7 @@ class PagesDatabaseService {
         creator_id: sub.creator_id,
         submission_id: sub.id,
         type: 'CREDIT',
-        amount_usd: sub.agreed_rate_usd, // exactly $50.00
+        amount_usd: sub.agreed_rate_usd, // exactly $10.00
         description: `Approval credit: ${sub.title}`,
         created_at: new Date().toISOString(),
       };
@@ -1590,7 +1593,7 @@ class PagesDatabaseService {
       user_id: sub.creator_id,
       title: sub.is_sample ? '30s Audition Approved! 🎉' : `Page-Turning Video Approved! (+$${sub.agreed_rate_usd.toFixed(2)})`,
       message: sub.is_sample
-        ? 'Your 30-second audition was approved! Full production unlocked: you may now upload your 8 full videos ($50 each).'
+        ? 'Your 30-second audition was approved! Full production unlocked: you may now upload your 8 full videos ($10 each).'
         : `Your page-turning video "${sub.title}" was approved. $${sub.agreed_rate_usd.toFixed(2)} USD has been added to your page-turning balance.`,
       type: 'REVIEW',
       link: sub.is_sample ? '/creator/upload' : '/creator/videos',
@@ -2228,10 +2231,17 @@ class PagesDatabaseService {
           ? profile.payment_method
           : null;
 
-      const enhancedPaymentDetails = {
+      const enhancedPaymentDetails: any = {
         ...(profile.payment_details || {}),
         ...(profile.payment_method ? { payment_method: profile.payment_method, method: profile.payment_method } : {}),
       };
+
+      if (profile.referral_code) {
+        enhancedPaymentDetails.referral_code = profile.referral_code;
+      }
+      if (profile.referred_by_id) {
+        enhancedPaymentDetails.referred_by_id = profile.referred_by_id;
+      }
 
       const isBanned = Boolean(profile.is_banned) || isUserBlacklisted(profile.id) || isEmailBlacklisted(profile.email);
       if (isBanned) {
@@ -2629,7 +2639,7 @@ class PagesDatabaseService {
 
     creator.sample_status = 'APPROVED';
     creator.sample_review_notes =
-      notes || 'Audition meets quality guidelines. You may now produce and upload the 8 full paid videos ($50 each).';
+      notes || 'Audition meets quality guidelines. You may now produce and upload the 8 full paid videos ($10 each).';
 
     // Update all sample submissions for this creator to APPROVED with $1.00 reward
     const sampleSubs = this.data.submissions.filter(
@@ -3071,7 +3081,37 @@ class PagesDatabaseService {
     this.reload();
     const cleanCode = (code || '').trim().toUpperCase();
     if (!cleanCode) return undefined;
-    return this.data.profiles.find((p) => (p.referral_code || '').toUpperCase() === cleanCode);
+
+    // 1. Direct code, details, or ID match
+    const directMatch = this.data.profiles.find((p) => {
+      if (p.referral_code && p.referral_code.toUpperCase() === cleanCode) return true;
+      if (p.payment_details?.referral_code && String(p.payment_details.referral_code).toUpperCase() === cleanCode) return true;
+      if (p.id === code || p.id.toUpperCase() === cleanCode) return true;
+      return false;
+    });
+    if (directMatch) return directMatch;
+
+    // 2. Computed stable code match
+    const computedMatch = this.data.profiles.find((p) => {
+      const prefix = (p.display_name || 'CREAT').replace(/[^a-zA-Z0-9]/g, '').substring(0, 5).toUpperCase() || 'CREAT';
+      const cleanId = p.id.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const suffix = cleanId.substring(0, 5) || '10001';
+      return `${prefix}-${suffix}` === cleanCode;
+    });
+    if (computedMatch) return computedMatch;
+
+    // 3. Name or email match
+    const normalizedInput = cleanCode.replace(/[^a-zA-Z0-9]/g, '');
+    if (normalizedInput.length >= 3) {
+      const nameMatch = this.data.profiles.find((p) => {
+        const normName = (p.display_name || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        const normEmail = (p.email || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        return (normName && normName === normalizedInput) || (normEmail && normEmail === normalizedInput);
+      });
+      if (nameMatch) return nameMatch;
+    }
+
+    return undefined;
   }
 
   createReferral(referrerId: string, referredUserId: string): Referral {
@@ -3207,13 +3247,85 @@ class PagesDatabaseService {
 
   getReferralsByReferrer(referrerId: string): Referral[] {
     this.reload();
-    if (!this.data.referrals) return [];
+    if (!this.data.referrals) this.data.referrals = [];
+
+    // Auto-reconcile any profiles linked via referred_by_id
+    const referredProfiles = this.data.profiles.filter((p) => p.referred_by_id === referrerId);
+    let addedAny = false;
+    for (const rp of referredProfiles) {
+      const exists = this.data.referrals.some((r) => r.referred_user_id === rp.id);
+      if (!exists) {
+        const referrer = this.getProfileById(referrerId);
+        const approvedCount = this.data.submissions.filter((s) => s.creator_id === rp.id && s.status === 'APPROVED' && !s.is_sample).length;
+        const auditionPassed = rp.sample_status === 'APPROVED';
+        const milestoneReached = Boolean(auditionPassed && approvedCount >= 8);
+        const newRef: Referral = {
+          id: ensureUuid(),
+          referrer_id: referrerId,
+          referred_user_id: rp.id,
+          referred_user_name: rp.display_name,
+          referred_user_email: rp.email,
+          audition_passed: auditionPassed,
+          videos_completed_count: approvedCount,
+          milestone_reached: milestoneReached,
+          reward_amount_usd: 35.0,
+          reward_status: milestoneReached ? 'REWARDED' : 'PENDING',
+          created_at: rp.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        this.data.referrals.unshift(newRef);
+        addedAny = true;
+      }
+    }
+    if (addedAny) {
+      this.save();
+    }
+
+    for (const referral of this.data.referrals) {
+      if (referral.referrer_id === referrerId) {
+        this.checkAndUpdateReferralMilestone(referral.referred_user_id);
+      }
+    }
     return this.data.referrals.filter((r) => r.referrer_id === referrerId);
   }
 
   getPlatformReferrals(): Referral[] {
     this.reload();
-    if (!this.data.referrals) return [];
+    if (!this.data.referrals) this.data.referrals = [];
+
+    const referredProfiles = this.data.profiles.filter((p) => Boolean(p.referred_by_id));
+    let addedAny = false;
+    for (const rp of referredProfiles) {
+      const exists = this.data.referrals.some((r) => r.referred_user_id === rp.id);
+      if (!exists && rp.referred_by_id) {
+        const approvedCount = this.data.submissions.filter((s) => s.creator_id === rp.id && s.status === 'APPROVED' && !s.is_sample).length;
+        const auditionPassed = rp.sample_status === 'APPROVED';
+        const milestoneReached = Boolean(auditionPassed && approvedCount >= 8);
+        const newRef: Referral = {
+          id: ensureUuid(),
+          referrer_id: rp.referred_by_id,
+          referred_user_id: rp.id,
+          referred_user_name: rp.display_name,
+          referred_user_email: rp.email,
+          audition_passed: auditionPassed,
+          videos_completed_count: approvedCount,
+          milestone_reached: milestoneReached,
+          reward_amount_usd: 35.0,
+          reward_status: milestoneReached ? 'REWARDED' : 'PENDING',
+          created_at: rp.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        this.data.referrals.unshift(newRef);
+        addedAny = true;
+      }
+    }
+    if (addedAny) {
+      this.save();
+    }
+
+    for (const referral of this.data.referrals) {
+      this.checkAndUpdateReferralMilestone(referral.referred_user_id);
+    }
     return this.data.referrals;
   }
 

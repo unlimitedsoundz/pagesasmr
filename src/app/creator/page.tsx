@@ -195,7 +195,7 @@ export default function CreatorDashboardPage() {
   const displayName = profile?.display_name || 'Creator';
   const firstName = displayName.trim().split(/\s+/)[0] || 'Creator';
   const minRequired = stats?.minRequired || 8;
-  const rate = profile?.rate_per_video_usd || 50;
+  const rate = profile?.rate_per_video_usd || 10;
   const targetPayout = minRequired * rate;
   const eligibleCount = stats?.eligibleCount || 0;
   const progressPercent = Math.min(100, Math.round((eligibleCount / minRequired) * 100));
@@ -402,7 +402,7 @@ export default function CreatorDashboardPage() {
                   YOUR LOCKED-IN RATE
                 </span>
                 <span className="font-bold text-white">
-                  $50 <span className="text-white/90 font-normal">/ approved video</span>
+                  $10 <span className="text-white/90 font-normal">/ approved video</span>
                 </span>
               </div>
 
@@ -558,7 +558,7 @@ export default function CreatorDashboardPage() {
                   {/* Card Bottom Meta */}
                   <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400">
                     <span>
-                      {sub.is_sample ? 'Audition sample · Non-billable' : `$${(sub.agreed_rate_usd || 50).toFixed(2)} · ${sub.payout_status || 'UNPAID'}`}
+                      {sub.is_sample ? 'Audition sample · Non-billable' : `$${(sub.agreed_rate_usd || 10).toFixed(2)} · ${sub.payout_status || 'UNPAID'}`}
                     </span>
                     <Link
                       href={`/creator/videos?highlight=${sub.id}`}

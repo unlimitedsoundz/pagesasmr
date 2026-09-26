@@ -123,7 +123,7 @@ export default function AdminPushNotificationsPage() {
       case 'audio_quality':
         setTitle('Acoustic Quality Notice: Background Noise & Crispness');
         setMessage(
-          'Please ensure all page-turning sessions are filmed in complete silence with no fans, television, or street audio. Crisp page sounds recorded close to the microphone ensure 100% approval rate on your $50 videos.'
+          'Please ensure all page-turning sessions are filmed in complete silence with no fans, television, or street audio. Crisp page sounds recorded close to the microphone ensure 100% approval rate on your $10 videos.'
         );
         setNotifType('REVIEW');
         setLink('/guidelines');
@@ -137,9 +137,9 @@ export default function AdminPushNotificationsPage() {
         setLink('/creator/settings');
         break;
       case 'upload_momentum':
-        setTitle('Complete Your 8-Video Milestone ($400 Direct Payout)');
+        setTitle('Complete Your 8-Video Milestone ($80 Direct Payout)');
         setMessage(
-          'You are close to your $400 payment threshold! Keep filming your 3+ minute faceless page-turning recordings and submit them to your review queue today.'
+          'You are close to your $80 payment threshold! Keep filming your 3+ minute faceless page-turning recordings and submit them to your review queue today.'
         );
         setNotifType('GENERAL');
         setLink('/creator/upload');
@@ -313,7 +313,7 @@ export default function AdminPushNotificationsPage() {
                 onClick={() => applyPreset('upload_momentum')}
                 className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-black border border-neutral-300 transition-colors"
               >
-                🚀 $400 Milestone Reminder
+                🚀 $80 Milestone Reminder
               </button>
             </div>
           </div>

@@ -66,7 +66,7 @@ export default function CreatorPayoutsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const rate = profile?.rate_per_video_usd || 50;
+  const rate = profile?.rate_per_video_usd || 10;
   const threshold = profile?.payout_min_videos || 8;
   const minPayout = threshold * rate;
 
@@ -237,7 +237,7 @@ export default function CreatorPayoutsPage() {
             </div>
           </div>
 
-          {/* Right: Progress Milestones ("Your First $400") */}
+          {/* Right: Progress Milestones ("Your First $80") */}
           <div className="lg:col-span-7 bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-5 shadow-2xs">
             <div>
               <div className="flex items-center justify-between gap-2">

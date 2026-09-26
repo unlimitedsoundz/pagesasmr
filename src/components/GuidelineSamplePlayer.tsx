@@ -340,7 +340,7 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
             <span>Platform Specification Standards</span>
           </div>
           <p className="text-xs text-neutral-600 leading-relaxed font-medium">
-            Submissions must maintain continuous, calming page-turning acoustics for at least <strong>3 minutes (180 seconds)</strong>. Once 8 approved videos are accumulated, you are eligible to withdraw your <strong>$400+ payout</strong> directly to your designated bank account.
+            Submissions must maintain continuous, calming page-turning acoustics for at least <strong>3 minutes (180 seconds)</strong>. Once 8 approved videos are accumulated, you are eligible to withdraw your <strong>$80+ payout</strong> directly to your designated bank account.
           </p>
         </div>
       </div>

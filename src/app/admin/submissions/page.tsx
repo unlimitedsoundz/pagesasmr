@@ -439,7 +439,7 @@ export default function AdminSubmissionsPage() {
             Submission Review Queue
           </h1>
           <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-            Review page-turning recordings. Approval credits $50.00 USD toward the 8-video payout threshold.
+            Review page-turning recordings. Approval credits $10.00 USD toward the 8-video payout threshold.
           </p>
         </div>
 
@@ -912,7 +912,7 @@ export default function AdminSubmissionsPage() {
 
             {reviewingSub.is_sample && (
               <div className="p-3.5 rounded-xl bg-[#f8e2ec] border-0 text-xs font-medium text-black">
-                <strong className="font-bold">Quality Audition Rule:</strong> Approving this sample unlocks the creator's portal to record and upload their <strong>8 full paid videos ($50.00 each)</strong> toward their $400 milestone payout. Note: audition samples earn an immediate <strong>$1.00 reward</strong> disbursed to their local bank.
+                <strong className="font-bold">Quality Audition Rule:</strong> Approving this sample unlocks the creator's portal to record and upload their <strong>8 full paid videos ($10.00 each)</strong> toward their $80 milestone payout. Note: audition samples earn an immediate <strong>$1.00 reward</strong> disbursed to their local bank.
               </div>
             )}
 
@@ -1061,7 +1061,7 @@ export default function AdminSubmissionsPage() {
                   }`}
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{reviewingSub.is_sample ? 'Approve Audition' : 'Approve ($50)'}</span>
+                  <span>{reviewingSub.is_sample ? 'Approve Audition' : 'Approve ($10)'}</span>
                 </button>
 
                 <button

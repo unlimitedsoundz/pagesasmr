@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error:
-              'Audition Required: You must submit a 30-second audition sample and receive Admin approval before you can upload full 3+ minute videos ($50 each).',
+              'Audition Required: You must submit a 30-second audition sample and receive Admin approval before you can upload full 3+ minute videos ($10 each).',
             code: 'AUDITION_SAMPLE_REQUIRED',
           },
           { status: 403 }

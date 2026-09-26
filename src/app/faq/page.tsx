@@ -17,11 +17,11 @@ export default function FaqPage() {
     },
     {
       q: 'Why is there an eight-video minimum threshold for payouts?',
-      a: 'To keep payment processing sustainable and minimize transaction overhead, earnings accumulate until you reach at least 8 approved, unpaid videos (8 × $50 = $400.00). Once reached, you can request a payout immediately for 8, 10 ($500), 16 ($800), or more approved submissions.',
+      a: 'To keep payment processing sustainable and minimize transaction overhead, earnings accumulate until you reach at least 8 approved, unpaid videos (8 × $10 = $80.00). Once reached, you can request a payout immediately for 8, 10 ($100), 16 ($160), or more approved submissions.',
     },
     {
       q: 'Can I request a payout if I have 7 approved videos ($350)?',
-      a: 'No. The platform strictly enforces the 8-video threshold ($400). If you have 7 approved videos, you simply need 1 more approved video to unlock your payout. Pending, rejected, or revision-requested videos do not count toward this minimum.',
+      a: 'No. The platform strictly enforces the 8-video threshold ($80). If you have 7 approved videos, you simply need 1 more approved video to unlock your payout. Pending, rejected, or revision-requested videos do not count toward this minimum.',
     },
     {
       q: 'Why was my video rejected for duration if it was 2 minutes and 55 seconds?',
@@ -44,8 +44,8 @@ export default function FaqPage() {
       a: 'You can use classic hardcover books, vintage paperbacks, art journals, notebooks, or sketchbooks. Ensure pages are clean, non-confidential, and non-explicit.',
     },
     {
-      q: 'How does the agreed $50 rate work if platform rates change?',
-      a: 'Every submission permanently stores the agreed rate ($50.00 USD) at the moment of upload. If the platform ever adjusts rates in the future, existing submissions are immutable and will still be paid out at the rate agreed upon when uploaded.',
+      q: 'How does the agreed $10 rate work if platform rates change?',
+      a: 'Every submission permanently stores the agreed rate ($10.00 USD) at the moment of upload. If the platform ever adjusts rates in the future, existing submissions are immutable and will still be paid out at the rate agreed upon when uploaded.',
     },
     {
       q: 'How are payouts sent to creators?',
@@ -85,11 +85,11 @@ export default function FaqPage() {
     },
     {
       q: 'How are earnings calculated?',
-      a: 'Each approved full video earns the agreed $50 USD rate recorded with that submission. Pending, rejected, duplicate, and revision-requested videos do not count toward the payout balance.',
+      a: 'Each approved full video earns the agreed $10 USD rate recorded with that submission. Pending, rejected, duplicate, and revision-requested videos do not count toward the payout balance.',
     },
     {
       q: 'When can I withdraw?',
-      a: 'You can request a payout once you have at least 8 approved, unpaid full videos, equal to the $400 minimum threshold. The payout page shows your eligible balance and whether the request button is available.',
+      a: 'You can request a payout once you have at least 8 approved, unpaid full videos, equal to the $80 minimum threshold. The payout page shows your eligible balance and whether the request button is available.',
     },
     {
       q: 'How long do payouts take?',
@@ -165,7 +165,7 @@ export default function FaqPage() {
             <div className="bg-white dark:bg-[#221C28] border border-neutral-200/80 dark:border-neutral-700/60 rounded-2xl p-7 sm:p-8 flex flex-col justify-between shadow-xs reveal-on-scroll reveal-delay-1">
               <div>
                 <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1520] dark:text-white mb-3">
-                  $50 flat rate
+                  $10 flat rate
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                   The agreed rate is locked onto every submission when uploaded.

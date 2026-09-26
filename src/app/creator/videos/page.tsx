@@ -394,7 +394,7 @@ export default function SubmissionsPage() {
     (s) => !s.is_sample && s.status === 'APPROVED'
   ).length;
   const minRequired = statsData?.minRequired || 8;
-  const rate = user?.rate_per_video_usd || 50;
+  const rate = user?.rate_per_video_usd || 10;
   const availableBalance = statsData?.availablePayoutBalance ?? 0;
 
   const tabCounts = {
@@ -623,7 +623,7 @@ export default function SubmissionsPage() {
                     .padStart(2, '0')}`;
                   const earnings = sub.is_sample
                     ? (sub.payout_status === 'PAID' ? '$1.00' : '$1.00 (Pending)')
-                    : `$${(sub.agreed_rate_usd || 50).toFixed(2)}`;
+                    : `$${(sub.agreed_rate_usd || 10).toFixed(2)}`;
                   const earningsNote = sub.is_sample
                     ? (sub.payout_status === 'PAID' ? 'Audition bonus paid' : 'Audition bonus unpaid')
                     : sub.payout_status || 'UNPAID';
@@ -870,7 +870,7 @@ export default function SubmissionsPage() {
               <div className="font-serif text-4xl sm:text-5xl font-normal tracking-tight text-white">
                 ${availableBalance.toFixed(0)}{' '}
                 <span className="text-2xl sm:text-3xl text-white/40 font-normal">
-                  of $400
+                  of $80
                 </span>
               </div>
               <div className="text-xs text-white/50 mt-2">
@@ -1064,7 +1064,7 @@ export default function SubmissionsPage() {
                       <div className="text-[10px] text-[#8E2848] font-semibold">Audition Bonus</div>
                     </div>
                   ) : (
-                    `$${(selectedSub.agreed_rate_usd || 50).toFixed(2)}`
+                    `$${(selectedSub.agreed_rate_usd || 10).toFixed(2)}`
                   )}
                 </div>
               </div>

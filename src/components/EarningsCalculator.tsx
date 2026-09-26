@@ -12,7 +12,7 @@ interface CalculatorProps {
 
 export default function EarningsCalculator({ initialCount = 8, showCta = true }: CalculatorProps) {
   const [videoCount, setVideoCount] = useState<number>(initialCount);
-  const [ratePerVideo, setRatePerVideo] = useState<number>(RATE_PER_VIDEO_USD || 50);
+  const [ratePerVideo, setRatePerVideo] = useState<number>(RATE_PER_VIDEO_USD || 10);
   const [minVideosForPayout, setMinVideosForPayout] = useState<number>(MIN_PAYOUT_VIDEOS || 8);
 
   useEffect(() => {

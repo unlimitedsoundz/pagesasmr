@@ -279,7 +279,7 @@ export async function sendWelcomeEmail(options: {
       &bull; <strong>Faceless Framing:</strong> Focus camera on hands, pages, and reading materials.<br/>
       &bull; <strong>Paper Sounds:</strong> Crisp page-turning acoustics recorded with long press-on nails, flipping from the edges of pages with your 2 middle fingers like the sample.<br/>
       &bull; <strong>Duration:</strong> At least 180 seconds (3 minutes) unbroken per video.<br/>
-      &bull; <strong>Payout:</strong> $50 per approved video. Request payout once 8 videos are approved ($400).
+      &bull; <strong>Payout:</strong> $10 per approved video. Request payout once 8 videos are approved ($80).
     </div>
     <p style="margin: 0 0 16px 0; line-height: 1.6;">
       You can immediately begin uploading your recordings from your creator dashboard.
