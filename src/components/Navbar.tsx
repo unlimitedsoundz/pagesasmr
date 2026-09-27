@@ -33,6 +33,28 @@ export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+
+  // Global URL referral code capture across all landing pages and routes
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const search = window.location.search;
+        if (search) {
+          const params = new URLSearchParams(search);
+          const ref =
+            params.get("ref") ||
+            params.get("referral") ||
+            params.get("referralCode") ||
+            params.get("ref_code");
+          if (ref && ref.trim()) {
+            const cleanRef = ref.trim().toUpperCase();
+            localStorage.setItem("pinkroom_ref_code", cleanRef);
+            document.cookie = "pinkroom_ref_code=" + encodeURIComponent(cleanRef) + "; path=/; max-age=2592000; SameSite=Lax";
+          }
+        }
+      }
+    } catch {}
+  }, [pathname]);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [submissionCount, setSubmissionCount] = useState<number | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);

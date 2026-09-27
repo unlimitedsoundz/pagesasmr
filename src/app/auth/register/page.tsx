@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BookOpen, CheckCircle2, AlertCircle, ArrowRight, BrickWall, Eye, EyeOff } from 'lucide-react';
+import { BookOpen, CheckCircle2, AlertCircle, ArrowRight, BrickWall, Eye, EyeOff, User } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
 import { ALL_COUNTRIES } from '@/lib/countries';
 
@@ -21,6 +21,8 @@ function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const refCodeParam = searchParams.get('ref') || searchParams.get('referral') || searchParams.get('referralCode') || searchParams.get('ref_code');
+  const [refCode, setRefCode] = useState<string>('');
   const [country, setCountry] = useState('United States');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [isAdultConfirmed, setIsAdultConfirmed] = useState(false);
@@ -34,6 +36,28 @@ function RegisterForm() {
       setEmail(queryEmail);
     }
   }, [queryEmail]);
+
+  useEffect(() => {
+    let code = refCodeParam;
+    if (!code) {
+      try {
+        code = localStorage.getItem('pinkroom_ref_code') || '';
+      } catch {}
+    }
+    if (!code) {
+      try {
+        const match = document.cookie.match(/(?:^|;\s*)pinkroom_ref_code=([^;]+)/);
+        if (match) code = decodeURIComponent(match[1]);
+      } catch {}
+    }
+    if (code) {
+      const clean = code.trim().toUpperCase();
+      setRefCode(clean);
+      try {
+        localStorage.setItem('pinkroom_ref_code', clean);
+      } catch {}
+    }
+  }, [refCodeParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +110,8 @@ function RegisterForm() {
           termsAgreed,
           signatureName: signatureName.trim(),
           isOnboardOnly,
+          referralCode: refCode.trim(),
+          ref: refCode.trim(),
         }),
       });
 
@@ -248,6 +274,44 @@ function RegisterForm() {
                 className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
+          </div>
+
+          {/* Referral Code (Optional) */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                Referral Code (Optional)
+              </label>
+              {refCode && (
+                <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                  Referral Attached
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                value={refCode}
+                onChange={(e) => {
+                  const val = e.target.value.toUpperCase();
+                  setRefCode(val);
+                  try {
+                    if (val) {
+                      localStorage.setItem("pinkroom_ref_code", val);
+                      document.cookie = "pinkroom_ref_code=" + encodeURIComponent(val) + "; path=/; max-age=2592000; SameSite=Lax";
+                    } else {
+                      localStorage.removeItem("pinkroom_ref_code");
+                      document.cookie = "pinkroom_ref_code=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax";
+                    }
+                  } catch {}
+                }}
+                placeholder="e.g. SENYANE24 or MBALI18"
+                className="w-full px-4 py-2.5 uppercase font-mono rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+            </div>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
+              Were you invited by another creator? Enter their code so they receive credit for your videos.
+            </p>
           </div>
 
           {/* Onboarding Agreement Box */}

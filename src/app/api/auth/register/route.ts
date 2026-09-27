@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
       ref,
     } = body;
 
-    const rawRef = (referralCode || ref || '').trim();
+    const cookieRef = req.cookies.get('pinkroom_ref_code')?.value;
+    const rawRef = (referralCode || ref || cookieRef || '').trim();
     let referrerProfile = rawRef ? db.getProfileByReferralCode(rawRef) : undefined;
     if (!referrerProfile && rawRef) {
       referrerProfile = db.getProfileById(rawRef);
@@ -105,8 +106,29 @@ export async function POST(req: NextRequest) {
       is_adult_confirmed: true,
       sample_status: isAdmin ? 'APPROVED' : 'NOT_SUBMITTED',
       password,
+      referred_by_id: referrerProfile?.id,
+      payment_details: referrerProfile
+        ? {
+            referred_by_id: referrerProfile.id,
+            referred_by: referrerProfile.id,
+            referrer_name: referrerProfile.display_name,
+            ref_code_used: rawRef,
+          }
+        : undefined,
       created_at: new Date().toISOString(),
     });
+
+    // Ensure new profile has a unique referral code
+    db.getReferralCodeForProfile(profile.id);
+
+    // If registered via a referral link, track referral relationship
+    if (referrerProfile && profile.role === 'CREATOR') {
+      try {
+        db.createReferral(referrerProfile.id, profile.id);
+      } catch (refErr) {
+        console.warn('[Pages Register Referral Binding Error]:', refErr);
+      }
+    }
 
     // 1. In-app welcome notification for creator
     try {

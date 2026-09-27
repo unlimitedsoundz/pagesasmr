@@ -15,6 +15,8 @@ export async function GET() {
     const referralCode = db.getReferralCodeForProfile(user.id);
     const referralLink = `${PUBLIC_URL.replace(/\/$/, '')}/auth/register?ref=${encodeURIComponent(referralCode)}`;
 
+    // Automatically refresh referrals from Supabase & reconcile any new signups
+    await db.syncReferralsFromSupabase();
     const referrals = db.getReferralsByReferrer(user.id);
 
     const totalReferred = referrals.length;

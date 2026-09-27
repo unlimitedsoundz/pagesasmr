@@ -512,6 +512,9 @@ class PagesDatabaseService {
         }
       }
 
+      // 7. Live sync Platform Referrals
+      await this.syncReferralsFromSupabase();
+
       // 7. Live sync Chat Messages — only for pinkroom_pages creators
       // Build list of creator IDs belonging to this platform
       const pagesCreatorIds = new Set(
@@ -3052,6 +3055,101 @@ class PagesDatabaseService {
   // ==========================================
   // REFERRAL LINK & MILESTONE SYSTEM ($35 BONUS)
   // ==========================================
+  public async syncReferralsToSupabase(): Promise<void> {
+    try {
+      if (!this.data.referrals) return;
+      await supabaseAdmin.from("platform_settings").upsert({
+        key: "platform_referrals",
+        value: this.data.referrals,
+        updated_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.warn("[Pages DB] Failed to sync referrals to Supabase:", err);
+    }
+  }
+
+  public async syncReferralsFromSupabase(): Promise<void> {
+    try {
+      let changed = false;
+      if (!this.data.referrals) this.data.referrals = [];
+
+      // 1. Fetch saved referrals list from Supabase platform_settings
+      const { data: refSetting, error: refErr } = await supabaseAdmin
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'platform_referrals')
+        .single();
+      if (!refErr && refSetting && Array.isArray(refSetting.value)) {
+        const existingMap = new Map(this.data.referrals.map((r) => [r.id, r]));
+        for (const r of refSetting.value) {
+          if (!existingMap.has(r.id)) {
+            this.data.referrals.push(r);
+            existingMap.set(r.id, r);
+            changed = true;
+          } else {
+            const existing = existingMap.get(r.id);
+            if (existing && r.milestone_reached && !existing.milestone_reached) {
+              existing.milestone_reached = true;
+              existing.reward_status = "REWARDED";
+              existing.rewarded_at = r.rewarded_at || new Date().toISOString();
+              changed = true;
+            }
+          }
+        }
+      }
+
+      // 2. Auto-reconcile any profiles in Supabase with payment_details.referred_by_id
+      const { data: referredProfiles, error: profErr } = await supabaseAdmin
+        .from('profiles')
+        .select('id, display_name, email, sample_status, payment_details, created_at')
+        .not('payment_details->referred_by_id', 'is', null);
+
+      if (!profErr && Array.isArray(referredProfiles)) {
+        for (const rp of referredProfiles) {
+          const referrerId = rp.payment_details?.referred_by_id || rp.payment_details?.referred_by;
+          if (!referrerId) continue;
+
+          // Check if this referral already exists
+          const exists = this.data.referrals.some(
+            (r) => r.referred_user_id === rp.id && r.referrer_id === referrerId
+          );
+          if (!exists) {
+            const referrer = this.getProfileById(referrerId);
+            const stats = this.getCreatorStats(rp.id);
+            const auditionPassed = rp.sample_status === 'APPROVED';
+            const videosCount = stats.approvedFullCount || 0;
+            const milestoneReached = Boolean(auditionPassed && videosCount >= 8);
+            const newRef: Referral = {
+              id: ensureUuid(),
+              referrer_id: referrerId,
+              referrer_name: rp.payment_details?.referrer_name || referrer?.display_name || 'Referrer',
+              referred_user_id: rp.id,
+              referred_user_name: rp.display_name,
+              referred_user_email: rp.email,
+              audition_passed: auditionPassed,
+              videos_completed_count: videosCount,
+              milestone_reached: milestoneReached,
+              reward_amount_usd: 35.0,
+              reward_status: milestoneReached ? 'REWARDED' : 'PENDING',
+              rewarded_at: milestoneReached ? new Date().toISOString() : undefined,
+              created_at: rp.created_at || new Date().toISOString(),
+              updated_at: rp.created_at || new Date().toISOString(),
+            };
+            this.data.referrals.unshift(newRef);
+            changed = true;
+          }
+        }
+      }
+
+      if (changed) {
+        this.save();
+        await this.syncReferralsToSupabase();
+      }
+    } catch (err) {
+      console.warn("Failed to sync referrals from Supabase:", err);
+    }
+  }
+
   getReferralCodeForProfile(profileId: string): string {
     const profile = this.getProfileById(profileId);
     if (!profile) return '';
@@ -3060,20 +3158,22 @@ class PagesDatabaseService {
       return profile.referral_code;
     }
 
-    const cleanName = (profile.display_name || 'CREATOR')
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '')
-      .slice(0, 6);
-    const randomSuffix = crypto.randomBytes(2).toString('hex').toUpperCase();
-    let code = `${cleanName}-${randomSuffix}`;
-
-    while (this.data.profiles.some((p) => p.referral_code === code)) {
-      const extra = crypto.randomBytes(2).toString('hex').toUpperCase();
-      code = `${cleanName}-${extra}`;
+    if (profile.payment_details?.referral_code) {
+      profile.referral_code = profile.payment_details.referral_code;
+      return profile.referral_code;
     }
 
+    // Stable deterministic code so it never mutates across sessions/restarts
+    const prefix = (profile.display_name || 'CREAT').replace(/[^a-zA-Z0-9]/g, '').substring(0, 5).toUpperCase() || 'CREAT';
+    const cleanId = profile.id.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const suffix = cleanId.substring(0, 5) || '10001';
+    const code = `${prefix}-${suffix}`;
+
     profile.referral_code = code;
-    this.updateProfile(profileId, { referral_code: code });
+    if (!profile.payment_details) profile.payment_details = {};
+    profile.payment_details.referral_code = code;
+    this.save();
+    this.syncProfileToSupabase(profile);
     return code;
   }
 
@@ -3156,6 +3256,7 @@ class PagesDatabaseService {
 
     this.data.referrals.push(newReferral);
     this.save();
+    this.syncReferralsToSupabase();
 
     this.createNotification({
       user_id: referrerId,
@@ -3198,6 +3299,7 @@ class PagesDatabaseService {
       referral.reward_status = 'REWARDED';
       referral.rewarded_at = new Date().toISOString();
       this.save();
+      this.syncReferralsToSupabase();
 
       const existingRewardLedger = this.data.earnings_ledger.find(
         (l) => l.creator_id === referral.referrer_id && l.description.includes(referredUserId)
@@ -3249,8 +3351,17 @@ class PagesDatabaseService {
     this.reload();
     if (!this.data.referrals) this.data.referrals = [];
 
-    // Auto-reconcile any profiles linked via referred_by_id
-    const referredProfiles = this.data.profiles.filter((p) => p.referred_by_id === referrerId);
+    const referrer = this.getProfileById(referrerId);
+    const referrerCode = referrer?.referral_code || referrer?.payment_details?.referral_code;
+
+    // Auto-reconcile any profiles linked via referred_by_id OR payment_details.referred_by_id OR matching code
+    const referredProfiles = this.data.profiles.filter(
+      (p) =>
+        p.referred_by_id === referrerId ||
+        p.payment_details?.referred_by_id === referrerId ||
+        p.payment_details?.referred_by === referrerId ||
+        (referrerCode && p.payment_details?.ref_code_used?.toUpperCase() === referrerCode.toUpperCase())
+    );
     let addedAny = false;
     for (const rp of referredProfiles) {
       const exists = this.data.referrals.some((r) => r.referred_user_id === rp.id);
@@ -3279,6 +3390,7 @@ class PagesDatabaseService {
     }
     if (addedAny) {
       this.save();
+      this.syncReferralsToSupabase();
     }
 
     for (const referral of this.data.referrals) {

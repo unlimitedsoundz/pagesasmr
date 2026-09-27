@@ -257,6 +257,7 @@ export interface ChatMessage {
 export interface Referral {
   id: string;
   referrer_id: string;
+  referrer_name?: string;
   referred_user_id: string;
   referred_user_name: string;
   referred_user_email: string;
