@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   Bell,
   Trash2,
-  Sparkles,
   Send,
   X,
   RefreshCw,

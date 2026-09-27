@@ -13,7 +13,6 @@ import {
   Clock,
   ArrowLeft,
   ExternalLink,
-  Sparkles,
   RefreshCw,
   Eye,
   Sliders,

@@ -1116,14 +1116,14 @@ div[class*="fixed"][class*="inset-0"]>div button.bg-black,
    ======================================================== */
 
 /* 1. FORCE ALL BUTTONS, ACTION LINKS & CTAs TO PINK PILLS WITH ZERO BORDER */
-button:not(.chat-bubble):not([data-message-bubble]):not(.notification-card):not(.animate-spin):not(.official-sample-banner):not([data-official-sample-banner]),
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
-[role="button"]:not(.chat-bubble):not(.official-sample-banner):not([data-official-sample-banner]),
-.btn,
-.button,
-a[class*="px-"][class*="py-"]:not(.notification-card):not(.official-sample-banner):not([data-official-sample-banner]) {
+button:not(.chat-bubble):not([data-message-bubble]):not(.notification-card):not(.animate-spin):not(.official-sample-banner):not([data-official-sample-banner]):not(.admin-page-container *):not([data-admin-container] *),
+input[type="button"]:not(.admin-page-container *):not([data-admin-container] *),
+input[type="submit"]:not(.admin-page-container *):not([data-admin-container] *),
+input[type="reset"]:not(.admin-page-container *):not([data-admin-container] *),
+[role="button"]:not(.chat-bubble):not(.official-sample-banner):not([data-official-sample-banner]):not(.admin-page-container *):not([data-admin-container] *),
+.btn:not(.admin-page-container *):not([data-admin-container] *),
+.button:not(.admin-page-container *):not([data-admin-container] *),
+a[class*="px-"][class*="py-"]:not(.notification-card):not(.official-sample-banner):not([data-official-sample-banner]):not(.admin-page-container *):not([data-admin-container] *) {
   border-radius: 9999px !important;
   border: 0 !important;
   border-style: none !important;
@@ -1134,12 +1134,12 @@ a[class*="px-"][class*="py-"]:not(.notification-card):not(.official-sample-banne
 /* Primary Action Buttons (black, dark, pink, plum fills) -> #7B1E4B Plum Fill + White Text */
 button[class*="bg-[#7B1E4B]"],
 button[class*="bg-[#7b1e4b]"],
-button[class*="bg-black"],
-button[class*="bg-neutral-900"],
-button[class*="bg-neutral-800"],
-input[type="submit"],
-a[class*="px-"][class*="py-"][class*="bg-black"],
-a[class*="px-"][class*="py-"][class*="bg-[#18151A]"],
+button[class*="bg-black"]:not(.admin-page-container *):not([data-admin-container] *),
+button[class*="bg-neutral-900"]:not(.admin-page-container *):not([data-admin-container] *),
+button[class*="bg-neutral-800"]:not(.admin-page-container *):not([data-admin-container] *),
+input[type="submit"]:not(.admin-page-container *):not([data-admin-container] *),
+a[class*="px-"][class*="py-"][class*="bg-black"]:not(.admin-page-container *):not([data-admin-container] *),
+a[class*="px-"][class*="py-"][class*="bg-[#18151A]"]:not(.admin-page-container *):not([data-admin-container] *),
 a[class*="px-"][class*="py-"][class*="bg-[#7B1E4B]"],
 a[class*="px-"][class*="py-"][class*="bg-[#7b1e4b]"] {
   background-color: #7B1E4B !important;
@@ -1244,19 +1244,85 @@ a[class*="bg-[#7b1e4b]"],
   color: #7B1E4B !important;
 }
 
-/* Admin container buttons and pills override */
-.admin-page-container button,
-.admin-page-container [role="button"],
-.admin-page-container a[class*="px-"],
-.admin-page-container .rounded-full,
-.admin-page-container [class*="rounded-full"],
-.admin-page-container span[class*="rounded-full"],
-.admin-page-container div[class*="rounded-full"] {
-  border-radius: 9999px !important;
-  border: 0 !important;
-  border-style: none !important;
-  border-width: 0 !important;
-  border-color: transparent !important;
+/* ========================================================
+   ADMIN SUITE CLEAN PROFESSIONAL STYLING (NO AI SLOP)
+   Ensures all admin pages have sharp, high-utility UI:
+   - Proper borders, no forced borderless pills
+   - True dark/white contrast without forced pink/plum muting
+   - Preserves explicit rounded-none / rounded-md borders
+   ======================================================== */
+.admin-page-container button:not(.rounded-full):not([class*="rounded-full"]),
+.admin-page-container [role="button"]:not(.rounded-full):not([class*="rounded-full"]),
+.admin-page-container a[class*="px-"]:not(.rounded-full):not([class*="rounded-full"]),
+[data-admin-container] button:not(.rounded-full):not([class*="rounded-full"]),
+[data-admin-container] [role="button"]:not(.rounded-full):not([class*="rounded-full"]),
+[data-admin-container] a[class*="px-"]:not(.rounded-full):not([class*="rounded-full"]) {
+  border-radius: 4px;
+}
+
+.admin-page-container .rounded-none,
+.admin-page-container [class*="rounded-none"],
+[data-admin-container] .rounded-none,
+[data-admin-container] [class*="rounded-none"] {
+  border-radius: 0px !important;
+}
+
+/* Ensure admin cards maintain clean neutral borders and no pink tint/glow */
+.admin-page-container .admin-card,
+.admin-page-container [data-admin-card],
+[data-admin-container] .admin-card,
+[data-admin-container] [data-admin-card] {
+  border: 1px solid #E5E7EB !important;
+  box-shadow: none !important;
+  background-color: #FFFFFF !important;
+}
+
+/* Preserve true black styling for admin buttons and header bars */
+.admin-page-container button.bg-black,
+.admin-page-container button[class*="bg-black"],
+.admin-page-container a.bg-black,
+.admin-page-container a[class*="bg-black"],
+[data-admin-container] button.bg-black,
+[data-admin-container] button[class*="bg-black"],
+[data-admin-container] a.bg-black,
+[data-admin-container] a[class*="bg-black"] {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+.admin-page-container button.bg-black:hover,
+.admin-page-container button[class*="bg-black"]:hover,
+.admin-page-container a.bg-black:hover,
+.admin-page-container a[class*="bg-black"]:hover,
+[data-admin-container] button.bg-black:hover,
+[data-admin-container] button[class*="bg-black"]:hover,
+[data-admin-container] a.bg-black:hover,
+[data-admin-container] a[class*="bg-black"]:hover {
+  background-color: #262626 !important;
+  color: #FFFFFF !important;
+}
+
+/* Preserve true neutral darks for admin control buttons */
+.admin-page-container button[class*="bg-neutral-800"],
+.admin-page-container a[class*="bg-neutral-800"],
+[data-admin-container] button[class*="bg-neutral-800"],
+[data-admin-container] a[class*="bg-neutral-800"] {
+  background-color: #262626 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #404040 !important;
+}
+
+/* Preserve white buttons with neutral borders inside admin */
+.admin-page-container button.bg-white,
+.admin-page-container button[class*="bg-white"],
+.admin-page-container a.bg-white,
+.admin-page-container a[class*="bg-white"],
+[data-admin-container] button.bg-white,
+[data-admin-container] button[class*="bg-white"],
+[data-admin-container] a.bg-white,
+[data-admin-container] a[class*="bg-white"] {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 /* ========================================================
@@ -1290,4 +1356,4 @@ button.official-sample-banner,
     padding-left: 0.75rem !important;  /* 12px instead of 24px */
     padding-right: 0.75rem !important; /* 12px instead of 24px */
   }
-}
+}
