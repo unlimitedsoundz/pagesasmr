@@ -16,6 +16,7 @@ import {
 import * as tus from 'tus-js-client';
 import { useToast } from './ToastProvider';
 import { supabase } from '@/lib/supabase';
+import { compressVideoFile } from '@/lib/videoCompression';
 
 export interface UploadMetadata {
   title: string;
@@ -466,10 +467,11 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
   };
 
   const startUpload = async (
-    file: File,
+    fileInput: File,
     meta: UploadMetadata,
     options?: { submissionId?: string; isRevision?: boolean }
   ): Promise<any> => {
+    let file: File = fileInput;
     if (uploadState.isUploading && (uploadState.status === 'UPLOADING' || uploadState.status === 'VERIFYING')) {
       const msg = 'Another video upload is currently in progress. Please wait for it to finish.';
       toast.warning(msg);
@@ -478,6 +480,27 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
 
     const isSample = Boolean(meta.isSample);
     const title = meta.title.trim() || (isSample ? '30s Audition Sample' : file.name);
+
+    // Auto-compress files that exceed 100 MB before uploading
+    const MAX_UPLOAD_BYTES = 104857600; // 100 MB
+    if (file.size > MAX_UPLOAD_BYTES) {
+      const origMb = (file.size / (1024 * 1024)).toFixed(1);
+      toast.info('Compressing ' + file.name + ' (' + origMb + ' MB) to fit the 100 MB limit…', 'Auto-Compressing Video');
+      try {
+        const result = await compressVideoFile(file, {
+          videoBitrate: 1_200_000,
+          audioBitrate: 96_000,
+          maxDimension: 1280,
+        });
+        file = result.file;
+        const newMb = (result.compressedSize / (1024 * 1024)).toFixed(1);
+        toast.success('Compression complete (' + newMb + ' MB). Starting upload…');
+      } catch (compErr) {
+        console.warn('Auto-compression failed, proceeding with original file:', compErr);
+        toast.warning('Could not compress video automatically. Proceeding with original file.');
+      }
+    }
+
     activeFileRef.current = file;
 
     setUploadState({

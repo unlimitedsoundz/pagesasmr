@@ -8,7 +8,7 @@ export const RATE_PER_VIDEO_USD = 10.0;
 export const MIN_PAYOUT_VIDEOS = 8;
 export const MIN_PAYOUT_AMOUNT_USD = 80.0;
 export const MIN_VIDEO_DURATION_SECONDS = 180; // 3 minutes strictly
-export const MAX_UPLOAD_SIZE_BYTES = 524288000; // 500 MB
+export const MAX_UPLOAD_SIZE_BYTES = 104857600; // 100 MB
 
 export const NOTIFICATION_SENDER =
   process.env.RESEND_FROM_EMAIL || 'The Pink Room Pages <notifications@pages.pinkroom.online>';

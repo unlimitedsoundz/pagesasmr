@@ -319,11 +319,11 @@ export default function CreatorUploadPage() {
 
     setAuditionError('');
 
-    const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
+    const MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024; // 500 MB
     if (auditionFile.size > MAX_FILE_SIZE_BYTES) {
-      const err = `Audition sample (${formatBytes(auditionFile.size)}) exceeds the maximum allowed upload size of 500 MB.`;
+      const err = `Audition sample (${formatBytes(auditionFile.size)}) exceeds the maximum allowed upload size of 100 MB.`;
       setAuditionError(err);
-      toast.error(err, 'File Exceeds 500 MB');
+      toast.error(err, 'File Exceeds 100 MB');
       return;
     }
 
@@ -358,7 +358,7 @@ export default function CreatorUploadPage() {
       return;
     }
 
-    const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
+    const MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024; // 500 MB
     const newItems: UploadQueueItem[] = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -371,7 +371,7 @@ export default function CreatorUploadPage() {
 
       if (file.size > MAX_FILE_SIZE_BYTES) {
         toast.error(
-          `"${file.name}" (${formatBytes(file.size)}) exceeds the maximum upload limit of 500 MB. Please compress or trim your video.`,
+          `"${file.name}" (${formatBytes(file.size)}) exceeds the maximum upload limit of 100 MB. Please compress or trim your video.`,
           'File Too Large'
         );
         continue;
@@ -735,7 +735,7 @@ export default function CreatorUploadPage() {
                 </div>
 
                 <div className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2 font-medium">
-                  Select up to {minRequired} videos for this batch &bull; Max 500 MB per file
+                  Select up to {minRequired} videos for this batch &bull; Max 100 MB per file
                 </div>
               </div>
 
@@ -747,7 +747,7 @@ export default function CreatorUploadPage() {
                 </span>
                 <span className="flex items-center gap-1">
                   <Video className="w-3.5 h-3.5 text-neutral-400" />
-                  <span>MP4 or MOV (Up to 500 MB)</span>
+                  <span>MP4 or MOV (Up to 100 MB)</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <Shield className="w-3.5 h-3.5 text-neutral-400" />

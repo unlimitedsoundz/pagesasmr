@@ -17,7 +17,7 @@ export default function AdminSettingsPage() {
   const [ratePerVideo, setRatePerVideo] = useState(10);
   const [minPayoutVideos, setMinPayoutVideos] = useState(8);
   const [minDurationSeconds, setMinDurationSeconds] = useState(180);
-  const [maxUploadMb, setMaxUploadMb] = useState(500);
+  const [maxUploadMb, setMaxUploadMb] = useState(100);
 
   useEffect(() => {
     fetch('/api/admin/settings')

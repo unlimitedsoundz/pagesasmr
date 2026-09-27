@@ -13238,7 +13238,7 @@
     "rate_per_video_usd": 10,
     "min_payout_videos": 8,
     "min_duration_seconds": 180,
-    "max_upload_size_bytes": 524288000
+    "max_upload_size_bytes": 104857600
   },
   "guideline_samples": [
     {
