@@ -147,7 +147,7 @@ export default function EarningsAndPaymentsPage() {
                   STEADY CREATOR
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $800
+                  $160
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">

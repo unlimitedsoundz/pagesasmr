@@ -6,7 +6,7 @@ export interface CurrencyInfo {
 }
 
 export const COUNTRY_CURRENCY_MAP: Record<string, CurrencyInfo> = {
-  'Nigeria': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira', ratePerUsd: 1550 },
+  'Nigeria': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira', ratePerUsd: 1110 },
   'Kenya': { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling', ratePerUsd: 129 },
   'Ghana': { code: 'GHS', symbol: 'GH₵', name: 'Ghanaian Cedi', ratePerUsd: 15.5 },
   'Uganda': { code: 'UGX', symbol: 'USh', name: 'Ugandan Shilling', ratePerUsd: 3700 },

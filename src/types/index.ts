@@ -280,3 +280,21 @@ export interface BannedEntry {
   created_at: string;
 }
 
+export interface Testimonial {
+  id: string;
+  platform_id?: PlatformId | string;
+  creator_id: string;
+  creator_name: string;
+  creator_email?: string;
+  creator_avatar_url?: string;
+  creator_country?: string;
+  payout_id: string;
+  amount_usd: number;
+  payment_method?: string;
+  rating: number; // 1 to 5
+  review: string;
+  proof_image_url: string;
+  created_at: string;
+  status: 'APPROVED' | 'PENDING';
+}
+

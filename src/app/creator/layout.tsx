@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import MandatoryTestimonialModal from '@/components/MandatoryTestimonialModal';
 
 export default function CreatorLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -64,6 +65,7 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="w-full min-h-screen bg-[#FDFBFD] dark:bg-[#120F15] text-neutral-900 dark:text-neutral-100 transition-colors">
+      <MandatoryTestimonialModal />
       {children}
     </div>
   );

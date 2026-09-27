@@ -6,6 +6,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import HomeTestimonialsSection from '@/components/HomeTestimonialsSection';
 
 export const metadata: Metadata = {
   title: 'Turn Pages. Create Calming ASMR. Earn Beautifully. | The Pink Room',
@@ -124,7 +125,7 @@ export default function HomePage() {
                   STEADY CREATOR
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $800
+                  $160
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
@@ -303,7 +304,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. DARK WINE / PLUM BANNER */}
+      {/* 5. VERIFIED CREATOR TESTIMONIALS & PAYOUT PROOFS */}
+      <HomeTestimonialsSection />
+
+      {/* 6. DARK WINE / PLUM BANNER */}
       <section className="w-full bg-[#581335] dark:bg-[#3D0A23] py-20 sm:py-24 px-4 sm:px-6 lg:px-8 text-center transition-colors">
         <div className="max-w-4xl mx-auto space-y-6 reveal-on-scroll">
           <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase !text-pink-200">

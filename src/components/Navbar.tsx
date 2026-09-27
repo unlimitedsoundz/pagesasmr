@@ -252,6 +252,7 @@ export default function Navbar() {
     { href: '/how-it-works', label: 'How It Works' },
     { href: '/guidelines', label: 'Recording Guidelines' },
     { href: '/earnings-and-payments', label: 'Earnings & Payments' },
+    { href: '/testimonials', label: 'Testimonials' },
     { href: '/faq', label: 'FAQ' },
     { href: '/contact', label: 'Contact' },
   ];
@@ -276,6 +277,7 @@ export default function Navbar() {
     { href: '/creator/upload', label: 'Upload' },
     { href: '/creator/videos', label: 'Submissions' },
     { href: '/creator/payouts', label: 'Payouts' },
+    { href: '/testimonials', label: 'Testimonials' },
     { href: '/creator/referrals', label: 'Referrals ($35 Bonus)' },
     { href: '/creator/agreement', label: 'Agreement' },
     { href: '/guidelines', label: 'Guidelines' },

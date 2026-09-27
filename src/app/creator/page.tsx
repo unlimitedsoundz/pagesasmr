@@ -11,6 +11,7 @@ import {
   Upload,
   ArrowRight,
   MessageSquare,
+  Star,
 } from 'lucide-react';
 import VideoThumbnail from '@/components/VideoThumbnail';
 import StatusBadge from '@/components/StatusBadge';
@@ -686,6 +687,38 @@ export default function CreatorDashboardPage() {
                   className="text-xs font-semibold text-[#8E2848] dark:text-pink-300 hover:underline flex items-center justify-between"
                 >
                   <span>Full recording guidelines</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Community Reviews & Payout Receipts Card */}
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800 rounded-2xl p-6 sm:p-7 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-[10px] font-bold tracking-[0.2em] text-[#9D174D] dark:text-pink-300 uppercase">
+                  COMMUNITY REVIEWS
+                </div>
+                <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span className="text-xs font-bold text-neutral-900 dark:text-white">Verified</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-serif text-2xl font-normal text-neutral-900 dark:text-white">
+                  Creator testimonials & receipts
+                </h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 leading-relaxed">
+                  Browse authentic reviews, star ratings, and transparent payout receipts submitted by fellow creators.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                <Link
+                  href="/testimonials"
+                  className="text-xs font-semibold text-[#8E2848] dark:text-pink-300 hover:underline flex items-center justify-between"
+                >
+                  <span>Explore creator testimonials</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

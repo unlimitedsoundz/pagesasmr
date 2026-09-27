@@ -36,6 +36,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/testimonials" className="hover:!text-white transition-colors">
+                  Creator testimonials
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy" className="hover:!text-white transition-colors">
                   Privacy policy
                 </Link>

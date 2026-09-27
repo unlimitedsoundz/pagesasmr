@@ -24,6 +24,7 @@ import {
   UploadStatus,
   ProcessingStatus,
   BannedEntry,
+  Testimonial,
 } from '@/types';
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
@@ -63,6 +64,7 @@ interface DatabaseData {
   banned_ips?: string[];
   banned_devices?: string[];
   banned_entries?: BannedEntry[];
+  testimonials?: Testimonial[];
 }
 
 const APP_DATA_DIR = path.resolve(__dirname, '../../data');
@@ -176,6 +178,7 @@ function getInitialSeedData(): DatabaseData {
     settings: DEFAULT_SETTINGS,
     guideline_samples,
     chat_messages: [],
+    testimonials: [],
   };
 }
 
@@ -202,6 +205,7 @@ class PagesDatabaseService {
     this.data.platform_memberships = diskData.platform_memberships || [];
     this.data.settings = diskData.settings || this.data.settings || DEFAULT_SETTINGS;
     this.data.payout_requests = diskData.payout_requests || [];
+    this.data.testimonials = diskData.testimonials || [];
 
     // Refresh and merge chat_messages from disk so concurrent requests/workers immediately see new messages
     if (diskData.chat_messages) {
@@ -3545,6 +3549,135 @@ class PagesDatabaseService {
     this.data.banned_entries.splice(idx, 1);
     this.save();
     return true;
+  }
+
+  // ==========================================
+  // TESTIMONIALS & REVIEWS
+  // ==========================================
+  getTestimonials(filters?: { creatorId?: string; status?: string; minRating?: number }): Testimonial[] {
+    this.reload();
+    return (this.data.testimonials || [])
+      .filter((t) => {
+        if (filters?.creatorId && t.creator_id !== filters.creatorId) return false;
+        if (filters?.status && t.status !== filters.status) return false;
+        if (filters?.minRating && t.rating < filters.minRating) return false;
+        return true;
+      })
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+
+  getTestimonialById(id: string): Testimonial | undefined {
+    this.reload();
+    return (this.data.testimonials || []).find((t) => t.id === id);
+  }
+
+  getTestimonialByPayoutId(payoutId: string): Testimonial | undefined {
+    this.reload();
+    return (this.data.testimonials || []).find((t) => t.payout_id === payoutId);
+  }
+
+  getPendingPayoutReviews(creatorId: string): PayoutRequest[] {
+    this.reload();
+    const reviewedPayoutIds = new Set(
+      (this.data.testimonials || [])
+        .filter((t) => t.creator_id === creatorId)
+        .map((t) => t.payout_id)
+    );
+
+    return (this.data.payout_requests || [])
+      .filter(
+        (p) =>
+          p.creator_id === creatorId &&
+          p.status === 'PAID' &&
+          !reviewedPayoutIds.has(p.id)
+      )
+      .sort((a, b) => new Date(b.processed_at || b.requested_at).getTime() - new Date(a.processed_at || a.requested_at).getTime());
+  }
+
+  createTestimonial(data: Omit<Testimonial, 'id' | 'created_at'>): Testimonial {
+    this.reload();
+    if (!this.data.testimonials) this.data.testimonials = [];
+
+    const payout = this.data.payout_requests.find((p) => p.id === data.payout_id);
+    if (!payout) {
+      throw new Error('Payout request not found.');
+    }
+    if (payout.status !== 'PAID') {
+      throw new Error('Testimonials can only be submitted for completed/paid payouts.');
+    }
+    if (payout.creator_id !== data.creator_id) {
+      throw new Error('You can only review your own payouts.');
+    }
+
+    const existing = this.data.testimonials.find((t) => t.payout_id === data.payout_id);
+    if (existing) {
+      throw new Error('A testimonial has already been submitted for this payout.');
+    }
+
+    const item: Testimonial = {
+      ...data,
+      id: ensureUuid(),
+      status: data.status || 'APPROVED',
+      created_at: new Date().toISOString(),
+    };
+
+    this.data.testimonials.unshift(item);
+    this.save();
+    this.syncTestimonialToSupabase(item).catch(() => {});
+    return item;
+  }
+
+  async syncTestimonialToSupabase(item: Testimonial): Promise<void> {
+    try {
+      const { data } = await supabaseAdmin
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'platform_testimonials')
+        .maybeSingle();
+
+      let list: Testimonial[] = Array.isArray(data?.value) ? data.value : [];
+      const idx = list.findIndex((t) => t.id === item.id || t.payout_id === item.payout_id);
+      if (idx !== -1) {
+        list[idx] = item;
+      } else {
+        list.unshift(item);
+      }
+
+      await supabaseAdmin.from('platform_settings').upsert({
+        key: 'platform_testimonials',
+        value: list,
+        updated_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.warn('Failed to backup testimonial to platform_settings in pinkroom-pages:', err);
+    }
+  }
+
+  public async syncTestimonialsFromSupabase(): Promise<Testimonial[]> {
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'platform_testimonials')
+        .maybeSingle();
+
+      if (!error && Array.isArray(data?.value)) {
+        if (!this.data.testimonials) this.data.testimonials = [];
+        const existingIds = new Set(this.data.testimonials.map((t) => t.id));
+        const existingPayoutIds = new Set(this.data.testimonials.map((t) => t.payout_id));
+
+        for (const t of data.value) {
+          if (!existingIds.has(t.id) && !existingPayoutIds.has(t.payout_id)) {
+            this.data.testimonials.push(t);
+            existingIds.add(t.id);
+            existingPayoutIds.add(t.payout_id);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to sync testimonials in pinkroom-pages:', err);
+    }
+    return this.data.testimonials || [];
   }
 }
 
