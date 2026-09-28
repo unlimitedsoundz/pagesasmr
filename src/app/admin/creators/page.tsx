@@ -35,6 +35,7 @@ export default function AdminCreatorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [payingSampleId, setPayingSampleId] = useState<string | null>(null);
+  const [sampleConfirmId, setSampleConfirmId] = useState<{id: string; name: string} | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -103,14 +104,13 @@ export default function AdminCreatorsPage() {
   };
 
   const handleMarkSamplePaid = async (creatorId: string, creatorName?: string) => {
-    if (
-      !confirm(
-        `Confirm that the $1.00 audition sample reward has been disbursed to ${creatorName || 'this creator'}?\n\nThis will mark the audition sample as PAID and remove $1.00 from their available balance.`
-      )
-    ) {
-      return;
-    }
+    setSampleConfirmId({ id: creatorId, name: creatorName || 'this creator' });
+  };
 
+  const executeSamplePaid = async () => {
+    if (!sampleConfirmId) return;
+    const { id: creatorId, name: creatorName } = sampleConfirmId;
+    setSampleConfirmId(null);
     setPayingSampleId(creatorId);
     try {
       const res = await fetch('/api/admin/creators/sample-payout', {
@@ -122,7 +122,7 @@ export default function AdminCreatorsPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to mark sample payout.');
 
       toast.success(
-        `$1.00 audition reward marked as paid out for ${creatorName || 'creator'}. Available balance updated!`,
+        `$1.00 audition reward marked as paid out for ${creatorName}. Available balance updated!`,
         'Bonus Paid Out'
       );
 
@@ -937,6 +937,44 @@ export default function AdminCreatorsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Confirm $1 Sample Bonus Paid */}
+      {sampleConfirmId && (
+        <div className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                <DollarSign className="w-5 h-5 text-emerald-700" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-neutral-900">Confirm $1.00 Audition Bonus</h3>
+                <p className="text-xs text-neutral-500 mt-0.5">This action cannot be undone.</p>
+              </div>
+            </div>
+            <p className="text-sm text-neutral-700 leading-relaxed">
+              Confirm that the <strong>$1.00 audition sample reward</strong> has been disbursed to{' '}
+              <strong>{sampleConfirmId.name}</strong>? This will mark their audition as paid and deduct $1.00 from their available balance.
+            </p>
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setSampleConfirmId(null)}
+                className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeSamplePaid}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5"
+              >
+                <DollarSign className="w-3.5 h-3.5" />
+                Mark $1 Paid
+              </button>
+            </div>
           </div>
         </div>
       )}
