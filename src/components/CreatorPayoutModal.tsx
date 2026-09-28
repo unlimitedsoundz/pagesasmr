@@ -16,7 +16,6 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  ExternalLink,
   Ban,
 } from 'lucide-react';
 import { formatCreatorPayoutInfo, FormattedPayoutInfo } from '@/lib/payoutDetails';
@@ -111,13 +110,39 @@ export default function CreatorPayoutModal({
         {/* Modal Scrollable Body */}
         <div className="overflow-y-auto space-y-4 pr-1 flex-1">
           {!info.isConfigured ? (
-            <div className="p-6 rounded-xl bg-neutral-50 border border-dashed border-neutral-300 text-center space-y-2">
-              <AlertCircle className="w-8 h-8 text-neutral-400 mx-auto" />
-              <div className="font-bold text-sm text-neutral-700">No Payout Details Configured</div>
-              <p className="text-xs text-neutral-500 max-w-sm mx-auto">
-                This creator has not yet submitted their bank or electronic account details in their profile settings.
-              </p>
-            </div>
+            info.needsUpdate ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1.5">
+                  <div className="flex items-center gap-2 font-bold text-xs">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Payout Method Discontinued (PayPal)</span>
+                  </div>
+                  <p className="text-xs text-amber-800 font-normal leading-relaxed">
+                    PayPal is no longer supported on the platform. This creator must update their payout preferences in Settings to Local Bank Transfer, African Mobile Money, Wise, or US ACH before disbursements can be issued.
+                  </p>
+                </div>
+                {info.lines.length > 0 && (
+                  <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-xs divide-y divide-neutral-100">
+                    {info.lines.map((line, idx) => (
+                      <div key={idx} className="p-3.5 flex items-center justify-between gap-2">
+                        <div>
+                          <div className="text-[10px] uppercase font-bold tracking-wider text-neutral-500">{line.label}</div>
+                          <div className="text-xs font-medium text-neutral-800 font-mono mt-0.5">{line.value}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-6 rounded-xl bg-neutral-50 border border-dashed border-neutral-300 text-center space-y-2">
+                <AlertCircle className="w-8 h-8 text-neutral-400 mx-auto" />
+                <div className="font-bold text-sm text-neutral-700">No Payout Details Configured</div>
+                <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                  This creator has not yet submitted their bank or electronic account details in their profile settings.
+                </p>
+              </div>
+            )
           ) : (
             <>
               {/* Primary Account Card */}
@@ -210,7 +235,7 @@ export default function CreatorPayoutModal({
                     Associated Payout Request
                   </div>
                   <div className="text-neutral-700 font-medium">
-                    Requested Amount: <strong className="text-black">${payout.amount_usd?.toFixed(2)} USD</strong> ({payout.video_count} videos)
+                    Requested Amount: <strong className="text-black">${payout.amount_usd?.toFixed(2)} USD</strong> ({payout.video_count > 0 ? `${payout.video_count} videos` : "Referral Bonus"})
                   </div>
                   {payout.payment_destination && (
                     <div className="text-[11px] text-neutral-600 font-mono break-all">

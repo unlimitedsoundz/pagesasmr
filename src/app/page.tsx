@@ -11,7 +11,7 @@ import HomeTestimonialsSection from '@/components/HomeTestimonialsSection';
 export const metadata: Metadata = {
   title: 'Turn Pages. Create Calming ASMR. Earn Beautifully. | The Pink Room',
   description:
-    'Join The Pink Room. Record authentic faceless page-turning ASMR. Earn $10 USD per approved video with reliable direct bank, Mobile Money & PayPal payouts.',
+    'Join The Pink Room. Record authentic faceless page-turning ASMR. Earn $10 USD per approved video with reliable direct bank, Mobile Money & Wise payouts.',
   alternates: {
     canonical: '/',
   },
@@ -81,7 +81,7 @@ export default function HomePage() {
             </div>
             <div className="md:max-w-md">
               <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                We pay $10 for every accepted faceless video. Direct bank deposits via PayPal, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($80).
+                We pay $10 for every accepted faceless video. Direct bank deposits via Wise, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($80).
               </p>
             </div>
           </div>
@@ -297,7 +297,7 @@ export default function HomePage() {
                 Request your money
               </h3>
               <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                Reach 8 approved videos to request your $80 payout via PayPal, Mobile Money, local bank transfer, or direct deposit straight to your account.
+                Reach 8 approved videos to request your $80 payout via Wise, Mobile Money, local bank transfer, or direct deposit straight to your account.
               </p>
             </div>
           </div>

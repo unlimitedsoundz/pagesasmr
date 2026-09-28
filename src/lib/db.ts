@@ -1780,11 +1780,16 @@ class PagesDatabaseService {
       }
     }
 
+    if (resolvedMethod === 'PAYPAL') {
+      throw new Error(
+        'PayPal has been discontinued as a payout method. Please update your payout details in Settings to Local Bank Transfer, African Mobile Money, Wise, or US ACH before requesting a payout.'
+      );
+    }
+
     let resolvedDestination = (paymentDestination || '').trim();
     if (!resolvedDestination && creator.payment_details) {
       const pd = creator.payment_details;
       if (resolvedMethod === 'WISE' && pd.wise_email) resolvedDestination = pd.wise_email;
-      else if (resolvedMethod === 'PAYPAL' && pd.paypal_email) resolvedDestination = pd.paypal_email;
       else if (resolvedMethod === 'NIGERIA_BANK') {
         const b = pd.nigerian_bank_name || 'Nigerian Bank';
         const num = pd.nigerian_account_number;
@@ -3072,10 +3077,47 @@ class PagesDatabaseService {
     }
   }
 
+  public deduplicateReferrals(): boolean {
+    if (!this.data.referrals || this.data.referrals.length === 0) return false;
+    const initialLen = this.data.referrals.length;
+    const byUser = new Map<string, Referral>();
+
+    for (const r of this.data.referrals) {
+      if (!r.referred_user_id) continue;
+      const existing = byUser.get(r.referred_user_id);
+      if (!existing) {
+        byUser.set(r.referred_user_id, { ...r });
+      } else {
+        const isRewarded =
+          existing.reward_status === 'REWARDED' ||
+          existing.milestone_reached ||
+          r.reward_status === 'REWARDED' ||
+          r.milestone_reached;
+        existing.milestone_reached = Boolean(isRewarded);
+        existing.reward_status = isRewarded ? 'REWARDED' : 'PENDING';
+        existing.rewarded_at = existing.rewarded_at || r.rewarded_at;
+        existing.audition_passed = Boolean(existing.audition_passed || r.audition_passed);
+        existing.videos_completed_count = Math.max(
+          existing.videos_completed_count || 0,
+          r.videos_completed_count || 0
+        );
+      }
+    }
+
+    this.data.referrals = Array.from(byUser.values());
+    const changed = this.data.referrals.length !== initialLen;
+    if (changed) {
+      this.save();
+    }
+    return changed;
+  }
+
   public async syncReferralsFromSupabase(): Promise<void> {
     try {
       let changed = false;
       if (!this.data.referrals) this.data.referrals = [];
+
+      this.deduplicateReferrals();
 
       // 1. Fetch saved referrals list from Supabase platform_settings
       const { data: refSetting, error: refErr } = await supabaseAdmin
@@ -3084,19 +3126,30 @@ class PagesDatabaseService {
         .eq('key', 'platform_referrals')
         .single();
       if (!refErr && refSetting && Array.isArray(refSetting.value)) {
-        const existingMap = new Map(this.data.referrals.map((r) => [r.id, r]));
+        const existingByUser = new Map(this.data.referrals.map((r) => [r.referred_user_id, r]));
         for (const r of refSetting.value) {
-          if (!existingMap.has(r.id)) {
+          if (!r.referred_user_id) continue;
+          if (!existingByUser.has(r.referred_user_id)) {
             this.data.referrals.push(r);
-            existingMap.set(r.id, r);
+            existingByUser.set(r.referred_user_id, r);
             changed = true;
           } else {
-            const existing = existingMap.get(r.id);
-            if (existing && r.milestone_reached && !existing.milestone_reached) {
-              existing.milestone_reached = true;
-              existing.reward_status = "REWARDED";
-              existing.rewarded_at = r.rewarded_at || new Date().toISOString();
-              changed = true;
+            const existing = existingByUser.get(r.referred_user_id);
+            if (existing) {
+              if (r.milestone_reached && !existing.milestone_reached) {
+                existing.milestone_reached = true;
+                existing.reward_status = "REWARDED";
+                existing.rewarded_at = r.rewarded_at || new Date().toISOString();
+                changed = true;
+              }
+              if ((r.videos_completed_count || 0) > (existing.videos_completed_count || 0)) {
+                existing.videos_completed_count = r.videos_completed_count;
+                changed = true;
+              }
+              if (r.audition_passed && !existing.audition_passed) {
+                existing.audition_passed = true;
+                changed = true;
+              }
             }
           }
         }
@@ -3115,7 +3168,7 @@ class PagesDatabaseService {
 
           // Check if this referral already exists
           const exists = this.data.referrals.some(
-            (r) => r.referred_user_id === rp.id && r.referrer_id === referrerId
+            (r) => r.referred_user_id === rp.id
           );
           if (!exists) {
             const referrer = this.getProfileById(referrerId);
@@ -3144,6 +3197,8 @@ class PagesDatabaseService {
           }
         }
       }
+
+      this.deduplicateReferrals();
 
       if (changed) {
         this.save();
@@ -3276,16 +3331,33 @@ class PagesDatabaseService {
   }
 
   checkAndUpdateReferralMilestone(referredUserId: string): any {
-    this.reload();
     if (!this.data.referrals) {
       this.data.referrals = [];
     }
+
+    this.deduplicateReferrals();
 
     const referralIndex = this.data.referrals.findIndex((r) => r.referred_user_id === referredUserId);
     if (referralIndex === -1) return;
 
     const referral = this.data.referrals[referralIndex];
-    if (referral.reward_status === 'REWARDED') return referral;
+    if (referral.reward_status === 'REWARDED' || referral.milestone_reached) {
+      referral.reward_status = 'REWARDED';
+      referral.milestone_reached = true;
+      return referral;
+    }
+
+    // Check if an earnings ledger entry already exists for this referral milestone
+    const existingRewardLedger = (this.data.earnings_ledger || []).find(
+      (l) => l.creator_id === referral.referrer_id && l.description && l.description.includes(referredUserId)
+    );
+    if (existingRewardLedger) {
+      referral.reward_status = 'REWARDED';
+      referral.milestone_reached = true;
+      referral.rewarded_at = referral.rewarded_at || existingRewardLedger.created_at;
+      this.save();
+      return referral;
+    }
 
     const referredUser = this.getProfileById(referredUserId);
     if (!referredUser) return;
@@ -3302,14 +3374,12 @@ class PagesDatabaseService {
       referral.milestone_reached = true;
       referral.reward_status = 'REWARDED';
       referral.rewarded_at = new Date().toISOString();
-      this.save();
-      this.syncReferralsToSupabase();
 
-      const existingRewardLedger = this.data.earnings_ledger.find(
-        (l) => l.creator_id === referral.referrer_id && l.description.includes(referredUserId)
+      const existingLedger = (this.data.earnings_ledger || []).find(
+        (l) => l.creator_id === referral.referrer_id && l.description && l.description.includes(referredUserId)
       );
 
-      if (!existingRewardLedger) {
+      if (!existingLedger) {
         const creditEntry: EarningsLedgerEntry = {
           id: ensureUuid(),
           platform_id: PLATFORM_ID,
@@ -3322,29 +3392,40 @@ class PagesDatabaseService {
         this.data.earnings_ledger.push(creditEntry);
         this.save();
         this.syncLedgerToSupabase(creditEntry);
-      }
 
-      this.createNotification({
-        user_id: referral.referrer_id,
-        title: 'Referral Bonus Unlocked! (+$35.00)',
-        message: `Congratulations! ${referral.referred_user_name} completed their audition and 8 videos milestone. $35.00 has been credited to your earnings!`,
-        type: 'PAYOUT',
-        link: '/creator/referrals',
-      });
+        // Check if unlock notification was already sent to avoid duplicate emails
+        const alreadyNotified = (this.data.notifications || []).some(
+          (n) => n.user_id === referral.referrer_id &&
+                 n.title && n.title.includes('Referral Bonus Unlocked') &&
+                 n.message && n.message.includes(referral.referred_user_name)
+        );
 
-      try {
-        const referrer = this.data.profiles.find((p) => p.id === referral.referrer_id);
-        sendNotificationEmail({
-          to: ADMIN_NOTIFICATION_EMAILS,
-          recipientName: 'Admin',
-          type: 'GENERAL',
-          title: `$35 Referral Payout Triggered for ${referrer?.display_name || 'Referrer'}`,
-          message: `Creator ${referrer?.display_name || 'Referrer'} (${referral.referrer_id}) earned a $35 referral bonus because ${referral.referred_user_name} passed audition and reached 8 approved production videos.`,
-          link: '/admin/referrals',
-        });
-      } catch (err) {
-        console.warn('Referral alert email warning:', err);
+        if (!alreadyNotified) {
+          this.createNotification({
+            user_id: referral.referrer_id,
+            title: 'Referral Bonus Unlocked! (+$35.00)',
+            message: `Congratulations! ${referral.referred_user_name} completed their audition and 8 videos milestone. $35.00 has been credited to your earnings!`,
+            type: 'PAYOUT',
+            link: '/creator/referrals',
+          });
+
+          try {
+            const referrer = this.data.profiles.find((p) => p.id === referral.referrer_id);
+            sendNotificationEmail({
+              to: ADMIN_NOTIFICATION_EMAILS,
+              recipientName: 'Admin',
+              type: 'GENERAL',
+              title: `$35 Referral Payout Triggered for ${referrer?.display_name || 'Referrer'}`,
+              message: `Creator ${referrer?.display_name || 'Referrer'} (${referral.referrer_id}) earned a $35 referral bonus because ${referral.referred_user_name} passed audition and reached 8 approved production videos.`,
+              link: '/admin/referrals',
+            });
+          } catch (err) {
+            console.warn('Referral alert email warning:', err);
+          }
+        }
       }
+      this.save();
+      this.syncReferralsToSupabase();
     }
 
     this.save();
@@ -3354,6 +3435,8 @@ class PagesDatabaseService {
   getReferralsByReferrer(referrerId: string): Referral[] {
     this.reload();
     if (!this.data.referrals) this.data.referrals = [];
+
+    this.deduplicateReferrals();
 
     const referrer = this.getProfileById(referrerId);
     const referrerCode = referrer?.referral_code || referrer?.payment_details?.referral_code;
@@ -3393,13 +3476,18 @@ class PagesDatabaseService {
       }
     }
     if (addedAny) {
+      this.deduplicateReferrals();
       this.save();
       this.syncReferralsToSupabase();
     }
 
+    const checkedUsers = new Set<string>();
     for (const referral of this.data.referrals) {
-      if (referral.referrer_id === referrerId) {
-        this.checkAndUpdateReferralMilestone(referral.referred_user_id);
+      if (referral.referrer_id === referrerId && !checkedUsers.has(referral.referred_user_id)) {
+        checkedUsers.add(referral.referred_user_id);
+        if (referral.reward_status !== 'REWARDED') {
+          this.checkAndUpdateReferralMilestone(referral.referred_user_id);
+        }
       }
     }
     return this.data.referrals.filter((r) => r.referrer_id === referrerId);
@@ -3408,6 +3496,8 @@ class PagesDatabaseService {
   getPlatformReferrals(): Referral[] {
     this.reload();
     if (!this.data.referrals) this.data.referrals = [];
+
+    this.deduplicateReferrals();
 
     const referredProfiles = this.data.profiles.filter((p) => Boolean(p.referred_by_id));
     let addedAny = false;
@@ -3436,11 +3526,19 @@ class PagesDatabaseService {
       }
     }
     if (addedAny) {
+      this.deduplicateReferrals();
       this.save();
+      this.syncReferralsToSupabase();
     }
 
+    const checkedUsers = new Set<string>();
     for (const referral of this.data.referrals) {
-      this.checkAndUpdateReferralMilestone(referral.referred_user_id);
+      if (!checkedUsers.has(referral.referred_user_id)) {
+        checkedUsers.add(referral.referred_user_id);
+        if (referral.reward_status !== 'REWARDED') {
+          this.checkAndUpdateReferralMilestone(referral.referred_user_id);
+        }
+      }
     }
     return this.data.referrals;
   }

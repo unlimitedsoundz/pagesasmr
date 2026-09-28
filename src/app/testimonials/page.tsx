@@ -169,7 +169,7 @@ export default function TestimonialsPage() {
               </div>
               <div className="md:max-w-md">
                 <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                  Upon completion of every payout, creators must upload their actual bank alert, mobile wallet receipt, or PayPal confirmation before continuing.
+                  Upon completion of every payout, creators must upload their actual bank alert, mobile wallet receipt, or payment confirmation before continuing.
                 </p>
               </div>
             </div>

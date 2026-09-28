@@ -42,7 +42,7 @@ export default function HowItWorksPage() {
       num: '05',
       title: 'Reach 8 Videos & Request Payout',
       desc: 'At eight approved, unpaid videos, your $80 payout button unlocks. Request payment for eight, ten, sixteen, or more approved videos.',
-      meta: ['8 videos = $80 minimum', 'Direct Deposit, PayPal, Mobile Money, or Local Bank', 'Earnings reserved during processing', 'Official transaction reference recorded'],
+      meta: ['8 videos = $80 minimum', 'Direct Deposit, Wise, Mobile Money, or Local Bank', 'Earnings reserved during processing', 'Official transaction reference recorded'],
     },
   ];
 

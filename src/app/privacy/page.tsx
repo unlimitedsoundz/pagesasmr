@@ -32,7 +32,7 @@ export default function PrivacyPage() {
     {
       num: '04',
       title: 'Financial & Payout Information Handling',
-      desc: 'To deliver payouts via PayPal, Mobile Money, Local Bank Transfer, or Direct Deposit (ACH), we collect routing details, bank identifiers, phone numbers, or payment emails. We use industry-standard encryption and never store raw unencrypted sensitive banking pins or credentials. Payment details are used exclusively to process verified creator disbursements.',
+      desc: 'To deliver payouts via Wise, Mobile Money, Local Bank Transfer, or Direct Deposit (ACH), we collect routing details, bank identifiers, phone numbers, or payment emails. We use industry-standard encryption and never store raw unencrypted sensitive banking pins or credentials. Payment details are used exclusively to process verified creator disbursements.',
     },
     {
       num: '05',

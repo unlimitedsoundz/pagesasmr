@@ -12,10 +12,12 @@ import {
   ArrowRight,
   MessageSquare,
   Star,
+  AlertTriangle,
 } from 'lucide-react';
 import VideoThumbnail from '@/components/VideoThumbnail';
 import StatusBadge from '@/components/StatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
+import { creatorHasDiscontinuedPayPal } from '@/lib/payoutDetails';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ToastProvider';
 import {
@@ -286,6 +288,27 @@ export default function CreatorDashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* PayPal Discontinued Warning Banner */}
+        {creatorHasDiscontinuedPayPal(data?.profile) && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-sm font-bold">Action Required: PayPal Payouts Discontinued</h2>
+                <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
+                  PayPal is no longer supported as a payout method. Please update your payout preferences in Settings to Local Bank Transfer, African Mobile Money, Wise, or US ACH to receive disbursements.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/creator/settings"
+              className="shrink-0 px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors shadow-xs"
+            >
+              Update Payout Details
+            </Link>
+          </div>
+        )}
 
         {/* Audition Approved Status Banner */}
         <div className="bg-[#f8e2ec] dark:bg-[#281420] border border-[#f0cddc] dark:border-[#421d31] rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">

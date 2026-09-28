@@ -10,6 +10,8 @@ export interface FormattedPayoutInfo {
   badgeLabel: string;
   badgeColor: string;
   isConfigured: boolean;
+  needsUpdate?: boolean;
+  warning?: string;
   bankName?: string;
   accountNumber?: string;
   accountName?: string;
@@ -225,27 +227,31 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
   }
 
   if (method === 'PAYPAL') {
-    if (paypalEmail) lines.push({ label: 'PayPal Email', value: paypalEmail, copyable: true });
+    if (paypalEmail) lines.push({ label: 'PayPal Email (Discontinued)', value: paypalEmail, copyable: true });
     if (accountName) lines.push({ label: 'Recipient Name', value: accountName, copyable: true });
+    lines.push({ label: 'Status Notice', value: 'PayPal is discontinued. Creator must update payout method to Bank Transfer, Mobile Money, Wise, or ACH.' });
     if (notes) lines.push({ label: 'Notes', value: notes });
 
     const copyText = buildFullCopyText([
-      { label: 'Payment Method', val: 'PayPal' },
+      { label: 'Payment Method', val: 'PayPal (Discontinued)' },
       { label: 'PayPal Email', val: paypalEmail },
       { label: 'Recipient Name', val: accountName },
+      { label: 'Status', val: 'Update Required (PayPal Discontinued)' },
       { label: 'Notes', val: notes },
     ]);
 
     return {
       method: 'PAYPAL',
-      methodLabel: 'PayPal',
-      badgeLabel: '💳 PayPal',
-      badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
-      isConfigured: true,
+      methodLabel: 'PayPal (Discontinued)',
+      badgeLabel: '⚠️ Update Required (PayPal)',
+      badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+      isConfigured: false,
+      needsUpdate: true,
+      warning: 'PayPal is no longer supported as a payout method. Please update your payout method in Settings.',
       email: paypalEmail,
       accountName,
       notes,
-      summary: paypalEmail || accountName || 'PayPal configured',
+      summary: `PayPal discontinued — update required (${paypalEmail || 'Email unrecorded'})`,
       fullCopyText: copyText,
       lines,
       rawDetails: d,
@@ -343,4 +349,32 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
     lines,
     rawDetails: d,
   };
+}
+
+/**
+ * Checks whether a creator or profile is configured with discontinued PayPal
+ * and has not updated to a currently active payout method (bank, mobile money, wise, ach).
+ */
+export function creatorHasDiscontinuedPayPal(creatorOrDetails: any): boolean {
+  if (!creatorOrDetails) return false;
+  const d = creatorOrDetails.payment_details || creatorOrDetails.creator_payment_details || creatorOrDetails;
+  const method = (
+    creatorOrDetails.payment_method ||
+    creatorOrDetails.creator_payment_method ||
+    d.payment_method ||
+    d.method ||
+    ''
+  ).toUpperCase();
+
+  const hasValidOther = Boolean(
+    d.nigerian_account_number || d.nigerianAccountNumber ||
+    d.mobile_money_phone || d.mobileNumber ||
+    d.wise_email || d.wiseEmail ||
+    d.routing_number || d.routingNumber ||
+    d.account_number || d.accountNumber
+  );
+
+  if (method === 'PAYPAL') return true;
+  if (!hasValidOther && (d.paypal_email || d.paypalEmail)) return true;
+  return false;
 }

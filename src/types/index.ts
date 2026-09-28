@@ -51,7 +51,8 @@ export type SampleStatus =
   | 'REVISION_REQUESTED'
   | 'REJECTED';
 
-export type PaymentMethodType = 'WISE' | 'PAYPAL' | 'ACH' | 'WIRE' | 'NIGERIA_BANK' | 'MOBILE_MONEY';
+/** Supported payout methods. PAYPAL is deprecated/discontinued. */
+export type PaymentMethodType = 'WISE' | 'ACH' | 'WIRE' | 'NIGERIA_BANK' | 'MOBILE_MONEY' | 'PAYPAL';
 
 export interface GuidelineSample {
   id: string;

@@ -14,9 +14,11 @@ import {
   Minus,
   Sparkles,
   Video,
+  AlertTriangle,
 } from 'lucide-react';
 import { PayoutRequest, PaymentMethodType } from '@/types';
 import { useToast } from '@/components/ToastProvider';
+import { creatorHasDiscontinuedPayPal } from '@/lib/payoutDetails';
 
 export default function CreatorPayoutsPage() {
   const { toast } = useToast();
@@ -113,7 +115,16 @@ export default function CreatorPayoutsPage() {
     ? effectiveMethod.replace(/_/g, ' ')
     : 'No preference selected';
 
+  const isPayPalDiscontinuedUser =
+    effectiveMethod === 'PAYPAL' ||
+    creatorHasDiscontinuedPayPal(profile) ||
+    creatorHasDiscontinuedPayPal(effectiveDetails);
+
   const handleRequestPayout = async () => {
+    if (isPayPalDiscontinuedUser) {
+      toast.error('PayPal is no longer supported as a payout method. Please update your payout preferences in Settings to Bank Transfer, Mobile Money, Wise, or ACH before requesting a payout.', 'Update Required');
+      return;
+    }
     if (!canRequest) return;
     setSubmitting(true);
     try {
@@ -188,6 +199,26 @@ export default function CreatorPayoutsPage() {
         </div>
 
         {/* ─── Top Grid (Available to Withdraw + Milestone Progress) ─── */}
+        {isPayPalDiscontinuedUser && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-sm font-bold">Action Required: PayPal Payouts Discontinued</h2>
+                <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
+                  PayPal is no longer supported as a payout method. All creators previously using PayPal must update their payout preferences to Local Bank Transfer, African Mobile Money, Wise, or US ACH in Settings before requesting a payout.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/creator/settings"
+              className="shrink-0 px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors shadow-xs"
+            >
+              Update Payout Details
+            </Link>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
           {/* Left: Available to withdraw */}
           <div className="lg:col-span-5 bg-[#130E14] text-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm">
@@ -212,7 +243,20 @@ export default function CreatorPayoutsPage() {
             </div>
 
             <div>
-              {canRequest ? (
+              {isPayPalDiscontinuedUser ? (
+                <div className="space-y-2">
+                  <Link
+                    href="/creator/settings"
+                    className="w-full py-3 px-4 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Update Payout Details (PayPal Discontinued)</span>
+                  </Link>
+                  <p className="text-[10px] text-amber-300/80 text-center font-medium">
+                    PayPal discontinued — update method to withdraw.
+                  </p>
+                </div>
+              ) : canRequest ? (
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(true)}
@@ -449,18 +493,25 @@ export default function CreatorPayoutsPage() {
                 <CreditCard className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-neutral-900 dark:text-white capitalize">
-                  {paymentPreferenceName}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-neutral-900 dark:text-white capitalize">
+                    {paymentPreferenceName}
+                  </span>
+                  {isPayPalDiscontinuedUser && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                      Discontinued
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                  {(effectiveDetails as any)?.mobile_money_phone || (effectiveDetails as any)?.mobileNumber
+                  {isPayPalDiscontinuedUser
+                    ? 'PayPal is no longer supported. Please click Manage Preference to connect your bank account or mobile wallet.'
+                    : (effectiveDetails as any)?.mobile_money_phone || (effectiveDetails as any)?.mobileNumber
                     ? `${(effectiveDetails as any).mobile_money_provider || (effectiveDetails as any).mobileNetwork || 'Mobile Money'} (${(effectiveDetails as any).mobile_money_phone || (effectiveDetails as any).mobileNumber})`
                     : (effectiveDetails as any)?.nigerian_account_number || (effectiveDetails as any)?.nigerianAccountNumber
                     ? `${(effectiveDetails as any).nigerian_bank_name || 'Bank'} ••••${((effectiveDetails as any).nigerian_account_number || (effectiveDetails as any).nigerianAccountNumber).slice(-4)}`
                     : (effectiveDetails as any)?.wise_email || (effectiveDetails as any)?.wiseEmail
                     ? `Wise: ${(effectiveDetails as any).wise_email || (effectiveDetails as any).wiseEmail}`
-                    : (effectiveDetails as any)?.paypal_email || (effectiveDetails as any)?.paypalEmail
-                    ? `PayPal: ${(effectiveDetails as any).paypal_email || (effectiveDetails as any).paypalEmail}`
                     : effectiveMethod
                     ? 'Payment method configured. You can edit details in Settings.'
                     : 'Choose a payment preference in Settings. No payment account is connected yet.'}
