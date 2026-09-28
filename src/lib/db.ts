@@ -3666,12 +3666,17 @@ class PagesDatabaseService {
         const existingIds = new Set(this.data.testimonials.map((t) => t.id));
         const existingPayoutIds = new Set(this.data.testimonials.map((t) => t.payout_id));
 
+        let changed = false;
         for (const t of data.value) {
           if (!existingIds.has(t.id) && !existingPayoutIds.has(t.payout_id)) {
             this.data.testimonials.push(t);
             existingIds.add(t.id);
             existingPayoutIds.add(t.payout_id);
+            changed = true;
           }
+        }
+        if (changed) {
+          this.save();
         }
       }
     } catch (err) {

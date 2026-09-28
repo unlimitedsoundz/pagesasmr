@@ -16923,6 +16923,23 @@
       "proof_image_url": "/api/testimonials/proofs/proof-fcde2998-8771-4c8f-9603-cb25a22afad4-bcaf887e-1790534083979.png",
       "status": "APPROVED",
       "created_at": "2026-09-27T18:34:44.461Z"
+    },
+    {
+      "id": "382d6a47-fc60-480c-8eef-f8c26fb68a0e",
+      "rating": 5,
+      "review": "I got in in my PayPal!! 😍😍 I’ve just referred a lots of creators with my referral link",
+      "status": "APPROVED",
+      "payout_id": "444a0c65-7681-4915-8c8f-8989bac44693",
+      "amount_usd": 400,
+      "created_at": "2026-09-27T23:05:32.172Z",
+      "creator_id": "2d85336b-0c34-48a9-a17f-a36028ef59d5",
+      "platform_id": "pinkroom_main",
+      "creator_name": "Ada Wunor",
+      "creator_email": "adannakanayo@gmail.com",
+      "payment_method": "NIGERIA_BANK",
+      "creator_country": "Nigeria",
+      "proof_image_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/proofs/proof-2d85336b-0c34-48a9-a17f-a36028ef59d5-444a0c65-1790550331356.png",
+      "creator_avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-2d85336b-0c34-48a9-a17f-a36028ef59d5-1788819037691.jpg"
     }
   ]
 }
