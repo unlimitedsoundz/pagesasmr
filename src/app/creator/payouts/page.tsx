@@ -15,6 +15,7 @@ import {
   Sparkles,
   Video,
   AlertTriangle,
+  Star,
 } from 'lucide-react';
 import { PayoutRequest, PaymentMethodType } from '@/types';
 import { useToast } from '@/components/ToastProvider';
@@ -466,15 +467,29 @@ export default function CreatorPayoutsPage() {
                         {new Date(p.requested_at || Date.now()).toLocaleDateString()} · {p.payment_method}
                       </div>
                     </div>
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        p.status === 'PAID'
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
-                      }`}
-                    >
-                      {p.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {p.status === 'PAID' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.dispatchEvent(new CustomEvent('open-payout-review', { detail: { payout: p } }));
+                          }}
+                          className="hidden sm:inline-flex items-center gap-1 text-[11px] text-rose-500 dark:text-rose-400 font-medium hover:underline"
+                        >
+                          <Star className="w-3 h-3 fill-rose-500 dark:fill-rose-400" />
+                          <span>Review Payout</span>
+                        </button>
+                      )}
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          p.status === 'PAID'
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
+                        }`}
+                      >
+                        {p.status}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>

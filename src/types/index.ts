@@ -210,6 +210,8 @@ export interface PayoutRequest {
   requested_at: string;
   created_at?: string;
   processed_at?: string;
+  review_prompted?: boolean;
+  review_prompted_at?: string;
 }
 
 export interface NotificationItem {

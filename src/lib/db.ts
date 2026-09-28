@@ -3690,9 +3690,25 @@ class PagesDatabaseService {
         (p) =>
           p.creator_id === creatorId &&
           p.status === 'PAID' &&
+          !p.review_prompted &&
           !reviewedPayoutIds.has(p.id)
       )
       .sort((a, b) => new Date(b.processed_at || b.requested_at).getTime() - new Date(a.processed_at || a.requested_at).getTime());
+  }
+
+  markPayoutReviewPrompted(payoutId: string, creatorId: string): boolean {
+    this.reload();
+    const payout = (this.data.payout_requests || []).find(
+      (p) => p.id === payoutId && p.creator_id === creatorId
+    );
+    if (!payout) return false;
+    if (payout.review_prompted) return true;
+
+    payout.review_prompted = true;
+    payout.review_prompted_at = new Date().toISOString();
+    this.save();
+    this.syncPayoutToSupabase(payout).catch(() => {});
+    return true;
   }
 
   createTestimonial(data: Omit<Testimonial, 'id' | 'created_at'>): Testimonial {
@@ -3722,6 +3738,8 @@ class PagesDatabaseService {
       created_at: new Date().toISOString(),
     };
 
+    payout.review_prompted = true;
+    payout.review_prompted_at = new Date().toISOString();
     this.data.testimonials.unshift(item);
     this.save();
     this.syncTestimonialToSupabase(item).catch(() => {});

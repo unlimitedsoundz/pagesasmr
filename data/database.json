@@ -12640,7 +12640,9 @@
       ],
       "payment_reference": "6374784662839",
       "requested_at": "2026-09-22T18:10:48.143+00:00",
-      "processed_at": "2026-09-26T07:19:54.675+00:00"
+      "processed_at": "2026-09-26T07:19:54.675+00:00",
+      "review_prompted": true,
+      "review_prompted_at": "2026-09-26T07:19:54.675+00:00"
     },
     {
       "id": "29dbca3e-d384-4cab-b7b5-ba74611602d4",
@@ -12667,7 +12669,9 @@
       ],
       "payment_reference": "937489273672729",
       "requested_at": "2026-09-23T13:01:33.56+00:00",
-      "processed_at": "2026-09-26T07:20:10.89+00:00"
+      "processed_at": "2026-09-26T07:20:10.89+00:00",
+      "review_prompted": true,
+      "review_prompted_at": "2026-09-26T07:20:10.89+00:00"
     }
   ],
   "notifications": [

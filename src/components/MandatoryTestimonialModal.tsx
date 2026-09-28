@@ -25,13 +25,39 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const markPayoutPrompted = (payoutId: string) => {
+    try {
+      localStorage.setItem(`pinkroom_prompted_payout_${payoutId}`, '1');
+      fetch('/api/creator/pending-testimonial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payout_id: payoutId }),
+      }).catch(() => {});
+    } catch {}
+  };
+
   const checkPending = async () => {
     try {
       const res = await fetch('/api/creator/pending-testimonial', { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       if (data.pendingPayouts && Array.isArray(data.pendingPayouts)) {
-        setPendingPayouts(data.pendingPayouts);
+        // Filter out payouts already prompted on this client session
+        const unprompted = data.pendingPayouts.filter((p: PayoutRequest) => {
+          try {
+            return !localStorage.getItem(`pinkroom_prompted_payout_${p.id}`);
+          } catch {
+            return true;
+          }
+        });
+
+        if (unprompted.length > 0) {
+          setPendingPayouts(unprompted);
+          // Immediately mark the first payout as prompted so it never appears again
+          markPayoutPrompted(unprompted[0].id);
+        } else {
+          setPendingPayouts([]);
+        }
       }
     } catch (err) {
       console.error('Failed to check pending testimonials', err);
@@ -44,11 +70,30 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
     checkPending();
 
     const handleRefresh = () => checkPending();
+    const handleOpenModal = (e: any) => {
+      if (e.detail?.payout) {
+        setPendingPayouts([e.detail.payout]);
+        setCurrentIdx(0);
+        setSubmittedSuccess(false);
+      }
+    };
+
     window.addEventListener('payout-updated', handleRefresh);
-    return () => window.removeEventListener('payout-updated', handleRefresh);
+    window.addEventListener('open-payout-review', handleOpenModal as EventListener);
+    return () => {
+      window.removeEventListener('payout-updated', handleRefresh);
+      window.removeEventListener('open-payout-review', handleOpenModal as EventListener);
+    };
   }, []);
 
   const activePayout = pendingPayouts[currentIdx];
+
+  const handleDismiss = () => {
+    if (activePayout) {
+      markPayoutPrompted(activePayout.id);
+    }
+    setPendingPayouts([]);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMsg('');
@@ -111,7 +156,7 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
     }
 
     if (!proofFile) {
-      setErrorMsg('Proof of payout is mandatory. Please upload a screenshot of your bank, wallet, or mobile money receipt.');
+      setErrorMsg('Proof of payout is required. Please upload a screenshot of your bank, wallet, or mobile money receipt.');
       return;
     }
 
@@ -133,13 +178,16 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
         throw new Error(data.error || 'Failed to submit review');
       }
 
+      markPayoutPrompted(activePayout.id);
       setSubmittedSuccess(true);
       window.dispatchEvent(new CustomEvent('testimonial-submitted'));
 
       // If more pending payouts remain, move to next after brief delay
       setTimeout(() => {
         if (currentIdx + 1 < pendingPayouts.length) {
-          setCurrentIdx((prev) => prev + 1);
+          const nextIdx = currentIdx + 1;
+          setCurrentIdx(nextIdx);
+          markPayoutPrompted(pendingPayouts[nextIdx].id);
           setReview('');
           setRating(5);
           setProofFile(null);
@@ -172,8 +220,24 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
   const currentStarVal = hoverRating ?? rating;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fade-in">
+    <div
+      className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleDismiss();
+      }}
+    >
       <div className="relative w-full max-w-lg bg-white dark:bg-[#1A1620] border border-neutral-200 dark:border-neutral-700/80 rounded-2xl shadow-2xl p-6 sm:p-8 text-neutral-900 dark:text-neutral-100 my-8">
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={handleDismiss}
+          className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-white rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+          title="Close"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         {submittedSuccess ? (
           <div className="py-12 text-center space-y-4 animate-scale-in">
             <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -187,15 +251,15 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Header */}
-            <div className="space-y-2 text-center">
+            <div className="space-y-2 text-center pt-1">
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] text-[#9D174D] dark:text-pink-300 uppercase">
-                Compulsory Payout Review
+                Payout Completed
               </span>
               <h2 className="text-2xl sm:text-3xl font-serif font-medium text-[#1C1520] dark:text-white tracking-tight">
-                Your Payout Is Completed! 🎉
+                Your Payout Is Here! 🎉
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed max-w-md mx-auto">
-                Before accessing your dashboard, please drop your star rating, review, and upload your payment receipt (screenshot or SMS).
+                We'd love to hear how your payout went! Drop a quick rating, review, and upload your payment receipt below.
               </p>
             </div>
 
@@ -273,7 +337,7 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
             {/* Proof of Payout Upload */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
-                Upload Payout Receipt * (Mandatory Screenshot / SMS)
+                Upload Payout Receipt * (Screenshot / SMS)
               </label>
 
               {proofPreview ? (
@@ -336,24 +400,34 @@ export default function MandatoryTestimonialModal({ onSuccess }: MandatoryTestim
               </div>
             )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-3.5 px-6 rounded-full bg-[#18181B] hover:bg-black text-white font-medium text-xs sm:text-sm shadow-sm hover:shadow transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Submitting Review & Receipt...</span>
-                </>
-              ) : (
-                <>
-                  <span>Submit Review & Access Dashboard</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
+            {/* Actions: Submit + Maybe Later */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-3.5 px-6 rounded-full bg-[#18181B] hover:bg-black text-white font-medium text-xs sm:text-sm shadow-sm hover:shadow transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Submitting Review & Receipt...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Submit Review & Receipt</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="w-full py-2.5 text-xs font-semibold text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 transition"
+              >
+                Maybe Later
+              </button>
+            </div>
 
             <p className="text-[11px] text-neutral-500 text-center">
               Your review and receipt will appear on The Pink Room public testimonials page.
