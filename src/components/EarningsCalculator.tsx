@@ -128,7 +128,7 @@ export default function EarningsCalculator({ initialCount = 8, showCta = true }:
               {isEligibleForPayout ? (
                 <>
                   You have reached the {minVideosForPayout}-video threshold ({videoCount} approved). You can request an immediate payout
-                  via Direct Deposit (ACH), Wise, Mobile Money, or Local Bank Transfer.
+                  via Direct Deposit (ACH), African Mobile Money, or Nigerian Local Bank Transfer.
                 </>
               ) : (
                 <>

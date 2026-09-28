@@ -229,7 +229,7 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
   if (method === 'PAYPAL') {
     if (paypalEmail) lines.push({ label: 'PayPal Email (Discontinued)', value: paypalEmail, copyable: true });
     if (accountName) lines.push({ label: 'Recipient Name', value: accountName, copyable: true });
-    lines.push({ label: 'Status Notice', value: 'PayPal is discontinued. Creator must update payout method to Bank Transfer, Mobile Money, Wise, or ACH.' });
+    lines.push({ label: 'Status Notice', value: 'PayPal is discontinued. Creator must update payout method to Bank Transfer, Mobile Money, or US ACH / Wire.' });
     if (notes) lines.push({ label: 'Notes', value: notes });
 
     const copyText = buildFullCopyText([
@@ -259,27 +259,31 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
   }
 
   if (method === 'WISE') {
-    if (wiseEmail) lines.push({ label: 'Wise Email / Account', value: wiseEmail, copyable: true });
+    if (wiseEmail) lines.push({ label: 'Wise Email (Discontinued)', value: wiseEmail, copyable: true });
     if (accountName) lines.push({ label: 'Recipient Name', value: accountName, copyable: true });
+    lines.push({ label: 'Status Notice', value: 'Wise is discontinued. Creator must update payout method to Bank Transfer, Mobile Money, or US ACH / Wire.' });
     if (notes) lines.push({ label: 'Notes', value: notes });
 
     const copyText = buildFullCopyText([
-      { label: 'Payment Method', val: 'Wise (TransferWise)' },
+      { label: 'Payment Method', val: 'Wise (Discontinued)' },
       { label: 'Wise Email', val: wiseEmail },
       { label: 'Recipient Name', val: accountName },
+      { label: 'Status', val: 'Update Required (Wise Discontinued)' },
       { label: 'Notes', val: notes },
     ]);
 
     return {
       method: 'WISE',
-      methodLabel: 'Wise (TransferWise)',
-      badgeLabel: '🌐 Wise',
-      badgeColor: 'bg-teal-50 text-teal-800 border-teal-200',
-      isConfigured: true,
+      methodLabel: 'Wise (Discontinued)',
+      badgeLabel: '⚠️ Update Required (Wise)',
+      badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+      isConfigured: false,
+      needsUpdate: true,
+      warning: 'Wise is no longer supported as a payout method. Please update your payout method in Settings.',
       email: wiseEmail,
       accountName,
       notes,
-      summary: wiseEmail || accountName || 'Wise configured',
+      summary: `Wise discontinued — update required (${wiseEmail || 'Email unrecorded'})`,
       fullCopyText: copyText,
       lines,
       rawDetails: d,

@@ -676,13 +676,17 @@ class PagesDatabaseService {
   private writeToDisk(data: DatabaseData): void {
     try {
       this.ensureDataDir();
-      fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+      const tmpPath = `${DB_FILE}.tmp.${Date.now()}`;
+      fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+      fs.renameSync(tmpPath, DB_FILE);
     } catch (err) {
       try {
         if (!fs.existsSync(TMP_DATA_DIR)) {
           fs.mkdirSync(TMP_DATA_DIR, { recursive: true });
         }
-        fs.writeFileSync(TMP_DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+        const tmpPath = `${TMP_DB_FILE}.tmp.${Date.now()}`;
+        fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+        fs.renameSync(tmpPath, TMP_DB_FILE);
       } catch (tmpErr) {
         console.warn('[Pages DB] In-memory write only:', tmpErr);
       }
@@ -1776,21 +1780,20 @@ class PagesDatabaseService {
       } else if (AFRICAN_MOBILE_MONEY_COUNTRIES.includes(creator.country)) {
         resolvedMethod = 'MOBILE_MONEY';
       } else {
-        resolvedMethod = 'WISE';
+        resolvedMethod = 'ACH';
       }
     }
 
-    if (resolvedMethod === 'PAYPAL') {
+    if (resolvedMethod === 'PAYPAL' || (resolvedMethod as any) === 'WISE') {
       throw new Error(
-        'PayPal has been discontinued as a payout method. Please update your payout details in Settings to Local Bank Transfer, African Mobile Money, Wise, or US ACH before requesting a payout.'
+        'Wise and PayPal have been discontinued as payout methods. Please update your payout details in Settings to Local Bank Transfer, African Mobile Money, or US ACH / Wire before requesting a payout.'
       );
     }
 
     let resolvedDestination = (paymentDestination || '').trim();
     if (!resolvedDestination && creator.payment_details) {
       const pd = creator.payment_details;
-      if (resolvedMethod === 'WISE' && pd.wise_email) resolvedDestination = pd.wise_email;
-      else if (resolvedMethod === 'NIGERIA_BANK') {
+      if (resolvedMethod === 'NIGERIA_BANK') {
         const b = pd.nigerian_bank_name || 'Nigerian Bank';
         const num = pd.nigerian_account_number;
         const name = pd.nigerian_account_name;

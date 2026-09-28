@@ -340,8 +340,8 @@ export default function CreatorSettingsPage() {
   };
 
   const handleSavePaymentPreference = async () => {
-    if (paymentMethod === 'PAYPAL') {
-      toast.error('PayPal has been discontinued. Please select a supported payout method (Bank Transfer, Mobile Money, Wise, or ACH) and provide your details before saving.', 'Update Required');
+    if (paymentMethod === 'PAYPAL' || paymentMethod === 'WISE') {
+      toast.error('Wise and PayPal have been discontinued as payout methods. Please select a supported payout method (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and provide your details before saving.', 'Update Required');
       return;
     }
     setSavingPayment(true);
@@ -900,15 +900,15 @@ export default function CreatorSettingsPage() {
                 </div>
               </div>
 
-              {/* Action Required Alert if user currently has PayPal configured */}
-              {(paymentMethod === 'PAYPAL' || creatorHasDiscontinuedPayPal(profile)) && (
+              {/* Action Required Alert if user currently has PayPal or Wise configured */}
+              {(paymentMethod === 'PAYPAL' || paymentMethod === 'WISE' || creatorHasDiscontinuedPayPal(profile)) && (
                 <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 space-y-1.5">
                   <div className="flex items-center gap-2 font-bold text-xs">
                     <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Action Required: PayPal Payouts Discontinued</span>
+                    <span>Action Required: {paymentMethod === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued</span>
                   </div>
                   <p className="text-xs text-amber-800 dark:text-amber-300 font-normal leading-relaxed">
-                    PayPal is no longer supported as a payout method. All creators previously using PayPal must select a supported payout method below (such as Nigerian Local Bank Transfer, African Mobile Money, Wise, or US ACH) and save their updated details to receive payouts.
+                    {paymentMethod === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. All creators previously using this method must select a supported payout method below (such as Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and save their updated details to receive payouts.
                   </p>
                 </div>
               )}
@@ -926,9 +926,11 @@ export default function CreatorSettingsPage() {
                   <option value="">No preference selected</option>
                   <option value="NIGERIA_BANK">Nigerian Local Bank Transfer (NGN Direct Deposit / NUBAN)</option>
                   <option value="MOBILE_MONEY">African Mobile Money (M-Pesa, MTN MoMo, Airtel)</option>
-                  <option value="WISE">Wise (TransferWise)</option>
                   <option value="ACH">US ACH / Direct Deposit</option>
                   <option value="WIRE">International Wire Transfer</option>
+                  {paymentMethod === 'WISE' && (
+                    <option value="WISE" disabled>Wise (Discontinued — Please select another)</option>
+                  )}
                   {paymentMethod === 'PAYPAL' && (
                     <option value="PAYPAL" disabled>PayPal (Discontinued — Please select another)</option>
                   )}
@@ -1126,27 +1128,15 @@ export default function CreatorSettingsPage() {
                 </div>
               )}
 
-              {/* Dynamic Fields for Wise */}
+              {/* Dynamic Fields for Wise (Discontinued) */}
               {paymentMethod === 'WISE' && (
-                <div className="space-y-3 p-5 rounded-xl bg-[#FDFBFD] dark:bg-[#151218] border border-neutral-200/80 dark:border-neutral-800/90">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#7B1E4B] dark:text-pink-400 pb-2 border-b border-neutral-100 dark:border-neutral-800">
-                    <Building2 className="w-4 h-4" />
-                    <span>Wise (TransferWise) Account</span>
+                <div className="space-y-3 p-5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200">
+                  <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300 pb-2 border-b border-amber-500/20">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <span>Wise is Discontinued</span>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                      Wise Recipient Email
-                    </label>
-                    <input
-                      type="email"
-                      value={wiseEmail}
-                      onChange={(e) => setWiseEmail(e.target.value)}
-                      placeholder="e.g. your-email@domain.com"
-                      className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1B1720] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B]"
-                    />
-                  </div>
-                  <p className="text-[11px] text-neutral-400">
-                    We disburse USD or your chosen currency directly into your Wise multi-currency account.
+                  <p className="text-xs text-amber-800 dark:text-amber-300 font-normal leading-relaxed">
+                    Wise has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and fill out the required account information to save your payout preferences.
                   </p>
                 </div>
               )}
@@ -1159,7 +1149,7 @@ export default function CreatorSettingsPage() {
                     <span>PayPal is Discontinued</span>
                   </div>
                   <p className="text-xs text-amber-800 dark:text-amber-300 font-normal leading-relaxed">
-                    PayPal has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, Wise, or US ACH) and fill out the required account information to save your payout preferences.
+                    PayPal has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and fill out the required account information to save your payout preferences.
                   </p>
                 </div>
               )}

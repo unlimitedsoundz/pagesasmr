@@ -115,10 +115,10 @@ export default function CreatorPayoutModal({
                 <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1.5">
                   <div className="flex items-center gap-2 font-bold text-xs">
                     <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Payout Method Discontinued (PayPal)</span>
+                    <span>Payout Method Discontinued ({info.method === 'WISE' ? 'Wise' : 'PayPal'})</span>
                   </div>
                   <p className="text-xs text-amber-800 font-normal leading-relaxed">
-                    PayPal is no longer supported on the platform. This creator must update their payout preferences in Settings to Local Bank Transfer, African Mobile Money, Wise, or US ACH before disbursements can be issued.
+                    {info.method === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported on the platform. This creator must update their payout preferences in Settings to Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire before disbursements can be issued.
                   </p>
                 </div>
                 {info.lines.length > 0 && (

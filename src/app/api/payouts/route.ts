@@ -61,6 +61,16 @@ export async function POST(req: NextRequest) {
       paymentMethod = profile.payment_method;
     }
 
+    if (paymentMethod === 'PAYPAL' || paymentMethod === 'WISE') {
+      return NextResponse.json(
+        {
+          error:
+            'Wise and PayPal have been discontinued as payout methods. Please update your payout details in Settings to Nigerian Bank Transfer, African Mobile Money, or US ACH / Wire before requesting a payout.',
+        },
+        { status: 400 }
+      );
+    }
+
     const payout = db.requestPayout(
       user.id,
       paymentMethod as PaymentMethodType | undefined,

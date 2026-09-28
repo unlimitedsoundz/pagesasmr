@@ -32,7 +32,7 @@ export default function CreatorPayoutsPage() {
   // Request payout modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [method, setMethod] = useState<PaymentMethodType>('WISE');
+  const [method, setMethod] = useState<PaymentMethodType>('NIGERIA_BANK');
   const [destination, setDestination] = useState('');
 
   useEffect(() => {
@@ -115,14 +115,15 @@ export default function CreatorPayoutsPage() {
     ? effectiveMethod.replace(/_/g, ' ')
     : 'No preference selected';
 
-  const isPayPalDiscontinuedUser =
+  const isDiscontinuedMethodUser =
     effectiveMethod === 'PAYPAL' ||
+    effectiveMethod === 'WISE' ||
     creatorHasDiscontinuedPayPal(profile) ||
     creatorHasDiscontinuedPayPal(effectiveDetails);
 
   const handleRequestPayout = async () => {
-    if (isPayPalDiscontinuedUser) {
-      toast.error('PayPal is no longer supported as a payout method. Please update your payout preferences in Settings to Bank Transfer, Mobile Money, Wise, or ACH before requesting a payout.', 'Update Required');
+    if (isDiscontinuedMethodUser) {
+      toast.error('Wise and PayPal are no longer supported as payout methods. Please update your payout preferences in Settings to Nigerian Bank Transfer, African Mobile Money, or US ACH / Wire before requesting a payout.', 'Update Required');
       return;
     }
     if (!canRequest) return;
@@ -199,14 +200,14 @@ export default function CreatorPayoutsPage() {
         </div>
 
         {/* ─── Top Grid (Available to Withdraw + Milestone Progress) ─── */}
-        {isPayPalDiscontinuedUser && (
+        {isDiscontinuedMethodUser && (
           <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <h2 className="text-sm font-bold">Action Required: PayPal Payouts Discontinued</h2>
+                <h2 className="text-sm font-bold">Action Required: {effectiveMethod === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued</h2>
                 <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
-                  PayPal is no longer supported as a payout method. All creators previously using PayPal must update their payout preferences to Local Bank Transfer, African Mobile Money, Wise, or US ACH in Settings before requesting a payout.
+                  {effectiveMethod === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. All creators previously using this method must update their payout preferences to Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire in Settings before requesting a payout.
                 </p>
               </div>
             </div>
@@ -243,17 +244,17 @@ export default function CreatorPayoutsPage() {
             </div>
 
             <div>
-              {isPayPalDiscontinuedUser ? (
+              {isDiscontinuedMethodUser ? (
                 <div className="space-y-2">
                   <Link
                     href="/creator/settings"
                     className="w-full py-3 px-4 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2"
                   >
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>Update Payout Details (PayPal Discontinued)</span>
+                    <span>Update Payout Details (Method Discontinued)</span>
                   </Link>
                   <p className="text-[10px] text-amber-300/80 text-center font-medium">
-                    PayPal discontinued — update method to withdraw.
+                    Wise & PayPal discontinued — update method to withdraw.
                   </p>
                 </div>
               ) : canRequest ? (
@@ -497,21 +498,21 @@ export default function CreatorPayoutsPage() {
                   <span className="text-sm font-semibold text-neutral-900 dark:text-white capitalize">
                     {paymentPreferenceName}
                   </span>
-                  {isPayPalDiscontinuedUser && (
+                  {isDiscontinuedMethodUser && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
                       Discontinued
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                  {isPayPalDiscontinuedUser
-                    ? 'PayPal is no longer supported. Please click Manage Preference to connect your bank account or mobile wallet.'
+                  {isDiscontinuedMethodUser
+                    ? 'Wise and PayPal are no longer supported. Please click Manage Preference to connect your Nigerian bank, mobile money, or ACH account.'
                     : (effectiveDetails as any)?.mobile_money_phone || (effectiveDetails as any)?.mobileNumber
                     ? `${(effectiveDetails as any).mobile_money_provider || (effectiveDetails as any).mobileNetwork || 'Mobile Money'} (${(effectiveDetails as any).mobile_money_phone || (effectiveDetails as any).mobileNumber})`
                     : (effectiveDetails as any)?.nigerian_account_number || (effectiveDetails as any)?.nigerianAccountNumber
                     ? `${(effectiveDetails as any).nigerian_bank_name || 'Bank'} ••••${((effectiveDetails as any).nigerian_account_number || (effectiveDetails as any).nigerianAccountNumber).slice(-4)}`
-                    : (effectiveDetails as any)?.wise_email || (effectiveDetails as any)?.wiseEmail
-                    ? `Wise: ${(effectiveDetails as any).wise_email || (effectiveDetails as any).wiseEmail}`
+                    : (effectiveDetails as any)?.bank_name || (effectiveDetails as any)?.account_number || (effectiveDetails as any)?.accountNumber
+                    ? `ACH / Wire: ${(effectiveDetails as any).bank_name || 'Bank'}`
                     : effectiveMethod
                     ? 'Payment method configured. You can edit details in Settings.'
                     : 'Choose a payment preference in Settings. No payment account is connected yet.'}

@@ -289,15 +289,15 @@ export default function CreatorDashboardPage() {
           </div>
         </div>
 
-        {/* PayPal Discontinued Warning Banner */}
-        {creatorHasDiscontinuedPayPal(data?.profile) && (
+        {/* Discontinued Method Warning Banner */}
+        {(data?.profile?.payment_method === 'WISE' || creatorHasDiscontinuedPayPal(data?.profile)) && (
           <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <h2 className="text-sm font-bold">Action Required: PayPal Payouts Discontinued</h2>
+                <h2 className="text-sm font-bold">Action Required: {data?.profile?.payment_method === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued</h2>
                 <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
-                  PayPal is no longer supported as a payout method. Please update your payout preferences in Settings to Local Bank Transfer, African Mobile Money, Wise, or US ACH to receive disbursements.
+                  {data?.profile?.payment_method === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. Please update your payout preferences in Settings to Nigerian Bank Transfer, African Mobile Money, or US ACH / Wire to receive disbursements.
                 </p>
               </div>
             </div>

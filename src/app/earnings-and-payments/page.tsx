@@ -14,7 +14,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Earnings & Payments | Guaranteed $10/Video Payouts | The Pink Room — Page Turning',
   description:
-    'Transparent compensation model: Earn flat $10 USD per approved page-turning video. Minimum 8-video ($80) payout threshold via Wise, Mobile Money, Local Bank Transfer, or Direct Deposit.',
+    'Transparent compensation model: Earn flat $10 USD per approved page-turning video. Minimum 8-video ($80) payout threshold via Mobile Money, Local Bank Transfer, or Direct Deposit (ACH).',
   alternates: {
     canonical: '/earnings-and-payments',
   },
@@ -43,8 +43,8 @@ export default function EarningsAndPaymentsPage() {
     {
       num: '04',
       title: 'Direct Disbursements With Bank Reference',
-      desc: 'Once your payout is released, your creator transaction ledger records the official bank confirmation number, Wise transfer reference, Mobile Money reference, or local bank transfer ID for complete auditability.',
-      meta: ['Official transaction reference', 'ACH, Wise, Mobile Money, Local Bank & Wire', 'Non-reversible paid earnings'],
+      desc: 'Once your payout is released, your creator transaction ledger records the official bank confirmation number, ACH trace number, Mobile Money reference, or local bank transfer ID for complete auditability.',
+      meta: ['Official transaction reference', 'ACH, Mobile Money, Local Bank & Wire', 'Non-reversible paid earnings'],
     },
   ];
 
@@ -64,11 +64,7 @@ export default function EarningsAndPaymentsPage() {
       icon: Building2,
       desc: 'Direct electronic funds transfer to any US checking or savings account with zero creator fees.',
     },
-    {
-      name: 'Wise (TransferWise)',
-      icon: CreditCard,
-      desc: 'Instant direct multi-currency transfer straight to your Wise account worldwide.',
-    },
+
     {
       name: 'International Wire Transfer',
       icon: Globe2,
@@ -89,7 +85,7 @@ export default function EarningsAndPaymentsPage() {
             Direct payouts.
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            We pay $10 for every accepted faceless video. Direct bank deposits via Wise, Mobile Money, or local bank transfer. Payout threshold is 8 approved videos ($80).
+            We pay $10 for every accepted faceless video. Direct bank deposits via Mobile Money, Nigerian bank transfer, or Direct Deposit (ACH). Payout threshold is 8 approved videos ($80).
           </p>
         </div>
       </section>

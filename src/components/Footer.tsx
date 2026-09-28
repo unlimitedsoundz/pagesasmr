@@ -82,7 +82,7 @@ export default function Footer() {
               SUPPORTED PAYMENT<br className="hidden sm:inline" /> METHODS
             </h4>
             <p className="text-xs sm:text-sm leading-relaxed !text-white/80">
-              Direct bank transfer, African Mobile Money, Wise, US ACH, and international wire transfer where available. Availability, fees, and timing depend on your country and payment setup.
+              Direct bank transfer, African Mobile Money, US ACH Direct Deposit, and international wire transfer where available. Availability, fees, and timing depend on your country and payment setup.
             </p>
           </div>
         </div>

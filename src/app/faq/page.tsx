@@ -49,7 +49,7 @@ export default function FaqPage() {
     },
     {
       q: 'How are payouts sent to creators?',
-      a: 'Payouts are disbursed via Direct Deposit (ACH for US creators), Wise, Mobile Money (M-Pesa, MTN, Airtel), Local Bank Transfer, or Wire Transfer. Every completed payout is logged with an official bank reference or transaction code.',
+      a: 'Payouts are disbursed via Direct Deposit (ACH for US creators), African Mobile Money (M-Pesa, MTN, Airtel), Nigerian Local Bank Transfer, or International Wire Transfer. Every completed payout is logged with an official bank reference or transaction code.',
     },
     {
       q: 'Are there any fees or hidden subscription costs to join?',
