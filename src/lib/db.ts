@@ -3754,6 +3754,28 @@ class PagesDatabaseService {
     }
   }
 
+  public async deleteTestimonial(idOrPayoutId: string): Promise<boolean> {
+    if (!this.data.testimonials) return false;
+    const initialLen = this.data.testimonials.length;
+    this.data.testimonials = this.data.testimonials.filter(
+      (t) => t.id !== idOrPayoutId && t.payout_id !== idOrPayoutId
+    );
+    const changed = this.data.testimonials.length !== initialLen;
+    if (changed) {
+      this.save();
+      try {
+        await supabaseAdmin.from('platform_settings').upsert({
+          key: 'platform_testimonials',
+          value: this.data.testimonials,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('Failed to sync deleted testimonial to platform_settings in pinkroom-pages:', err);
+      }
+    }
+    return changed;
+  }
+
   public async syncTestimonialsFromSupabase(): Promise<Testimonial[]> {
     try {
       const { data, error } = await supabaseAdmin
@@ -3763,20 +3785,9 @@ class PagesDatabaseService {
         .maybeSingle();
 
       if (!error && Array.isArray(data?.value)) {
-        if (!this.data.testimonials) this.data.testimonials = [];
-        const existingIds = new Set(this.data.testimonials.map((t) => t.id));
-        const existingPayoutIds = new Set(this.data.testimonials.map((t) => t.payout_id));
-
-        let changed = false;
-        for (const t of data.value) {
-          if (!existingIds.has(t.id) && !existingPayoutIds.has(t.payout_id)) {
-            this.data.testimonials.push(t);
-            existingIds.add(t.id);
-            existingPayoutIds.add(t.payout_id);
-            changed = true;
-          }
-        }
-        if (changed) {
+        const prev = JSON.stringify(this.data.testimonials || []);
+        this.data.testimonials = data.value;
+        if (JSON.stringify(this.data.testimonials) !== prev) {
           this.save();
         }
       }

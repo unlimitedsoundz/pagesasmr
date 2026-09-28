@@ -18,6 +18,7 @@ import {
   Settings,
   MessageSquare,
   Check,
+  ExternalLink,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -294,6 +295,242 @@ export default function Navbar() {
     window.location.href = '/auth/login';
   };
 
+  if (isAdminView) {
+    return (
+      <header className="sticky top-0 z-40 bg-white dark:bg-[#120F15] border-b border-neutral-200/80 dark:border-neutral-800 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Bar: Brand, Live Status, Theme, Notifs, Live Chat, Profile, Logout */}
+          <div className="flex items-center justify-between h-16">
+            {/* Left: Brand + Console Tag + Live System Pill */}
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <NextLink href="/admin" className="flex items-center group py-1 shrink-0">
+                <img
+                  src="/the-pink-room-logo.png"
+                  alt="The Pink Room"
+                  className="h-8 sm:h-9 w-auto object-contain"
+                />
+              </NextLink>
+              <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800 hidden sm:block" />
+              <span className="text-[10px] tracking-[0.2em] font-bold text-neutral-400 dark:text-neutral-500 uppercase hidden sm:inline-block">
+                OPERATIONS CONSOLE
+              </span>
+              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Live System</span>
+              </div>
+            </div>
+
+            {/* Right: Actions & Profile */}
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Public Site Link */}
+              <NextLink
+                href="/"
+                target="_blank"
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                title="View public website in new tab"
+              >
+                <span>View Site</span>
+                <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+              </NextLink>
+
+              <ThemeToggle />
+
+              {/* Notification Bell */}
+              <div className="relative" ref={notifRef}>
+                <button
+                  type="button"
+                  onClick={() => setNotifDropdownOpen((prev) => !prev)}
+                  className="relative p-2 rounded-lg text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadNotifs > 0 && (
+                    <span className="absolute top-1 right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center leading-none">
+                      {unreadNotifs > 9 ? '9+' : unreadNotifs}
+                    </span>
+                  )}
+                </button>
+
+                {/* Dropdown menu */}
+                {notifDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-80 max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 overflow-hidden text-neutral-900 dark:text-white">
+                    <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
+                      <span className="font-serif font-bold text-sm">Notifications</span>
+                      {unreadNotifs > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleMarkAllRead}
+                          className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800">
+                      {notifications.length === 0 ? (
+                        <div className="p-6 text-center text-xs text-neutral-500 font-medium">
+                          No notifications yet
+                        </div>
+                      ) : (
+                        notifications.slice(0, 5).map((n) => (
+                          <NextLink
+                            key={n.id}
+                            href={n.link || '/admin/submissions'}
+                            onClick={() => setNotifDropdownOpen(false)}
+                            className={`p-3 block hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors text-xs space-y-1 ${
+                              !n.is_read ? 'bg-neutral-50/80 dark:bg-neutral-800/80 border-l-2 border-l-black dark:border-l-white' : ''
+                            }`}
+                          >
+                            <div className="font-semibold text-neutral-900 dark:text-white flex items-center justify-between">
+                              <span className="truncate pr-2">{n.title}</span>
+                              {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />}
+                            </div>
+                            <p className="text-[11px] text-neutral-600 dark:text-neutral-300 line-clamp-2">{n.message}</p>
+                          </NextLink>
+                        ))
+                      )}
+                    </div>
+                    <div className="p-2.5 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800 text-center">
+                      <NextLink
+                        href="/admin/audit"
+                        onClick={() => setNotifDropdownOpen(false)}
+                        className="text-xs font-semibold text-neutral-900 dark:text-white hover:underline"
+                      >
+                        View audit trail &rarr;
+                      </NextLink>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Live Chat */}
+              <NextLink
+                href="/admin/chat"
+                className="p-2 rounded-lg text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                title="Admin Live Chat"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </NextLink>
+
+              {/* Admin Avatar & Profile Button */}
+              <NextLink
+                href="/admin/settings"
+                className="flex items-center gap-2 pl-1 group text-xs font-semibold text-neutral-900 dark:text-white hover:opacity-85 transition-opacity"
+                title="Admin Settings & Profile"
+              >
+                <div className="w-7 h-7 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-black flex items-center justify-center text-[10px] font-bold shrink-0">
+                  {user?.display_name
+                    ? user.display_name.substring(0, 2).toUpperCase()
+                    : 'AD'}
+                </div>
+                <span className="hidden sm:inline-block max-w-[120px] truncate text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                  {user?.display_name || 'Admin'}
+                </span>
+              </NextLink>
+
+              {/* Sign Out Button */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-bold transition-colors ml-1"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5 mr-1" />
+                <span>Sign Out</span>
+              </button>
+
+              {/* Mobile Hamburger Toggle */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                className="md:hidden p-2 rounded-lg text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none"
+                aria-label="Toggle Navigation Menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Subnav Row (Desktop Only) - Beautifully Spaced Horizontal Navigation */}
+          <div className="border-t border-neutral-200/70 dark:border-neutral-800/80 hidden md:flex items-center justify-between">
+            <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-2">
+              {adminLinks.map((link) => {
+                const isExact = link.href === '/admin';
+                const isActive = isExact ? pathname === link.href : pathname.startsWith(link.href);
+                return (
+                  <NextLink
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3 py-1.5 rounded-lg text-xs transition-all shrink-0 flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-bold shadow-2xs'
+                        : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800/80 font-medium'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                  </NextLink>
+                );
+              })}
+            </nav>
+
+            <div className="text-[9px] uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-500 font-semibold hidden lg:block shrink-0 pl-4">
+              OPERATIONS PORTAL
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Admin Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#120F15] px-4 py-3 space-y-2 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150">
+            <nav className="flex flex-col space-y-1">
+              {adminLinks.map((link) => {
+                const isExact = link.href === '/admin';
+                const isActive = isExact ? pathname === link.href : pathname.startsWith(link.href);
+                return (
+                  <NextLink
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
+                        : 'text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    <ChevronRight className="w-3.5 h-3.5 opacity-40" />
+                  </NextLink>
+                );
+              })}
+            </nav>
+
+            <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-1">
+              <NextLink
+                href="/admin/settings"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                <span>Admin Settings</span>
+                <Settings className="w-3.5 h-3.5 opacity-50" />
+              </NextLink>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-left"
+              >
+                <span>Sign Out</span>
+                <LogOut className="w-3.5 h-3.5 opacity-50" />
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+    );
+  }
+
   if (isCreatorView) {
     return (
       <header className="sticky top-0 z-40 bg-white dark:bg-[#120F15] border-b border-neutral-200/80 dark:border-neutral-800 transition-colors">
@@ -548,8 +785,8 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 text-xs lg:text-sm font-bold text-black dark:text-[#F0F0F6]">
-            {activeNavLinks.map((link) => {
-              const isExact = link.href === '/admin' || link.href === '/creator' || link.href === '/';
+            {publicLinks.map((link) => {
+              const isExact = link.href === '/';
               const isActive = isExact ? pathname === link.href : pathname.startsWith(link.href);
               return (
                 <NextLink
