@@ -902,14 +902,20 @@ export default function CreatorSettingsPage() {
 
               {/* Action Required Alert if user currently has PayPal or Wise configured */}
               {(paymentMethod === 'PAYPAL' || paymentMethod === 'WISE' || creatorHasDiscontinuedPayPal(profile)) && (
-                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 space-y-1.5">
-                  <div className="flex items-center gap-2 font-bold text-xs">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Action Required: {paymentMethod === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued</span>
+                <div className="w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-6 sm:p-7 transition-all text-left shadow-xs">
+                  <div className="flex items-start gap-4 sm:gap-5">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-[#2F1C2A] shadow-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <AlertTriangle className="w-5 h-5 text-[#721C38] dark:text-pink-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#2A0E19] dark:text-[#FDF2F7] leading-tight tracking-tight">
+                        Action Required: {paymentMethod === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#7D5B6A] dark:text-[#D1B5C3] mt-2 leading-relaxed">
+                        {paymentMethod === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. All creators previously using this method must select a supported payout method below (such as Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and save their updated details to receive payouts.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 font-normal leading-relaxed">
-                    {paymentMethod === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. All creators previously using this method must select a supported payout method below (such as Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and save their updated details to receive payouts.
-                  </p>
                 </div>
               )}
 
@@ -1130,27 +1136,39 @@ export default function CreatorSettingsPage() {
 
               {/* Dynamic Fields for Wise (Discontinued) */}
               {paymentMethod === 'WISE' && (
-                <div className="space-y-3 p-5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200">
-                  <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300 pb-2 border-b border-amber-500/20">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    <span>Wise is Discontinued</span>
+                <div className="w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-5 sm:p-6 transition-all text-left shadow-xs">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#2F1C2A] shadow-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <AlertTriangle className="w-4 h-4 text-[#721C38] dark:text-pink-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-serif text-lg sm:text-xl font-normal text-[#2A0E19] dark:text-[#FDF2F7] leading-tight">
+                        Wise is Discontinued
+                      </h4>
+                      <p className="text-xs text-[#7D5B6A] dark:text-[#D1B5C3] mt-1.5 leading-relaxed">
+                        Wise has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and fill out the required account information to save your payout preferences.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 font-normal leading-relaxed">
-                    Wise has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and fill out the required account information to save your payout preferences.
-                  </p>
                 </div>
               )}
 
               {/* Dynamic Fields for PayPal (Discontinued) */}
               {paymentMethod === 'PAYPAL' && (
-                <div className="space-y-3 p-5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200">
-                  <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300 pb-2 border-b border-amber-500/20">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    <span>PayPal is Discontinued</span>
+                <div className="w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-5 sm:p-6 transition-all text-left shadow-xs">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-[#2F1C2A] shadow-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <AlertTriangle className="w-4 h-4 text-[#721C38] dark:text-pink-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-serif text-lg sm:text-xl font-normal text-[#2A0E19] dark:text-[#FDF2F7] leading-tight">
+                        PayPal is Discontinued
+                      </h4>
+                      <p className="text-xs text-[#7D5B6A] dark:text-[#D1B5C3] mt-1.5 leading-relaxed">
+                        PayPal has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and fill out the required account information to save your payout preferences.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 font-normal leading-relaxed">
-                    PayPal has been removed as an eligible payout method. Please choose another method from the dropdown above (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and fill out the required account information to save your payout preferences.
-                  </p>
                 </div>
               )}
 

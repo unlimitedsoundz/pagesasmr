@@ -291,22 +291,29 @@ export default function CreatorDashboardPage() {
 
         {/* Discontinued Method Warning Banner */}
         {(data?.profile?.payment_method === 'WISE' || creatorHasDiscontinuedPayPal(data?.profile)) && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <h2 className="text-sm font-bold">Action Required: {data?.profile?.payment_method === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued</h2>
-                <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
-                  {data?.profile?.payment_method === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. Please update your payout preferences in Settings to Nigerian Bank Transfer, African Mobile Money, or US ACH / Wire to receive disbursements.
+          <div className="w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-6 sm:p-8 lg:p-10 transition-all text-left shadow-xs">
+            <div className="flex items-start gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white dark:bg-[#2F1C2A] shadow-xs flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-[#721C38] dark:text-pink-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-serif text-2xl sm:text-3xl lg:text-[2.1rem] font-normal text-[#2A0E19] dark:text-[#FDF2F7] leading-tight tracking-tight">
+                  Action Required: {data?.profile?.payment_method === 'WISE' ? 'Wise' : 'PayPal'} Payouts Discontinued
+                </h2>
+                <p className="text-xs sm:text-sm text-[#7D5B6A] dark:text-[#D1B5C3] mt-2 sm:mt-2.5 leading-relaxed max-w-xl">
+                  {data?.profile?.payment_method === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported as a payout method. All creators previously using this method must update their payout preferences in Settings to Nigerian Bank Transfer, African Mobile Money, or US ACH / Wire to receive disbursements.
                 </p>
+                <div className="mt-5 sm:mt-6">
+                  <Link
+                    href="/creator/settings"
+                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-[#721C38] hover:bg-[#5C152D] text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-md"
+                  >
+                    <span>Update Payout Details</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
             </div>
-            <Link
-              href="/creator/settings"
-              className="shrink-0 px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors shadow-xs"
-            >
-              Update Payout Details
-            </Link>
           </div>
         )}
 

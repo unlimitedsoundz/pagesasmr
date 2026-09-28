@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
+  AlertTriangle,
   Ban,
 } from 'lucide-react';
 import { formatCreatorPayoutInfo, FormattedPayoutInfo } from '@/lib/payoutDetails';
@@ -112,14 +113,20 @@ export default function CreatorPayoutModal({
           {!info.isConfigured ? (
             info.needsUpdate ? (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1.5">
-                  <div className="flex items-center gap-2 font-bold text-xs">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Payout Method Discontinued ({info.method === 'WISE' ? 'Wise' : 'PayPal'})</span>
+                <div className="w-full bg-[#FCEBF2] border border-[#F3D3E1] rounded-2xl p-4 sm:p-5 transition-all text-left shadow-xs">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-10 h-10 rounded-full bg-white shadow-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <AlertTriangle className="w-4 h-4 text-[#721C38]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-serif text-base sm:text-lg font-normal text-[#2A0E19] leading-tight">
+                        Payout Method Discontinued ({info.method === 'WISE' ? 'Wise' : 'PayPal'})
+                      </h4>
+                      <p className="text-xs text-[#7D5B6A] mt-1.5 leading-relaxed">
+                        {info.method === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported on the platform. This creator must update their payout preferences in Settings to Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire before disbursements can be issued.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-amber-800 font-normal leading-relaxed">
-                    {info.method === 'WISE' ? 'Wise' : 'PayPal'} is no longer supported on the platform. This creator must update their payout preferences in Settings to Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire before disbursements can be issued.
-                  </p>
                 </div>
                 {info.lines.length > 0 && (
                   <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-xs divide-y divide-neutral-100">
