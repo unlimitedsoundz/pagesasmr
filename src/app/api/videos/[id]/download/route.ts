@@ -21,8 +21,8 @@ const TMP_UPLOADS_DIR = path.join(os.tmpdir(), 'uploads');
  * 
  * Sets Content-Disposition: attachment on all responses.
  */
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const rawId = params.id;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: rawId } = await params;
 
   // 1. Check if this is a guideline benchmark sample
   let isGuidelineSample =

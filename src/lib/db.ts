@@ -4055,16 +4055,28 @@ class PagesDatabaseService {
         const supaList: Testimonial[] = data.value;
         const currentList: Testimonial[] = this.data.testimonials || [];
         const supaMap = new Map(supaList.map((t) => [t.id, t]));
-        const merged: Testimonial[] = [...supaList];
-        for (const local of currentList) {
-          if (!supaMap.has(local.id)) {
-            merged.push(local);
-          }
-        }
+        
+        // Preserve any recent local testimonials (within last 10 mins) not yet in Supabase
+        const localUnsynced = currentList.filter(
+          (local) => !supaMap.has(local.id) && Date.now() - new Date(local.created_at).getTime() < 1000 * 60 * 10
+        );
+
+        const merged: Testimonial[] = [...supaList, ...localUnsynced];
         const prev = JSON.stringify(this.data.testimonials || []);
         this.data.testimonials = merged;
         if (JSON.stringify(this.data.testimonials) !== prev) {
           this.save();
+        }
+
+        // If local items were missing from Supabase, push the merged list back to Supabase
+        if (localUnsynced.length > 0) {
+          try {
+            await supabaseAdmin.from('platform_settings').upsert({
+              key: 'platform_testimonials',
+              value: merged,
+              updated_at: new Date().toISOString(),
+            });
+          } catch {}
         }
       }
     } catch (err) {

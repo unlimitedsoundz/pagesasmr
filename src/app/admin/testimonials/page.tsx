@@ -159,7 +159,7 @@ export default function AdminTestimonialsPage() {
             Testimonials & Reviews Moderation
           </h1>
           <p className="text-xs text-neutral-300 font-medium max-w-2xl">
-            Review creator payout testimonials and bank receipts before they appear publicly on the public testimonials showcase.
+            Review creator payout testimonials and bank receipts before they appear publicly on the public testimonials showcase across both platforms.
           </p>
         </div>
 

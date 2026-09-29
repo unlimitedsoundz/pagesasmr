@@ -21,10 +21,11 @@ const MIME_MAP: Record<string, string> = {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { filename: string } }
+  { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
-    const filename = path.basename(params.filename);
+    const { filename: rawFilename } = await params;
+    const filename = path.basename(rawFilename);
     const possiblePaths = [
       path.join(PROOFS_DIR, filename),
       path.join(TMP_PROOFS_DIR, filename),

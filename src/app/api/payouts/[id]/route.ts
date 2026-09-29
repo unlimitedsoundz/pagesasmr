@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const adminUser = await requireAdmin();
     const body = await req.json();
     const { action, paymentReference, reason } = body;
@@ -13,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     switch (action) {
       case 'MARK_PROCESSING':
-        updatedPayout = db.markPayoutProcessing(params.id, adminUser);
+        updatedPayout = db.markPayoutProcessing(id, adminUser);
         break;
 
       case 'CONFIRM_PAID':
@@ -23,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             { status: 400 }
           );
         }
-        updatedPayout = db.confirmPayoutPaid(params.id, paymentReference.trim(), adminUser);
+        updatedPayout = db.confirmPayoutPaid(id, paymentReference.trim(), adminUser);
         break;
 
       case 'CANCEL':
@@ -33,7 +34,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             { status: 400 }
           );
         }
-        updatedPayout = db.cancelOrFailPayout(params.id, reason.trim(), adminUser, false);
+        updatedPayout = db.cancelOrFailPayout(id, reason.trim(), adminUser, false);
         break;
 
       case 'FAIL':
@@ -43,7 +44,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             { status: 400 }
           );
         }
-        updatedPayout = db.cancelOrFailPayout(params.id, reason.trim(), adminUser, true);
+        updatedPayout = db.cancelOrFailPayout(id, reason.trim(), adminUser, true);
         break;
 
       case 'REFUND':
@@ -53,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             { status: 400 }
           );
         }
-        updatedPayout = db.refundPayout(params.id, reason.trim(), adminUser);
+        updatedPayout = db.refundPayout(id, reason.trim(), adminUser);
         break;
 
       default:

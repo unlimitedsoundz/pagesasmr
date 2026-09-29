@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 import { isUserBlacklisted, isEmailBlacklisted } from '@/lib/blacklist';
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionUserId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   const user = await getCurrentUser();
 

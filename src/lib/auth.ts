@@ -7,7 +7,7 @@ export const SESSION_COOKIE_NAME = 'asmr_session_user';
 export const BANNED_DEVICE_COOKIE = 'pinkroom_banned_device';
 
 export async function getCurrentUser(): Promise<Profile | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   let sessionUserId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
   if (!sessionUserId) {

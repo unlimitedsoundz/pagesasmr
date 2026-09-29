@@ -4,8 +4,9 @@ import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { supabaseAdmin } from '@/lib/supabase';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const adminUser = await requireAdmin();
     const { action, feedback } = await req.json();
 
@@ -17,21 +18,21 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     switch (action) {
       case 'APPROVE':
-        updatedSubmission = db.approveSubmission(params.id, adminUser);
+        updatedSubmission = db.approveSubmission(id, adminUser);
         break;
 
       case 'REJECT':
         if (!feedback || feedback.trim().length === 0) {
           return NextResponse.json({ error: 'Specific guideline violation reason is required to reject.' }, { status: 400 });
         }
-        updatedSubmission = db.rejectSubmission(params.id, feedback, adminUser);
+        updatedSubmission = db.rejectSubmission(id, feedback, adminUser);
         break;
 
       case 'REQUEST_REVISION':
         if (!feedback || feedback.trim().length === 0) {
           return NextResponse.json({ error: 'Revision guidance notes are required to request changes.' }, { status: 400 });
         }
-        updatedSubmission = db.requestRevision(params.id, feedback, adminUser);
+        updatedSubmission = db.requestRevision(id, feedback, adminUser);
         break;
 
       default:

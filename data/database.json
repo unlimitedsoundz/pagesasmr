@@ -19749,22 +19749,6 @@
   ],
   "testimonials": [
     {
-      "id": "a71e3609-b68e-4a62-a509-38f3227928d1",
-      "platform_id": "pinkroom_main",
-      "creator_id": "fcde2998-8771-4c8f-9603-cb25a22afad4",
-      "creator_name": "Justina Ifeanyichukwu",
-      "creator_email": "ifeanyichukwujustina@gmail.com",
-      "creator_country": "Nigeria",
-      "payout_id": "bcaf887e-dfd9-46e9-a503-54cbd8532e74",
-      "amount_usd": 80,
-      "payment_method": "NIGERIA_BANK",
-      "rating": 5,
-      "review": "Received my payout of ₦88,800 directly into my UBA account! Fast and smooth transaction from The Pink Room.",
-      "proof_image_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/proofs/proof-fcde2998-8771-4c8f-9603-cb25a22afad4-bcaf887e-1790534083979.png",
-      "status": "APPROVED",
-      "created_at": "2026-09-27T18:34:44.461Z"
-    },
-    {
       "id": "382d6a47-fc60-480c-8eef-f8c26fb68a0e",
       "rating": 5,
       "review": "I got in in my PayPal!! 😍😍 I’ve just referred a lots of creators with my referral link",
@@ -19780,6 +19764,22 @@
       "creator_country": "Nigeria",
       "proof_image_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/proofs/proof-2d85336b-0c34-48a9-a17f-a36028ef59d5-444a0c65-1790550331356.png",
       "creator_avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-2d85336b-0c34-48a9-a17f-a36028ef59d5-1788819037691.jpg"
+    },
+    {
+      "id": "a71e3609-b68e-4a62-a509-38f3227928d1",
+      "rating": 5,
+      "review": "Received my payout of ₦88,800 directly into my UBA account! Fast and smooth transaction from The Pink Room.",
+      "status": "APPROVED",
+      "payout_id": "bcaf887e-dfd9-46e9-a503-54cbd8532e74",
+      "amount_usd": 80,
+      "created_at": "2026-09-27T18:34:44.461Z",
+      "creator_id": "fcde2998-8771-4c8f-9603-cb25a22afad4",
+      "platform_id": "pinkroom_main",
+      "creator_name": "Justina Ifeanyichukwu",
+      "creator_email": "ifeanyichukwujustina@gmail.com",
+      "payment_method": "NIGERIA_BANK",
+      "creator_country": "Nigeria",
+      "proof_image_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/proofs/proof-fcde2998-8771-4c8f-9603-cb25a22afad4-bcaf887e-1790534083979.png"
     }
   ],
   "banned_devices": [],

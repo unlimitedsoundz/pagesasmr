@@ -4,13 +4,14 @@ import { requireUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { sendTelegramSubmissionNotification } from '@/lib/telegram';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await requireUser();
     await db.syncFromSupabase().catch((error) => {
       console.warn('[Pages] Supabase sync warning on revision POST:', error);
     });
-    const submission = db.getSubmissionById(params.id);
+    const submission = db.getSubmissionById(id);
 
     if (!submission) {
       return NextResponse.json({ error: 'Submission not found.' }, { status: 404 });

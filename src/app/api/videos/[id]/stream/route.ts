@@ -14,8 +14,8 @@ const MEDIA_DIR = process.env.MEDIA_STORAGE_DIR ? path.resolve(process.env.MEDIA
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 const TMP_UPLOADS_DIR = path.join(os.tmpdir(), 'uploads');
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const rawId = params.id;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: rawId } = await params;
   if (!rawId) {
     return NextResponse.json({ error: 'Video ID or storage key required.' }, { status: 400 });
   }
