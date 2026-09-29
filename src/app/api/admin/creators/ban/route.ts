@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { supabaseAdmin } from '@/lib/supabase';
 import { PLATFORM_ID } from '@/lib/constants';
 import { isUserBlacklisted, isEmailBlacklisted } from '@/lib/blacklist';
+import { sendBanLiftedEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -181,7 +182,31 @@ export async function DELETE(req: NextRequest) {
       await db.syncProfileToSupabase(updated);
     }
 
-    // 6. Record audit event
+    // 6. Send in-app notification to creator
+    try {
+      db.createNotification({
+        user_id: creator.id,
+        title: 'Account Reinstated: Ban Lifted',
+        message: 'Your account suspension has been officially lifted by studio administration. Your account access, payment details, and permissions have been restored.',
+        type: 'SYSTEM',
+        link: '/creator',
+      }, { skipEmail: true });
+    } catch (notifErr) {
+      console.warn('Could not create unban notification:', notifErr);
+    }
+
+    // 7. Send email notification to creator
+    try {
+      await sendBanLiftedEmail({
+        to: creator.email,
+        recipientName: creator.display_name,
+        restoredSampleStatus,
+      });
+    } catch (emailErr) {
+      console.warn('Could not send unban email to creator:', emailErr);
+    }
+
+    // 8. Record audit event
     db.recordAuditEvent({
       platform_id: PLATFORM_ID,
       actor_id: admin.id,

@@ -297,3 +297,45 @@ export async function sendWelcomeEmail(options: {
     html,
   });
 }
+
+/**
+ * Send dedicated Account Reinstatement / Ban Lifted email to creator on Pages platform
+ */
+export async function sendBanLiftedEmail(options: {
+  to: string | string[];
+  recipientName: string;
+  restoredSampleStatus?: string;
+}): Promise<EmailDeliveryResult> {
+  const appUrl = PUBLIC_URL;
+  const name = options.recipientName ? options.recipientName.split(' ')[0] : 'Creator';
+
+  const content = `
+    <h2 style="font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: #1C1520; margin: 0 0 16px 0;">
+      Account Reinstated: Ban Lifted
+    </h2>
+    <p style="margin: 0 0 12px 0;">Dear ${name},</p>
+    <p style="margin: 0 0 14px 0; line-height: 1.6;">
+      We are pleased to inform you that the suspension on your creator account has been officially lifted by studio administration. Your account, payment details, and production permissions have been fully restored.
+    </p>
+    <div style="background-color: #FAF5F7; border-left: 4px solid #10B981; padding: 14px 16px; margin: 18px 0; font-size: 13px; line-height: 1.5; color: #374151;">
+      <strong>Account Status:</strong><br/>
+      &bull; <strong>Platform Status:</strong> Active & Reinstated<br/>
+      &bull; <strong>Upload Access:</strong> Unlocked<br/>
+      &bull; <strong>Payout Access:</strong> Fully restored
+    </div>
+    <p style="margin: 0 0 16px 0; line-height: 1.6;">
+      You can now log in to your creator portal, access your dashboard, and continue submitting your page-turning recordings.
+    </p>
+  `;
+
+  const html = wrapInEmailLayout(content, {
+    actionUrl: `${appUrl}/login`,
+    actionText: 'Log In to Dashboard',
+  });
+
+  return sendEmail({
+    to: options.to,
+    subject: `Account Reinstated — Welcome Back to ${BRAND_NAME}, ${name}`,
+    html,
+  });
+}

@@ -298,6 +298,6 @@ export interface Testimonial {
   review: string;
   proof_image_url: string;
   created_at: string;
-  status: 'APPROVED' | 'PENDING';
+  status: 'APPROVED' | 'PENDING' | 'REJECTED';
 }
 

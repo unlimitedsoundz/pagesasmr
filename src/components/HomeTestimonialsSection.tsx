@@ -229,8 +229,8 @@ export default function HomeTestimonialsSection({
                   <span className="font-semibold text-sm sm:text-base text-neutral-900 dark:text-white">
                     {selectedProof.creator_name}
                   </span>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-medium">
-                    Verified Payout Receipt
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-medium">
+                    Payment Receipt
                   </span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-0.5">

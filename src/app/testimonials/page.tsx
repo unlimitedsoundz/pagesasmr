@@ -11,7 +11,8 @@ import {
   X,
   ArrowRight,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  FileText,
 } from 'lucide-react';
 import { Testimonial } from '@/types';
 import { getLocalCurrency, formatLocalFx } from '@/lib/currency';
@@ -326,7 +327,6 @@ export default function TestimonialsPage() {
                                 <span className="font-serif font-medium text-lg text-neutral-900 dark:text-white">
                                   {t.creator_name}
                                 </span>
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                               </div>
 
                               <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -348,14 +348,6 @@ export default function TestimonialsPage() {
                           </div>
                         </div>
 
-                        {/* Verified Payout Pill */}
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                          <span>
-                            Verified Payout: ${t.amount_usd.toFixed(2)} USD
-                            {localFxString ? ` (${localFxString})` : ''}
-                          </span>
-                        </div>
 
                         {/* Review text */}
                         <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed italic border-l-2 border-rose-300 dark:border-rose-800 pl-3">
@@ -460,9 +452,9 @@ export default function TestimonialsPage() {
             </button>
 
             <div className="space-y-1 mb-4 pr-10">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Verified Uploaded Receipt</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-semibold">
+                <FileText className="w-3.5 h-3.5" />
+                <span>Uploaded Payment Receipt</span>
               </div>
               <h3 className="text-xl font-serif font-medium text-neutral-900 dark:text-white">
                 {selectedProof.creator_name}&apos;s Payout Receipt
