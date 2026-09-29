@@ -262,6 +262,7 @@ export default function Navbar() {
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/submissions', label: 'Submissions' },
     { href: '/admin/payouts', label: 'Payouts' },
+    { href: '/admin/testimonials', label: 'Testimonials' },
     { href: '/admin/referrals', label: 'Referrals' },
     { href: '/admin/creators', label: 'Creators' },
     { href: '/admin/chat', label: 'Live Chat' },

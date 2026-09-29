@@ -13,7 +13,9 @@ import {
   Copy,
   Check,
   RotateCcw,
+  Star,
 } from 'lucide-react';
+import Link from 'next/link';
 import StatusBadge from '@/components/StatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
 import CreatorPayoutModal from '@/components/CreatorPayoutModal';
@@ -115,13 +117,22 @@ export default function AdminPayoutsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-black">
-      <div className="border-b border-neutral-200 pb-6">
-        <h1 className="font-serif text-3xl font-bold text-black">
-          Admin Payout Processing
-        </h1>
-        <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-          Confirm bank transfers, log official transaction references, or release reservations.
-        </p>
+      <div className="border-b border-neutral-200 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-black">
+            Admin Payout Processing
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
+            Confirm bank transfers, log official transaction references, or release reservations.
+          </p>
+        </div>
+        <Link
+          href="/admin/testimonials"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold transition-colors shadow-2xs self-start sm:self-auto"
+        >
+          <Star className="w-3.5 h-3.5 text-amber-600 fill-amber-400" />
+          <span>Review Testimonials</span>
+        </Link>
       </div>
 
       <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm">
