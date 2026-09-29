@@ -46,6 +46,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         updatedPayout = db.cancelOrFailPayout(params.id, reason.trim(), adminUser, true);
         break;
 
+      case 'REFUND':
+        if (!reason || reason.trim().length === 0) {
+          return NextResponse.json(
+            { error: 'A refund reason is required to refund completed payouts.' },
+            { status: 400 }
+          );
+        }
+        updatedPayout = db.refundPayout(params.id, reason.trim(), adminUser);
+        break;
+
       default:
         return NextResponse.json({ error: `Invalid payout action: ${action}` }, { status: 400 });
     }

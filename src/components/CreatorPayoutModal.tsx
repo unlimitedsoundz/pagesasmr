@@ -18,6 +18,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Ban,
+  RotateCcw,
 } from 'lucide-react';
 import { formatCreatorPayoutInfo, FormattedPayoutInfo } from '@/lib/payoutDetails';
 
@@ -27,6 +28,7 @@ interface CreatorPayoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBan?: (creator: any) => void;
+  onRefund?: (payout: any) => void;
 }
 
 export default function CreatorPayoutModal({
@@ -35,6 +37,7 @@ export default function CreatorPayoutModal({
   isOpen,
   onClose,
   onBan,
+  onRefund,
 }: CreatorPayoutModalProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showRawJson, setShowRawJson] = useState(false);
@@ -278,7 +281,18 @@ export default function CreatorPayoutModal({
 
         {/* Footer */}
         <div className="border-t border-[#f2e3e8] pt-3 flex items-center justify-between gap-3">
-          <div>
+          <div className="flex items-center gap-2">
+            {onRefund && payout && payout.status === 'PAID' && (
+              <button
+                type="button"
+                onClick={() => onRefund(payout)}
+                className="px-4 py-2 rounded-xl text-xs font-bold border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-800 flex items-center gap-1.5 transition-colors shadow-xs"
+                title="Refund this completed payout and restore balance to creator"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Refund Payout</span>
+              </button>
+            )}
             {onBan && creator && !creator.is_banned && (
               <button
                 type="button"

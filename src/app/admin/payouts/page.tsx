@@ -12,6 +12,7 @@ import {
   CreditCard,
   Copy,
   Check,
+  RotateCcw,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -28,7 +29,6 @@ export default function AdminPayoutsPage() {
   const [selectedPayout, setSelectedPayout] = useState<PayoutRequest | null>(null);
   const [detailPayout, setDetailPayout] = useState<PayoutRequest | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [modalMode, setModalMode] = useState<'CONFIRM' | 'CANCEL' | null>(null);
 
   const handleCopy = (key: string, text: string) => {
     navigator.clipboard.writeText(text);
@@ -36,8 +36,11 @@ export default function AdminPayoutsPage() {
     setTimeout(() => setCopiedKey(null), 2000);
     toast.success(`Copied to clipboard: ${text}`);
   };
+
+  const [modalMode, setModalMode] = useState<'CONFIRM' | 'CANCEL' | 'REFUND' | null>(null);
   const [bankRef, setBankRef] = useState('');
   const [cancelReason, setCancelReason] = useState('');
+  const [refundReason, setRefundReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');
 
@@ -64,26 +67,34 @@ export default function AdminPayoutsPage() {
     setActionError('');
 
     try {
+      const payload: any = {
+        action: modalMode === 'CONFIRM' ? 'CONFIRM_PAID' : modalMode === 'REFUND' ? 'REFUND' : 'CANCEL',
+      };
+      if (modalMode === 'CONFIRM') payload.paymentReference = bankRef.trim();
+      else if (modalMode === 'REFUND') payload.reason = refundReason.trim();
+      else payload.reason = cancelReason.trim();
+
       const res = await fetch(`/api/payouts/${selectedPayout.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: modalMode === 'CONFIRM' ? 'CONFIRM_PAID' : 'CANCEL',
-          paymentReference: bankRef.trim(),
-          reason: cancelReason.trim(),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update payout');
 
       toast.success(
-        modalMode === 'CONFIRM' ? 'Payout confirmed with bank reference.' : 'Payout request cancelled.'
+        modalMode === 'CONFIRM'
+          ? 'Payout confirmed with bank reference.'
+          : modalMode === 'REFUND'
+          ? `Payout #${selectedPayout.id} refunded successfully. $${selectedPayout.amount_usd.toFixed(2)} USD restored.`
+          : 'Payout request cancelled.'
       );
       setSelectedPayout(null);
       setModalMode(null);
       setBankRef('');
       setCancelReason('');
+      setRefundReason('');
       loadPayouts();
     } catch (err: any) {
       setActionError(err.message || 'Error processing payout');
@@ -261,8 +272,22 @@ export default function AdminPayoutsPage() {
                             Cancel
                           </button>
                         </>
+                      ) : p.status === 'PAID' ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedPayout(p);
+                            setModalMode('REFUND');
+                            setRefundReason('');
+                            setActionError('');
+                          }}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-neutral-300 hover:border-neutral-400 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Refund</span>
+                        </button>
                       ) : (
-                        <span className="text-neutral-400 font-bold">Settled</span>
+                        <span className="text-neutral-400 font-bold">{p.status === 'REFUNDED' ? 'Refunded' : 'Settled'}</span>
                       )}
                     </td>
                   </tr>
@@ -403,6 +428,83 @@ export default function AdminPayoutsPage() {
                   className="px-6 py-2 text-xs font-bold rounded-lg bg-black text-white hover:bg-neutral-800 disabled:opacity-50"
                 >
                   {actionLoading ? 'Saving...' : 'Submit Decision'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Refund Modal */}
+      {modalMode === 'REFUND' && selectedPayout && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setModalMode(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl text-black"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-neutral-200 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-black">Refund Payout</h3>
+                <p className="text-xs text-neutral-600">
+                  Payout #{selectedPayout.id.substring(0, 8)} • ${selectedPayout.amount_usd.toFixed(2)} USD
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalMode(null)}
+                className="p-1 rounded-lg text-neutral-400 hover:text-black"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-900 space-y-1">
+              <p className="font-bold">Important Refund Action:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-[11px] text-rose-800">
+                <li>Payout status will change to <code>REFUNDED</code>.</li>
+                <li>Associated {selectedPayout.video_count} videos will be restored to UNPAID.</li>
+                <li>The creator&apos;s available earnings balance will be restored by ${selectedPayout.amount_usd.toFixed(2)} USD.</li>
+              </ul>
+            </div>
+
+            {actionError && (
+              <div className="p-2.5 rounded-lg bg-red-50 text-red-700 text-xs font-medium border border-red-200">
+                {actionError}
+              </div>
+            )}
+
+            <form onSubmit={handlePayoutAction} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-black uppercase tracking-wider mb-1">
+                  Refund Reason (Required)
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="e.g. Bank transfer bounced back due to incorrect account details"
+                  className="w-full p-2.5 border border-neutral-300 rounded-lg text-xs text-black focus:outline-none focus:border-black font-medium"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="submit"
+                  disabled={actionLoading || !refundReason.trim()}
+                  className="flex-1 py-2.5 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                >
+                  {actionLoading ? 'Processing Refund...' : 'Confirm Refund & Restore Balance'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalMode(null)}
+                  className="px-4 py-2.5 rounded-lg border border-neutral-300 text-xs font-semibold text-neutral-700 hover:bg-neutral-100"
+                >
+                  Cancel
                 </button>
               </div>
             </form>

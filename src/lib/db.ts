@@ -627,6 +627,9 @@ class PagesDatabaseService {
         console.warn('[Pages DB] Notifications Supabase sync warning:', notifSyncErr);
       }
 
+      // 9. Live sync Testimonials from platform_settings (shared across platforms)
+      await this.syncTestimonialsFromSupabase();
+
       this.save();
     } catch (err) {
       console.warn('[Pages DB] Supabase live sync exception:', err);
@@ -2087,6 +2090,72 @@ class PagesDatabaseService {
     return payout;
   }
 
+  refundPayout(payoutId: string, reason: string, adminUser: Profile): PayoutRequest {
+    const payout = this.data.payout_requests.find((p) => p.id === payoutId && p.platform_id === PLATFORM_ID);
+    if (!payout) throw new Error('Payout request not found.');
+
+    if (payout.status !== 'PAID') {
+      throw new Error('Only completed/paid payouts can be refunded.');
+    }
+
+    if (!reason || reason.trim().length === 0) {
+      throw new Error('A refund reason is required to process a payout refund.');
+    }
+
+    const now = new Date().toISOString();
+    payout.status = 'REFUNDED';
+    payout.failure_reason = reason.trim();
+    payout.processed_at = now;
+
+    // Reset all associated submissions back to UNPAID so creator can request payout again
+    for (const subId of payout.submission_ids) {
+      const sub = this.getSubmissionById(subId);
+      if (sub) {
+        sub.payout_status = 'UNPAID';
+        sub.payout_id = undefined;
+        sub.updated_at = now;
+        this.syncSubmissionToSupabase(sub);
+      }
+    }
+
+    // Record ledger RELEASED entry for accounting balance
+    const refundEntry: EarningsLedgerEntry = {
+      id: ensureUuid(),
+      platform_id: PLATFORM_ID,
+      creator_id: payout.creator_id,
+      payout_id: payout.id,
+      type: 'RELEASED',
+      amount_usd: payout.amount_usd,
+      description: `Refunded completed payout #${payout.id}: ${reason.trim()}`,
+      created_at: now,
+    };
+    this.data.earnings_ledger.push(refundEntry);
+    this.syncLedgerToSupabase(refundEntry);
+
+    // Notify creator
+    this.createNotification({
+      user_id: payout.creator_id,
+      title: 'Payout Refunded & Balance Restored',
+      message: `Payout #${payout.id} for $${payout.amount_usd.toFixed(2)} USD was refunded by studio admin: ${reason.trim()}. Your approved videos and funds have been restored to your available balance.`,
+      type: 'PAYOUT',
+      link: '/creator/payouts',
+    });
+
+    this.recordAuditEvent({
+      platform_id: PLATFORM_ID,
+      actor_id: adminUser.id,
+      actor_name: adminUser.display_name,
+      action: 'REFUND_PAYOUT',
+      target_type: 'PAYOUT',
+      target_id: payoutId,
+      details: { reason: reason.trim(), amount_usd: payout.amount_usd, previous_status: 'PAID' },
+    });
+
+    this.save();
+    this.syncPayoutToSupabase(payout);
+    return payout;
+  }
+
   // ==========================================
   // NOTIFICATIONS & AUDIT
   // ==========================================
@@ -2938,6 +3007,9 @@ class PagesDatabaseService {
       outstandingLiability,
       totalConfirmedPaid,
       pendingPayoutRequests,
+      pendingTestimonialsCount: (this.data.testimonials || []).filter(
+        (t) => t.status === 'PENDING'
+      ).length,
       creatorCount,
       totalLedgerEntries,
       totalAuditEvents,
@@ -3891,13 +3963,33 @@ class PagesDatabaseService {
     const item: Testimonial = {
       ...data,
       id: ensureUuid(),
-      status: data.status || 'APPROVED',
+      status: data.status || 'PENDING',
       created_at: new Date().toISOString(),
     };
 
     payout.review_prompted = true;
     payout.review_prompted_at = new Date().toISOString();
     this.data.testimonials.unshift(item);
+    this.save();
+    this.syncTestimonialToSupabase(item).catch(() => {});
+    return item;
+  }
+
+  approveTestimonial(id: string, adminUser?: Profile): Testimonial {
+    this.reload();
+    const item = (this.data.testimonials || []).find((t) => t.id === id);
+    if (!item) throw new Error('Testimonial not found.');
+    item.status = 'APPROVED';
+    this.save();
+    this.syncTestimonialToSupabase(item).catch(() => {});
+    return item;
+  }
+
+  rejectTestimonial(id: string, adminUser?: Profile): Testimonial {
+    this.reload();
+    const item = (this.data.testimonials || []).find((t) => t.id === id);
+    if (!item) throw new Error('Testimonial not found.');
+    item.status = 'REJECTED';
     this.save();
     this.syncTestimonialToSupabase(item).catch(() => {});
     return item;
@@ -3960,8 +4052,17 @@ class PagesDatabaseService {
         .maybeSingle();
 
       if (!error && Array.isArray(data?.value)) {
+        const supaList: Testimonial[] = data.value;
+        const currentList: Testimonial[] = this.data.testimonials || [];
+        const supaMap = new Map(supaList.map((t) => [t.id, t]));
+        const merged: Testimonial[] = [...supaList];
+        for (const local of currentList) {
+          if (!supaMap.has(local.id)) {
+            merged.push(local);
+          }
+        }
         const prev = JSON.stringify(this.data.testimonials || []);
-        this.data.testimonials = data.value;
+        this.data.testimonials = merged;
         if (JSON.stringify(this.data.testimonials) !== prev) {
           this.save();
         }

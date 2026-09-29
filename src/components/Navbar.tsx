@@ -353,7 +353,7 @@ export default function Navbar() {
 
                 {/* Dropdown menu */}
                 {notifDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-80 max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 overflow-hidden text-neutral-900 dark:text-white">
+                  <div className="fixed left-3 right-3 top-[68px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 md:w-96 sm:max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 overflow-hidden text-neutral-900 dark:text-white">
                     <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
                       <span className="font-serif font-bold text-sm">Notifications</span>
                       {unreadNotifs > 0 && (
@@ -572,7 +572,7 @@ export default function Navbar() {
 
                 {/* Dropdown menu */}
                 {notifDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-80 max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 overflow-hidden text-neutral-900 dark:text-white">
+                  <div className="fixed left-3 right-3 top-[68px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 md:w-96 sm:max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 overflow-hidden text-neutral-900 dark:text-white">
                     <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
                       <div className="flex items-center gap-2">
                         <span className="font-serif font-bold text-sm">Notifications</span>
@@ -829,7 +829,7 @@ export default function Navbar() {
                   </button>
 
                   {notifDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-1 w-[calc(100vw-2rem)] sm:w-80 md:w-96 max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-50 overflow-hidden text-black dark:text-[#F0F0F6]">
+                    <div className="fixed left-3 right-3 top-[68px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 md:w-96 sm:max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-50 overflow-hidden text-black dark:text-[#F0F0F6]">
                       <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
                         <div className="flex items-center gap-2">
                           <span className="font-serif font-bold text-sm">Notifications</span>

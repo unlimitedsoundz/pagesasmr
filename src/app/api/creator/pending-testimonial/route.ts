@@ -12,6 +12,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ pendingPayouts: [], required: false });
     }
 
+    // Ensure shared testimonials from both platforms are synced
+    await db.syncTestimonialsFromSupabase().catch(() => {});
+
     const pendingPayouts = db.getPendingPayoutReviews(user.id);
 
     return NextResponse.json({

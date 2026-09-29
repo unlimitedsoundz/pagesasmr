@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     const userProfile = db.getProfileById(user.id);
 
     const testimonial = db.createTestimonial({
-      platform_id: payout.platform_id || 'pinkroom_main',
+      platform_id: payout.platform_id || 'pinkroom_pages',
       creator_id: user.id,
       creator_name: userProfile?.display_name || payout.creator_name || 'Creator',
       creator_email: userProfile?.email || payout.creator_email || '',
@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
       rating,
       review,
       proof_image_url: proofImageUrl,
-      status: 'APPROVED',
+      status: 'PENDING',
     });
 
     return NextResponse.json({
