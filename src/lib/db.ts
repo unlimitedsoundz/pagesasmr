@@ -215,6 +215,12 @@ class PagesDatabaseService {
       for (const memMsg of (this.data.chat_messages || [])) {
         if (!diskMsgMap.has(memMsg.id)) {
           diskMsgMap.set(memMsg.id, memMsg);
+        } else {
+          // If in-memory state has already marked this message as read, preserve it
+          const diskMsg = diskMsgMap.get(memMsg.id);
+          if (memMsg.is_read && diskMsg && !diskMsg.is_read) {
+            diskMsg.is_read = true;
+          }
         }
       }
       this.data.chat_messages = Array.from(diskMsgMap.values());
@@ -572,7 +578,8 @@ class PagesDatabaseService {
           .order('created_at', { ascending: true });
         if (!cErr && chats && chats.length > 0) {
           if (!this.data.chat_messages) this.data.chat_messages = [];
-          const existingIds = new Set(this.data.chat_messages.map((m) => m.id));
+          const existingMap = new Map(this.data.chat_messages.map((m) => [m.id, m]));
+          let chatSyncChanged = false;
           for (const c of chats) {
             const mappedMsg: ChatMessage = {
               id: c.id,
@@ -585,10 +592,20 @@ class PagesDatabaseService {
               is_read: Boolean(c.is_read),
               created_at: c.created_at,
             };
-            if (!existingIds.has(c.id)) {
+            const existing = existingMap.get(c.id);
+            if (existing) {
+              if (c.is_read && !existing.is_read) {
+                existing.is_read = true;
+                chatSyncChanged = true;
+              }
+            } else {
               this.data.chat_messages.push(mappedMsg);
-              existingIds.add(c.id);
+              existingMap.set(c.id, mappedMsg);
+              chatSyncChanged = true;
             }
+          }
+          if (chatSyncChanged) {
+            this.save();
           }
         }
       } catch (chatSyncErr) {
@@ -3211,7 +3228,7 @@ class PagesDatabaseService {
     if (!this.data.chat_messages) return;
     let changed = false;
     this.data.chat_messages.forEach((m) => {
-      if (m.creator_id === creatorId && m.sender_role !== readerRole && !m.is_read) {
+      if ((m.creator_id === creatorId || m.sender_id === creatorId) && m.sender_role !== readerRole && !m.is_read) {
         m.is_read = true;
         changed = true;
       }
@@ -3222,7 +3239,7 @@ class PagesDatabaseService {
         supabaseAdmin
           .from('chat_messages')
           .update({ is_read: true })
-          .eq('creator_id', creatorId)
+          .or(`creator_id.eq.${creatorId},sender_id.eq.${creatorId}`)
           .neq('sender_role', readerRole)
       ).catch((e: any) => console.warn('[Pages DB] Supabase markChatRead batch update warning:', e));
     }

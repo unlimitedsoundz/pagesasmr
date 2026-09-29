@@ -72,9 +72,6 @@ export default function AdminReferralsPage() {
             <Award className="w-8 h-8 text-amber-500" />
             Referral Program Management ($35 Bonus)
           </h1>
-          <p className="text-sm text-charcoal-600 mt-1">
-            Track creator referral links, audition milestones, and $35 automatic ledger bonuses.
-          </p>
         </div>
       </div>
 

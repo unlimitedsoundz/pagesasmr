@@ -171,6 +171,10 @@ export async function POST(req: NextRequest) {
 
     const newMsg = db.sendChatMessage(targetCreatorId, user, message);
 
+    if (user.role === 'ADMIN') {
+      db.markChatRead(targetCreatorId, 'ADMIN');
+    }
+
     // Notify admin by email when a creator sends a message (fire-and-forget)
     if (user.role === 'CREATOR') {
       notifyAdminOfCreatorMessage(user.display_name || user.email || 'A creator', message.trim()).catch(() => {});

@@ -243,9 +243,6 @@ export default function AdminPushNotificationsPage() {
             <Bell className="w-7 h-7 text-black" />
             <span>Push Custom Notifications</span>
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-            Broadcast platform announcements, quality reminders, and payout alerts that instantly appear in the creator bell icon and their transactional email inbox.
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">

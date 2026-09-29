@@ -438,9 +438,6 @@ export default function AdminSubmissionsPage() {
           <h1 className="font-serif text-3xl font-bold text-black">
             Submission Review Queue
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-            Review page-turning recordings. Approval credits $10.00 USD toward the 8-video payout threshold.
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -724,7 +721,7 @@ export default function AdminSubmissionsPage() {
                       return (
                         <div
                           key={sub.id}
-                          className="bg-white p-4 sm:p-5 rounded-lg border border-neutral-200 hover:border-black transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
+                          className="bg-white p-4 sm:p-5 rounded-lg transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
                         >
                           <div className="space-y-2 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
@@ -734,28 +731,12 @@ export default function AdminSubmissionsPage() {
                                   30s Audition Sample
                                 </span>
                               )}
-                              {sub.storage_provider === 'hostinger' ? (
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-100 border border-purple-300 px-2 py-0.5 rounded flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
-                                  <span>Hostinger Storage</span>
-                                </span>
-                              ) : (
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 bg-neutral-100 border border-neutral-300 px-2 py-0.5 rounded flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                                  <span>Supabase Storage</span>
-                                </span>
-                              )}
                               <span className="text-xs font-bold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200">
                                 Page Turning
                               </span>
                               <span className="text-xs text-black flex items-center gap-1 font-bold">
                                 <Clock className="w-3.5 h-3.5 text-black" />
                                 {minutes}:{seconds.toString().padStart(2, '0')} ({Math.round(sub.duration_seconds)}s)
-                                {sub.verified_duration_seconds ? (
-                                  <span className="text-[10px] text-emerald-700 font-semibold ml-1">
-                                    (Verified: {Math.round(sub.verified_duration_seconds)}s)
-                                  </span>
-                                ) : null}
                               </span>
                               {sub.file_size_bytes ? (
                                 <span className="text-xs font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
@@ -1050,44 +1031,53 @@ export default function AdminSubmissionsPage() {
                   Review Decision
                 </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setActionType('APPROVE')}
-                  className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`p-2 sm:p-3 rounded-xl border text-[11px] sm:text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 ${
                     actionType === 'APPROVE'
                       ? 'border-emerald-600 bg-emerald-600 text-white'
                       : 'border-neutral-300 bg-white text-emerald-700 hover:bg-emerald-50'
                   }`}
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{reviewingSub.is_sample ? 'Approve Audition' : 'Approve ($10)'}</span>
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span className="leading-tight">
+                    Approve
+                    <span className="hidden sm:inline">{reviewingSub.is_sample ? ' Audition' : ' ($10)'}</span>
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActionType('REQUEST_REVISION')}
-                  className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`p-2 sm:p-3 rounded-xl border text-[11px] sm:text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 ${
                     actionType === 'REQUEST_REVISION'
                       ? 'border-amber-600 bg-amber-600 text-white'
                       : 'border-neutral-300 bg-white text-amber-700 hover:bg-amber-50'
                   }`}
                 >
-                  <RotateCw className="w-4 h-4" />
-                  <span>Request Revision</span>
+                  <RotateCw className="w-4 h-4 shrink-0" />
+                  <span className="leading-tight">
+                    <span className="hidden sm:inline">Request </span>
+                    {reviewingSub.is_sample ? 'Retake' : 'Revision'}
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActionType('REJECT')}
-                  className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`p-2 sm:p-3 rounded-xl border text-[11px] sm:text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 ${
                     actionType === 'REJECT'
                       ? 'border-red-600 bg-red-600 text-white'
                       : 'border-neutral-300 bg-white text-red-700 hover:bg-red-50'
                   }`}
                 >
-                  <XCircle className="w-4 h-4" />
-                  <span>Reject Video</span>
+                  <XCircle className="w-4 h-4 shrink-0" />
+                  <span className="leading-tight">
+                    Reject
+                    <span className="hidden sm:inline"> Video</span>
+                  </span>
                 </button>
               </div>
 

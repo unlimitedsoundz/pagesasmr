@@ -687,28 +687,6 @@ export default function AdminVideoPreview({
             </button>
           </div>
         </div>
-
-        {/* Mobile-Friendly Device Download Action Bar */}
-        {onDownloadNormal && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-neutral-900/95 border-t border-neutral-800 text-xs">
-            <span className="text-[10px] sm:text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-              Save to Device Storage:
-            </span>
-            <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-              <button
-                  type="button"
-                  onClick={onDownloadNormal}
-                  disabled={isDownloadingNormal}
-                  style={{ backgroundColor: '#ffffff', color: '#000000', borderRadius: 0 }}
-                  className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 hover:bg-neutral-100 font-bold rounded-none disabled:opacity-50 transition-colors text-[10px] sm:text-[11px]"
-                  title="Save normal original video file directly to phone/device storage"
-                >
-                  <Download className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${isDownloadingNormal ? 'animate-bounce' : ''}`} />
-                  <span className="truncate">{isDownloadingNormal ? 'Saving...' : 'Download Normal'}</span>
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

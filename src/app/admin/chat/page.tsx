@@ -51,7 +51,27 @@ function PagesAdminChatContent() {
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const readConversationsAtRef = useRef<Record<string, number>>({});
   const { toast } = useToast();
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('pages_admin_chat_read_timestamps');
+      if (stored) {
+        readConversationsAtRef.current = JSON.parse(stored);
+      }
+    } catch {}
+  }, []);
+
+  const markCreatorReadLocally = (creatorId: string) => {
+    readConversationsAtRef.current[creatorId] = Date.now();
+    try {
+      localStorage.setItem('pages_admin_chat_read_timestamps', JSON.stringify(readConversationsAtRef.current));
+    } catch {}
+    setConversations((convs) =>
+      convs.map((c) => (c.creator.id === creatorId ? { ...c, unreadCount: 0 } : c))
+    );
+  };
 
   useEffect(() => {
     if (queryCreatorId) {
@@ -66,7 +86,17 @@ function PagesAdminChatContent() {
       const res = await fetch('/api/chat?conversations=true');
       const data = await res.json();
       if (data.conversations) {
-        setConversations(data.conversations);
+        const updatedConversations: ConversationItem[] = data.conversations.map((c: ConversationItem) => {
+          const isOpen = Boolean(
+            expandedCreators[c.creator.id] ||
+            (viewMode === 'split' && selectedCreatorId === c.creator.id)
+          );
+          const lastMsgTime = new Date(c.lastMessage.created_at).getTime();
+          const lastReadTime = readConversationsAtRef.current[c.creator.id] || 0;
+          const isReadLocally = isOpen || (lastReadTime > 0 && lastMsgTime <= lastReadTime);
+          return isReadLocally ? { ...c, unreadCount: 0 } : c;
+        });
+        setConversations(updatedConversations);
         const activeId = targetId || selectedCreatorId || queryCreatorId;
         if (!activeId && data.conversations.length > 0 && !selectedCreatorId) {
           setSelectedCreatorId(data.conversations[0].creator.id);
@@ -103,9 +133,7 @@ function PagesAdminChatContent() {
         });
 
         if (markRead) {
-          setConversations((prev) =>
-            prev.map((c) => (c.creator.id === creatorId ? { ...c, unreadCount: 0 } : c))
-          );
+          markCreatorReadLocally(creatorId);
         }
       }
     } catch (e) {
@@ -119,6 +147,7 @@ function PagesAdminChatContent() {
     setExpandedCreators((prev) => {
       const nextState = !prev[creatorId];
       if (nextState) {
+        markCreatorReadLocally(creatorId);
         loadMessagesForCreator(creatorId, true);
         setSelectedCreatorId(creatorId);
       }
@@ -130,7 +159,8 @@ function PagesAdminChatContent() {
     const allExpanded: Record<string, boolean> = {};
     filteredConversations.forEach((c) => {
       allExpanded[c.creator.id] = true;
-      loadMessagesForCreator(c.creator.id, false);
+      markCreatorReadLocally(c.creator.id);
+      loadMessagesForCreator(c.creator.id, true);
     });
     setExpandedCreators(allExpanded);
   };
@@ -253,9 +283,6 @@ function PagesAdminChatContent() {
               </span>
             )}
           </h1>
-          <p className="text-xs text-neutral-600 mt-1">
-            Expand any creator's accordion dropdown below to review conversation history and send direct replies.
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -591,6 +618,7 @@ function PagesAdminChatContent() {
                       type="button"
                       onClick={() => {
                         setSelectedCreatorId(conv.creator.id);
+                        markCreatorReadLocally(conv.creator.id);
                         loadMessagesForCreator(conv.creator.id, true);
                       }}
                       className={`w-full text-left p-4 transition-colors flex items-start justify-between gap-3 ${

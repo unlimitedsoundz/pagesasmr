@@ -122,9 +122,6 @@ export default function AdminPayoutsPage() {
           <h1 className="font-serif text-3xl font-bold text-black">
             Admin Payout Processing
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-            Confirm bank transfers, log official transaction references, or release reservations.
-          </p>
         </div>
         <Link
           href="/admin/testimonials"
