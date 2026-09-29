@@ -128,12 +128,12 @@ export function isEmailBlacklisted(email?: string | null): boolean {
 export function isNameBlacklisted(name?: string | null): boolean {
   if (!name) return false;
   const normalized = normalizeString(name);
-  if (!normalized) return false;
+  if (!normalized || normalized.length < 5) return false;
 
-  // Check exact or partial phrase containment
+  // Check exact match or full blacklisted identity containment (preventing false positives on single first names)
   return BLACKLISTED_NAMES.some((b) => {
     const normB = normalizeString(b);
-    return normalized.includes(normB) || normB.includes(normalized);
+    return normalized === normB || normalized.includes(normB);
   });
 }
 
@@ -161,13 +161,12 @@ export function isPhoneNumberBlacklisted(phone?: string | null): boolean {
 }
 
 /**
- * Check if a User-Agent or device string contains banned phone hardware models
+ * Check if a User-Agent contains banned hardware signatures.
+ * Disabled to prevent blocking innocent creators who use mass-market phones (e.g. Tecno Spark series).
  */
 export function isHardwareSignatureBanned(userAgent?: string | null): boolean {
-  if (!userAgent) return false;
-  return BLACKLISTED_HARDWARE_SIGNATURES.some((sig) =>
-    userAgent.toLowerCase().includes(sig.toLowerCase())
-  );
+  // Never ban generic consumer phone models across entire mobile networks
+  return false;
 }
 
 /**

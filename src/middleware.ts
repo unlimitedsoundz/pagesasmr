@@ -14,39 +14,51 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 0. Admin immunity
-  if (sessionCookie && isAdminUser(sessionCookie)) {
-    const response = NextResponse.next();
+  // 0. AUTHENTICATED SESSION CHECK
+  if (sessionCookie) {
+    if (isUserBlacklisted(sessionCookie)) {
+      const isApi = pathname.startsWith('/api/');
+      const response = isApi
+        ? NextResponse.json(
+            { error: 'Access denied: Your account is permanently banned.' },
+            { status: 403 }
+          )
+        : NextResponse.redirect(new URL('/banned', request.url));
+
+      response.cookies.delete(SESSION_COOKIE_NAME);
+      response.cookies.set(BANNED_DEVICE_COOKIE, '1', {
+        path: '/',
+        httpOnly: false,
+        maxAge: 315360000,
+        sameSite: 'lax',
+      });
+      return response;
+    }
+
+    // Active session is NOT blacklisted (Valid creator or Admin).
+    // Automatically wipe any stale banned device flags so legitimate creators are never trapped.
     if (isDeviceFlaggedBanned) {
+      const response = NextResponse.next();
       response.cookies.delete(BANNED_DEVICE_COOKIE);
       response.cookies.set(BANNED_DEVICE_COOKIE, '', { path: '/', maxAge: 0 });
+      return response;
     }
-    return response;
   }
 
   // Allow auth routes
   const isAuthRoute =
-    pathname.startsWith('/auth/login') ||
-    pathname.startsWith('/api/auth/login');
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/api/auth');
 
-  // Blacklist check
-  if (!isAuthRoute && ((sessionCookie && isUserBlacklisted(sessionCookie)) || isDeviceFlaggedBanned)) {
+  // Blacklist check for unauthenticated requests
+  if (!isAuthRoute && !sessionCookie && isDeviceFlaggedBanned) {
     const isApi = pathname.startsWith('/api/');
-    const response = isApi
+    return isApi
       ? NextResponse.json(
-          { error: 'Access denied: Your account is permanently banned.' },
+          { error: 'Access denied: This device is flagged as banned from The Pink Room.' },
           { status: 403 }
         )
       : NextResponse.redirect(new URL('/banned', request.url));
-
-    response.cookies.delete(SESSION_COOKIE_NAME);
-    response.cookies.set(BANNED_DEVICE_COOKIE, '1', {
-      path: '/',
-      httpOnly: false,
-      maxAge: 315360000,
-      sameSite: 'lax',
-    });
-    return response;
   }
 
   // Protect /creator routes

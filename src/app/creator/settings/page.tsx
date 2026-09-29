@@ -22,6 +22,8 @@ import {
   Building2,
   Loader2,
   AlertTriangle,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { useToast } from '@/components/ToastProvider';
 import { NIGERIAN_BANKS, getBankCodeByName } from '@/lib/nigerian-banks';
@@ -61,6 +63,31 @@ export default function CreatorSettingsPage() {
   const [routingNumber, setRoutingNumber] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [savingPayment, setSavingPayment] = useState(false);
+
+  // Delete Account Modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmationText.trim().toUpperCase() !== 'DELETE') return;
+    setDeletingAccount(true);
+    try {
+      const res = await fetch('/api/creator/account', {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete account.');
+      toast.success('Your account has been permanently deleted.', 'Account Deleted');
+      setShowDeleteModal(false);
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 800);
+    } catch (err: any) {
+      toast.error(err.message || 'Error deleting account.');
+      setDeletingAccount(false);
+    }
+  };
 
   // NUBAN resolution state
   const [resolvingNuban, setResolvingNuban] = useState(false);
@@ -1356,6 +1383,38 @@ export default function CreatorSettingsPage() {
                   Reset preferences
                 </button>
               </div>
+
+              {/* Row 3: Danger Zone - Permanently Delete Account */}
+              <div className="pt-5 border-t border-rose-100 dark:border-rose-950/60">
+                <div className="rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/20 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Creator Account</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-200/80 dark:bg-rose-900/80 text-rose-800 dark:text-rose-300">
+                        Permanent
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-xl">
+                      Permanently delete your account, approved video submissions, unpaid balances, and platform profile. This action is irreversible.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDeleteConfirmationText('');
+                      setShowDeleteModal(true);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition-colors shrink-0 self-start sm:self-auto cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete account</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -1374,6 +1433,95 @@ export default function CreatorSettingsPage() {
         </div>
 
       </main>
+
+      {/* ─── Delete Account Confirmation Modal ────────────────────── */}
+      {showDeleteModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div className="bg-white dark:bg-[#1C1520] border border-rose-200 dark:border-rose-900/60 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative animate-in zoom-in-95 duration-150 text-neutral-900 dark:text-white">
+            <button
+              type="button"
+              onClick={() => {
+                if (!deletingAccount) setShowDeleteModal(false);
+              }}
+              disabled={deletingAccount}
+              className="absolute top-4 right-4 p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-neutral-900 dark:text-white">
+                  Permanently Delete Account
+                </h3>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-xs text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/70 p-4 rounded-xl border border-neutral-200/80 dark:border-neutral-800 leading-relaxed">
+              <p>Deleting your account will immediately:</p>
+              <ul className="list-disc pl-4 space-y-1 text-neutral-500 dark:text-neutral-400 text-[11px]">
+                <li>Erase your creator profile, bio, and login access.</li>
+                <li>Remove your video submission catalog and pending reviews.</li>
+                <li>Forfeit any unclaimed balances or pending payouts.</li>
+                <li>Clear all chat messages and notifications.</li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 block">
+                Type <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">DELETE</span> to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmationText}
+                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                placeholder="Type DELETE"
+                disabled={deletingAccount}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#140E16] text-xs font-mono tracking-wider focus:outline-none focus:border-rose-500 dark:focus:border-rose-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deletingAccount}
+                className="px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount || deleteConfirmationText.trim().toUpperCase() !== 'DELETE'}
+                className="px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                {deletingAccount ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting account...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Permanently delete account</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

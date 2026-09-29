@@ -29,7 +29,7 @@ export async function GET() {
   }
 
   const profiles = db.getProfiles();
-  return NextResponse.json(
+  const res = NextResponse.json(
     {
       user,
       availablePersonas: profiles.map((p) => ({
@@ -48,4 +48,15 @@ export async function GET() {
       },
     }
   );
+
+  // If user is authenticated and NOT banned, actively purge any lingering banned device cookie
+  if (user && !user.is_banned) {
+    res.cookies.delete(BANNED_DEVICE_COOKIE);
+    res.cookies.set(BANNED_DEVICE_COOKIE, '', {
+      path: '/',
+      maxAge: 0,
+    });
+  }
+
+  return res;
 }

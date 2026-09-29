@@ -46,13 +46,21 @@ export async function POST(req: NextRequest) {
 
     const membership = await db.getMembership(profile.id);
 
-    const res = NextResponse.json({ success: true, user: profile, membership });
+    const res = NextResponse.json({ success: true, user: profile, membership, clearBannedDevice: true });
     res.cookies.set(SESSION_COOKIE_NAME, profile.id, {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 86400 * 30,
     });
+
+    // Wipe any stale banned device cookie from browser
+    res.cookies.delete('pinkroom_banned_device');
+    res.cookies.set('pinkroom_banned_device', '', {
+      path: '/',
+      maxAge: 0,
+    });
+
     return res;
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Login failed.' }, { status: 500 });

@@ -61,6 +61,7 @@ interface DatabaseData {
   guideline_samples: GuidelineSample[];
   chat_messages: ChatMessage[];
   referrals?: Referral[];
+  deleted_creator_ids?: string[];
   banned_ips?: string[];
   banned_devices?: string[];
   banned_entries?: BannedEntry[];
@@ -206,6 +207,7 @@ class PagesDatabaseService {
     this.data.settings = diskData.settings || this.data.settings || DEFAULT_SETTINGS;
     this.data.payout_requests = diskData.payout_requests || [];
     this.data.testimonials = diskData.testimonials || [];
+    this.data.deleted_creator_ids = diskData.deleted_creator_ids || this.data.deleted_creator_ids || [];
 
     // Refresh and merge chat_messages from disk so concurrent requests/workers immediately see new messages
     if (diskData.chat_messages) {
@@ -218,11 +220,14 @@ class PagesDatabaseService {
       this.data.chat_messages = Array.from(diskMsgMap.values());
     }
 
+    const deletedSet = new Set(this.data.deleted_creator_ids || []);
     const memProfilesMap = new Map(this.data.profiles.map((p) => [p.id, p]));
-    this.data.profiles = (diskData.profiles || []).map((dp) => {
-      const mem = memProfilesMap.get(dp.id);
-      return mem ? { ...dp, ...mem } : dp;
-    });
+    this.data.profiles = (diskData.profiles || [])
+      .filter((dp) => !deletedSet.has(dp.id) && !deletedSet.has(dp.email.toLowerCase()))
+      .map((dp) => {
+        const mem = memProfilesMap.get(dp.id);
+        return mem ? { ...dp, ...mem } : dp;
+      });
 
     const existingSubIds = new Set(this.data.submissions.map((s) => s.id));
     for (const sub of diskData.submissions) {
@@ -234,10 +239,30 @@ class PagesDatabaseService {
 
   public async syncFromSupabase(): Promise<void> {
     try {
+      try {
+        const { data: delRow } = await supabaseAdmin.from('platform_settings').select('value').eq('key', 'deleted_creator_ids').maybeSingle();
+        if (delRow?.value && Array.isArray(delRow.value)) {
+          if (!this.data.deleted_creator_ids) this.data.deleted_creator_ids = [];
+          for (const item of delRow.value) {
+            if (!this.data.deleted_creator_ids.includes(item)) {
+              this.data.deleted_creator_ids.push(item);
+            }
+          }
+        }
+      } catch {}
+
+      const deletedIds = new Set(this.data.deleted_creator_ids || []);
+
       // 1. Sync Profiles (shared across platforms)
       const { data: profiles, error: pErr } = await supabaseAdmin.from('profiles').select('*');
       if (!pErr && profiles) {
         for (const sp of profiles) {
+          if (deletedIds.has(sp.id) || deletedIds.has(sp.email?.toLowerCase())) {
+            Promise.resolve(
+              supabaseAdmin.from('profiles').delete().or(`id.eq.${sp.id},email.eq.${sp.email?.toLowerCase()}`)
+            ).catch(() => {});
+            continue;
+          }
           const existingIdx = this.data.profiles.findIndex(
             (p) => p.id === sp.id || p.email.toLowerCase() === sp.email.toLowerCase()
           );
@@ -263,12 +288,21 @@ class PagesDatabaseService {
             resolvedPaymentDetails.method = resolvedPaymentMethod;
           }
 
-          const isBanned = Boolean(sp.is_banned) ||
-            Boolean(sp.payment_details?.is_banned) ||
-            sp.sample_status === 'BANNED' ||
-            Boolean(existingProfile?.is_banned) ||
-            isUserBlacklisted(sp.id) ||
-            isEmailBlacklisted(sp.email);
+          const isBanned = (isUserBlacklisted(sp.id) || isEmailBlacklisted(sp.email))
+            ? true
+            : (existingProfile?.is_banned !== undefined
+                ? Boolean(existingProfile.is_banned)
+                : Boolean(sp.is_banned) || Boolean(sp.payment_details?.is_banned));
+
+          if (!isBanned && resolvedPaymentDetails) {
+            delete (resolvedPaymentDetails as any).is_banned;
+            delete (resolvedPaymentDetails as any).banned_at;
+            delete (resolvedPaymentDetails as any).ban_reason;
+          }
+
+          const resolvedSampleStatus = (existingProfile && !existingProfile.is_banned && existingProfile.sample_status === 'APPROVED')
+            ? 'APPROVED'
+            : (sp.sample_status || 'NOT_SUBMITTED');
 
           const mappedProfile: Profile = {
             id: sp.id,
@@ -286,21 +320,19 @@ class PagesDatabaseService {
             date_of_birth: sp.date_of_birth || undefined,
             password: sp.password || undefined,
             preferred_category: sp.preferred_category || 'PAGE_TURNING',
-            sample_status: sp.sample_status || 'NOT_SUBMITTED',
+            sample_status: resolvedSampleStatus,
             sample_submission_id: sp.sample_submission_id || undefined,
             sample_review_notes: sp.sample_review_notes || undefined,
             agreement_signed: Boolean(sp.agreement_signed),
             agreement_signed_at: sp.agreement_signed_at || undefined,
             agreement_signature_name: sp.agreement_signature_name || undefined,
             is_banned: isBanned,
-            banned_at: sp.banned_at ||
-              sp.payment_details?.banned_at ||
-              existingProfile?.banned_at ||
-              (isBanned ? (existingProfile?.banned_at || new Date().toISOString()) : undefined),
-            ban_reason: sp.ban_reason ||
-              sp.payment_details?.ban_reason ||
-              existingProfile?.ban_reason ||
-              (isBanned ? (existingProfile?.ban_reason || 'Permanent platform ban') : undefined),
+            banned_at: isBanned
+              ? (sp.banned_at || sp.payment_details?.banned_at || existingProfile?.banned_at || new Date().toISOString())
+              : undefined,
+            ban_reason: isBanned
+              ? (sp.ban_reason || sp.payment_details?.ban_reason || existingProfile?.ban_reason || 'Permanent platform ban')
+              : undefined,
             created_at: sp.created_at || new Date().toISOString(),
           };
           if (existingIdx !== -1) {
@@ -791,27 +823,55 @@ class PagesDatabaseService {
   }
 
   /**
-   * Remove a specific creator account by ID (admin-only action).
-   * Cleans up profiles, memberships, notifications. Does NOT delete submissions
-   * (retains audit trail). Returns false if creator not found.
+   * Remove a specific creator account by ID (admin or user self-deletion).
    */
   async removeCreatorById(creatorId: string): Promise<boolean> {
     this.reload();
-    const profile = this.data.profiles.find((p) => p.id === creatorId && p.role === 'CREATOR');
+    const profile = this.data.profiles.find((p) => p.id === creatorId);
     if (!profile) return false;
 
-    this.data.profiles = this.data.profiles.filter((p) => p.id !== creatorId);
+    // 1. Record tombstone
+    if (!this.data.deleted_creator_ids) this.data.deleted_creator_ids = [];
+    if (!this.data.deleted_creator_ids.includes(creatorId)) {
+      this.data.deleted_creator_ids.push(creatorId);
+    }
+    if (profile.email && !this.data.deleted_creator_ids.includes(profile.email.toLowerCase())) {
+      this.data.deleted_creator_ids.push(profile.email.toLowerCase());
+    }
+
+    const cleanEmail = profile.email.toLowerCase();
+    this.data.profiles = this.data.profiles.filter((p) => p.id !== creatorId && p.email.toLowerCase() !== cleanEmail);
     this.data.platform_memberships = this.data.platform_memberships.filter(
-      (m) => !(m.user_id === creatorId && m.platform_id === PLATFORM_ID)
+      (m) => m.user_id !== creatorId
     );
-    this.data.notifications = this.data.notifications.filter(
+    this.data.notifications = (this.data.notifications || []).filter(
       (n) => n.user_id !== creatorId
     );
+    this.data.chat_messages = (this.data.chat_messages || []).filter(
+      (m) => m.creator_id !== creatorId && m.sender_id !== creatorId
+    );
+    this.data.submissions = (this.data.submissions || []).filter((s) => s.creator_id !== creatorId);
+    this.data.payout_requests = (this.data.payout_requests || []).filter((pr) => pr.creator_id !== creatorId);
+    this.data.earnings_ledger = (this.data.earnings_ledger || []).filter((e) => e.creator_id !== creatorId);
     this.save();
 
     try {
-      await supabaseAdmin.from('platform_memberships').delete().eq('user_id', creatorId).eq('platform_id', PLATFORM_ID);
-      await supabaseAdmin.from('profiles').delete().eq('id', creatorId);
+      await supabaseAdmin.from('platform_memberships').delete().eq('user_id', creatorId);
+      await supabaseAdmin.from('notifications').delete().eq('user_id', creatorId);
+      await supabaseAdmin.from('chat_messages').delete().or(`creator_id.eq.${creatorId},sender_id.eq.${creatorId}`);
+      await supabaseAdmin.from('submissions').delete().eq('creator_id', creatorId);
+      await supabaseAdmin.from('payout_requests').delete().eq('creator_id', creatorId);
+      await supabaseAdmin.from('profiles').delete().or(`id.eq.${creatorId},email.eq.${cleanEmail}`);
+
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(creatorId);
+      } catch {}
+
+      await supabaseAdmin.from('platform_settings').upsert({
+        key: 'deleted_creator_ids',
+        value: this.data.deleted_creator_ids,
+        updated_at: new Date().toISOString(),
+      });
     } catch (e) {
       console.warn('[Pages DB] removeCreatorById Supabase delete warning:', e);
     }
@@ -1053,6 +1113,14 @@ class PagesDatabaseService {
     const profile = this.getProfileById(id);
     if (!profile) throw new Error('Profile not found.');
     Object.assign(profile, updates);
+
+    const isNowBanned = updates.is_banned !== undefined ? updates.is_banned : profile.is_banned;
+    if (!isNowBanned && profile.payment_details) {
+      delete (profile.payment_details as any).is_banned;
+      delete (profile.payment_details as any).banned_at;
+      delete (profile.payment_details as any).ban_reason;
+    }
+
     this.save();
 
     try {
@@ -1092,6 +1160,14 @@ class PagesDatabaseService {
     const profile = this.getProfileById(id);
     if (!profile) throw new Error('Profile not found.');
     Object.assign(profile, updates);
+
+    const isNowBanned = updates.is_banned !== undefined ? updates.is_banned : profile.is_banned;
+    if (!isNowBanned && profile.payment_details) {
+      delete (profile.payment_details as any).is_banned;
+      delete (profile.payment_details as any).banned_at;
+      delete (profile.payment_details as any).ban_reason;
+    }
+
     this.save();
     (async () => {
       try {
@@ -2263,6 +2339,10 @@ class PagesDatabaseService {
         (enhancedPaymentDetails as any).is_banned = true;
         (enhancedPaymentDetails as any).banned_at = profile.banned_at || new Date().toISOString();
         (enhancedPaymentDetails as any).ban_reason = profile.ban_reason || 'Permanent platform ban and blacklisting';
+      } else {
+        delete (enhancedPaymentDetails as any).is_banned;
+        delete (enhancedPaymentDetails as any).banned_at;
+        delete (enhancedPaymentDetails as any).ban_reason;
       }
 
       const { error } = await supabaseAdmin.from('profiles').upsert(
@@ -2938,16 +3018,40 @@ class PagesDatabaseService {
       const lastMessage = messages[messages.length - 1];
       const unreadCount = messages.filter((m) => !m.is_read && m.sender_role === 'CREATOR').length;
 
-      const resolvedCreator: Profile = this.getProfileById(creatorId) || {
-        id: creatorId,
-        email: 'creator@pages.pinkroom.online',
-        display_name: lastMessage.sender_role === 'CREATOR' ? lastMessage.sender_name : 'Creator',
-        role: 'CREATOR',
-        country: 'Nigeria',
-        preferred_category: 'PAGE_TURNING',
-        is_adult_confirmed: true,
-        created_at: lastMessage.created_at,
-      };
+      let resolvedCreator: Profile | undefined = this.getProfileById(creatorId);
+      if (!resolvedCreator) {
+        resolvedCreator = this.data.profiles.find(
+          (p) => p.id === creatorId || p.email.toLowerCase() === creatorId.toLowerCase()
+        );
+      }
+      if (!resolvedCreator) {
+        const sub = (this.data.submissions || []).find((s) => s.creator_id === creatorId);
+        const payout = (this.data.payout_requests || []).find((pr) => pr.creator_id === creatorId);
+        const creatorMsg = messages.find(
+          (m) => m.sender_role === 'CREATOR' && m.sender_name && m.sender_name.trim().toLowerCase() !== 'creator'
+        );
+        const displayName =
+          creatorMsg?.sender_name ||
+          sub?.creator_name ||
+          payout?.creator_name ||
+          (lastMessage.sender_role === 'CREATOR' && lastMessage.sender_name !== 'Creator' ? lastMessage.sender_name : '') ||
+          'Creator';
+        const email =
+          sub?.creator_email ||
+          payout?.creator_email ||
+          `${displayName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'creator'}@gmail.com`;
+
+        resolvedCreator = {
+          id: creatorId,
+          email,
+          display_name: displayName,
+          role: 'CREATOR',
+          country: 'Nigeria',
+          preferred_category: 'PAGE_TURNING',
+          is_adult_confirmed: true,
+          created_at: lastMessage.created_at,
+        };
+      }
 
       activeConvs.push({ creator: resolvedCreator, lastMessage, unreadCount });
     }
@@ -3034,19 +3138,21 @@ class PagesDatabaseService {
     this.reload();
     if (!this.data.chat_messages) return;
     let changed = false;
-    const updated: ChatMessage[] = [];
     this.data.chat_messages.forEach((m) => {
-      if (m.creator_id === creatorId && m.platform_id === PLATFORM_ID && m.sender_role !== readerRole && !m.is_read) {
+      if (m.creator_id === creatorId && m.sender_role !== readerRole && !m.is_read) {
         m.is_read = true;
         changed = true;
-        updated.push(m);
       }
     });
     if (changed) {
       this.save();
-      for (const m of updated) {
-        this.syncChatToSupabase(m);
-      }
+      Promise.resolve(
+        supabaseAdmin
+          .from('chat_messages')
+          .update({ is_read: true })
+          .eq('creator_id', creatorId)
+          .neq('sender_role', readerRole)
+      ).catch((e: any) => console.warn('[Pages DB] Supabase markChatRead batch update warning:', e));
     }
   }
 
@@ -3592,6 +3698,21 @@ class PagesDatabaseService {
     this.save();
   }
 
+  unbanIp(ip: string): void {
+    if (!ip) return;
+    const cleanIp = ip.trim();
+    this.reload();
+    if (this.data.banned_ips) {
+      this.data.banned_ips = this.data.banned_ips.filter((b) => b !== cleanIp);
+    }
+    if (this.data.banned_entries) {
+      this.data.banned_entries = this.data.banned_entries.filter(
+        (e) => !(e.type === 'IP' && e.value === cleanIp)
+      );
+    }
+    this.save();
+  }
+
   getBannedDevices(): string[] {
     this.reload();
     return Array.from(new Set(this.data.banned_devices || []));
@@ -3630,6 +3751,21 @@ class PagesDatabaseService {
     this.save();
   }
 
+  unbanDevice(deviceId: string): void {
+    if (!deviceId) return;
+    const clean = deviceId.trim();
+    this.reload();
+    if (this.data.banned_devices) {
+      this.data.banned_devices = this.data.banned_devices.filter((b) => b !== clean);
+    }
+    if (this.data.banned_entries) {
+      this.data.banned_entries = this.data.banned_entries.filter(
+        (e) => !(e.type === 'DEVICE' && e.value === clean)
+      );
+    }
+    this.save();
+  }
+
   getBannedEntries(): BannedEntry[] {
     this.reload();
     return this.data.banned_entries || [];
@@ -3650,6 +3786,27 @@ class PagesDatabaseService {
     this.data.banned_entries.splice(idx, 1);
     this.save();
     return true;
+  }
+
+  unbanCreatorEntries(creatorId: string): void {
+    if (!creatorId) return;
+    this.reload();
+    if (!this.data.banned_entries) return;
+    const entriesToRemove = this.data.banned_entries.filter(
+      (e) => e.target_user_ids && e.target_user_ids.includes(creatorId)
+    );
+    for (const entry of entriesToRemove) {
+      if (entry.type === 'IP' && this.data.banned_ips) {
+        this.data.banned_ips = this.data.banned_ips.filter((ip) => ip !== entry.value);
+      }
+      if (entry.type === 'DEVICE' && this.data.banned_devices) {
+        this.data.banned_devices = this.data.banned_devices.filter((dev) => dev !== entry.value);
+      }
+    }
+    this.data.banned_entries = this.data.banned_entries.filter(
+      (e) => !e.target_user_ids || !e.target_user_ids.includes(creatorId)
+    );
+    this.save();
   }
 
   // ==========================================

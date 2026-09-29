@@ -49,7 +49,10 @@ export async function getCurrentUser(): Promise<Profile | null> {
 
 export async function requireUser(): Promise<Profile> {
   const user = await getCurrentUser();
-  if (!user || user.is_banned || isUserBlacklisted(user.id) || isEmailBlacklisted(user.email)) {
+  if (!user) {
+    throw new Error('UNAUTHORIZED');
+  }
+  if (user.is_banned || isUserBlacklisted(user.id) || isEmailBlacklisted(user.email)) {
     throw new Error('ACCESS_DENIED_BANNED');
   }
   return user;

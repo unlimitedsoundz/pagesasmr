@@ -38,6 +38,7 @@ export default function AdminCreatorsPage() {
   const [sampleConfirmId, setSampleConfirmId] = useState<{id: string; name: string} | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [unbanningId, setUnbanningId] = useState<string | null>(null);
 
   // Payout Details Modal & Copy
   const [payoutModalCreator, setPayoutModalCreator] = useState<any | null>(null);
@@ -81,6 +82,7 @@ export default function AdminCreatorsPage() {
 
   const handleUnban = async (creator: any) => {
     if (!confirm(`Lift permanent ban for ${creator.display_name}?`)) return;
+    setUnbanningId(creator.id);
     try {
       const res = await fetch(`/api/admin/creators/ban?creatorId=${encodeURIComponent(creator.id)}`, {
         method: 'DELETE',
@@ -89,10 +91,12 @@ export default function AdminCreatorsPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to lift ban');
       toast.success(`Ban lifted for ${creator.display_name}.`);
       setCreators((prev) =>
-        prev.map((c) => (c.id === creator.id ? { ...c, is_banned: false } : c))
+        prev.map((c) => (c.id === creator.id ? { ...c, is_banned: false, sample_status: data.profile?.sample_status || c.sample_status } : c))
       );
     } catch (err: any) {
       toast.error(err.message || 'Error lifting ban');
+    } finally {
+      setUnbanningId(null);
     }
   };
 
@@ -249,15 +253,20 @@ export default function AdminCreatorsPage() {
       return;
     }
     setDeletingId(creator.id);
+    // Immediately remove from UI
+    setCreators((prev) => prev.filter((c) => c.id !== creator.id));
     try {
       const res = await fetch(`/api/admin/creators?id=${creator.id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete creator.');
 
       toast.success(`Creator "${creator.display_name}" was successfully removed.`, 'Creator Removed');
-      fetchCreators();
+      setTimeout(() => {
+        fetchCreators();
+      }, 1500);
     } catch (err: any) {
       toast.error(err.message || 'Error deleting creator.');
+      fetchCreators();
     } finally {
       setDeletingId(null);
     }
@@ -681,11 +690,12 @@ export default function AdminCreatorsPage() {
                           {c.is_banned ? (
                             <button
                               type="button"
+                              disabled={unbanningId === c.id}
                               onClick={() => handleUnban(c)}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold transition-colors border-0 shadow-xs"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold transition-colors border-0 shadow-xs disabled:opacity-50"
                               title="Lift permanent ban"
                             >
-                              <span>Unban</span>
+                              <span>{unbanningId === c.id ? 'Unbanning...' : 'Unban'}</span>
                             </button>
                           ) : (
                             <button

@@ -25,15 +25,6 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
       })
       .then((data) => {
         if (!data) return;
-        if (data.user?.role === 'ADMIN' || data.user?.email === 'unlymitedsoundz@gmail.com' || data.user?.email === 'admin@asmrcreator.com') {
-          try {
-            localStorage.removeItem('pinkroom_banned_device');
-            document.cookie = 'pinkroom_banned_device=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0';
-          } catch {}
-          setUser(data.user);
-          setLoading(false);
-          return;
-        }
         if (data.isBanned || data.user?.is_banned) {
           try {
             localStorage.setItem('pinkroom_banned_device', '1');
@@ -42,6 +33,13 @@ export default function CreatorLayout({ children }: { children: React.ReactNode 
           window.location.replace('/banned');
           return;
         }
+
+        // Legitimate user: actively clear any stale banned flags from device
+        try {
+          localStorage.removeItem('pinkroom_banned_device');
+          document.cookie = 'pinkroom_banned_device=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax';
+        } catch {}
+
         if (!data.user) {
           router.replace(`/auth/register?redirect=${encodeURIComponent(pathname)}`);
         } else {

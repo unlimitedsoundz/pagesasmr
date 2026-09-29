@@ -1670,6 +1670,7 @@
       "is_adult_confirmed": true,
       "payment_method": "PAYPAL",
       "payment_details": {
+        "method": "MOBILE_MONEY",
         "bankName": "",
         "bank_name": "",
         "wiseEmail": "",
@@ -1679,8 +1680,10 @@
         "paypal_email": "danielmweu15@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
+        "referral_code": "DANIE-BAB7A",
         "routingNumber": "",
         "account_number": "",
+        "payment_method": "MOBILE_MONEY",
         "routing_number": "",
         "beneficiaryName": "Daniel mweu",
         "beneficiary_name": "Daniel mweu",
@@ -1691,9 +1694,7 @@
         "nigerianAccountNumber": "",
         "nigerian_account_name": "Daniel mweu",
         "nigerian_account_number": "",
-        "mobile_money_account_name": "Daniel mweu",
-        "payment_method": "PAYPAL",
-        "method": "PAYPAL"
+        "mobile_money_account_name": "Daniel mweu"
       },
       "date_of_birth": "2001-01-30",
       "sample_status": "APPROVED",
@@ -16945,5 +16946,8 @@
       "proof_image_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/proofs/proof-2d85336b-0c34-48a9-a17f-a36028ef59d5-444a0c65-1790550331356.png",
       "creator_avatar_url": "https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/avatar-2d85336b-0c34-48a9-a17f-a36028ef59d5-1788819037691.jpg"
     }
-  ]
+  ],
+  "banned_devices": [],
+  "banned_entries": [],
+  "banned_ips": []
 }
