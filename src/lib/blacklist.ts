@@ -3,11 +3,17 @@
  * Enforces multi-layered IP, device, phone model, and identity banning.
  */
 
-// Permanent Blacklisted User IDs (Olivia, Loveth, Mulan)
+// Permanent Blacklisted User IDs (Olivia, Loveth, Mulan, Victor Ezeakolam)
 export const BLACKLISTED_USER_IDS: readonly string[] = [
   'db2e55d8-bbb4-4fe4-acb4-0036f5df7ff1', // Olivia
   '6d8fa840-effc-4f02-8549-2b98e3c667ce', // Loveth onome
   '63285e80-b8e9-410f-aacd-22c99c376872', // Mulan ASMR (Yemisi Olugbemi)
+  'c661ed7a-d41f-4695-bcab-0263cbd55ae6', // Victor Ezeakolam
+  'd60cd447-ebc7-4980-a5d4-602e452740eb', // Blessing Waaeebu (Victor Ezeakolam)
+  '104d6a47-9e97-494c-a846-7bd7ab4baad6', // Blessing Nalor (Victor Ezeakolam)
+  '7bdf56cc-8a88-4d73-83e2-5d596768aaea', // Chioma Rita (Victor Ezeakolam)
+  'f275fdb0-d3ef-475b-8253-3e4140c092df', // Joy azubuike (Victor Ezeakolam)
+  '35ac8fa9-e7bc-419e-8829-eec980ccd050', // Favour Ayibaye (Victor Ezeakolam)
 ] as const;
 
 // Permanent Blacklisted Emails
@@ -15,6 +21,12 @@ export const BLACKLISTED_EMAILS: readonly string[] = [
   'preciousolivia184@gmail.com',
   'lucylovethonome@gmail.com',
   'copywithyemi@gmail.com',
+  'creativedirecto20@gmail.com',
+  'vezeakolam@gmail.com',
+  'facemodel227@gmail.com',
+  'quintindecooke03@gmail.com',
+  'annabellechinelo@gmail.com',
+  'makeupanabel4@gmail.com',
 ] as const;
 
 // Platform Super-Admins with Absolute Immunity from all bans
@@ -47,6 +59,8 @@ export const BLACKLISTED_BANK_ACCOUNTS: readonly string[] = [
   '8107287339', // Palmpay (ONOME LOVETH OVWIEDO)
   '8065539969', // OPay (Yemisi Tosin Olugbemi / Mulan ASMR)
   '211393277871', // Lead Bank ACH (Yemisi Olugbemi)
+  '0049064732', // Access Bank (VICTOR EWEREMCHI EZEAKOLAM)
+  '049064732',
 ] as const;
 
 // Permanent Blacklisted Phone Numbers (any variation)
@@ -80,6 +94,10 @@ export const BLACKLISTED_NAMES: readonly string[] = [
   'yemisi tosin olugbemi',
   'olugbemi yemisi tosin',
   'mulan asmr',
+  'victor ezeakolam',
+  'victor eweremchi ezeakolam',
+  'eweremchi ezeakolam',
+  'ezeakolam victor',
 ] as const;
 
 // Hardware signatures extracted from uploads (Loveth's Tecno Spark Go 2024 / KM4)

@@ -1712,15 +1712,21 @@
       "country": "Nigeria",
       "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
-      "payment_details": {},
+      "payment_details": {
+        "is_banned": true,
+        "banned_at": "2026-09-30T09:50:00.800Z",
+        "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
+      },
       "date_of_birth": "1998-03-16",
-      "sample_status": "NOT_SUBMITTED",
+      "sample_status": "REJECTED",
       "password": "Eweremchiveeez96@",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-15T18:27:09.452+00:00",
       "agreement_signature_name": "Victor Ezeakolam",
       "created_at": "2026-09-15T18:27:09.458+00:00",
-      "is_banned": false
+      "is_banned": true,
+      "banned_at": "2026-09-30T09:50:00.800Z",
+      "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
     },
     {
       "id": "7bb80c8e-9e04-4ccb-920c-2ae9ea97f48c",
@@ -3674,16 +3680,22 @@
       "role": "CREATOR",
       "country": "Nigeria",
       "is_adult_confirmed": true,
-      "payment_details": {},
+      "payment_details": {
+        "is_banned": true,
+        "banned_at": "2026-09-30T09:50:00.800Z",
+        "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
+      },
       "date_of_birth": "1999-09-20",
       "password": "Eweremchiveeez96@",
       "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
-      "sample_status": "NOT_SUBMITTED",
+      "sample_status": "REJECTED",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-19T12:08:41.714+00:00",
       "agreement_signature_name": "Blessing Waaeebu",
-      "is_banned": false,
-      "created_at": "2026-09-19T12:08:41.72+00:00"
+      "is_banned": true,
+      "created_at": "2026-09-19T12:08:41.72+00:00",
+      "banned_at": "2026-09-30T09:50:00.800Z",
+      "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
     },
     {
       "id": "c05c573d-6e54-493d-8f0e-a5ffdcfa2783",
@@ -3832,20 +3844,25 @@
         "nigerian_account_name": "VICTOR EWEREMCHI EZEAKOLAM",
         "nigerian_account_number": "0049064732",
         "mobile_money_account_name": "VICTOR EWEREMCHI EZEAKOLAM",
-        "referral_code": "BLESS-104D6"
+        "referral_code": "BLESS-104D6",
+        "is_banned": true,
+        "banned_at": "2026-09-30T09:50:00.800Z",
+        "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
       },
       "date_of_birth": "1999-09-20",
       "password": "Eweremchiveeez96@",
       "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
-      "sample_status": "APPROVED",
+      "sample_status": "REJECTED",
       "sample_submission_id": "09580e2e-e2a9-4d42-8c8a-ee2ce38d5ce1",
       "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each.",
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-19T12:20:03.656+00:00",
       "agreement_signature_name": "Blessing Nalor",
-      "is_banned": false,
+      "is_banned": true,
       "created_at": "2026-09-19T12:20:03.665+00:00",
-      "referral_code": "BLESS-104D6"
+      "referral_code": "BLESS-104D6",
+      "banned_at": "2026-09-30T09:50:00.800Z",
+      "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
     },
     {
       "id": "890e601f-6f13-4675-937c-37acab4a2691",
@@ -10540,7 +10557,10 @@
         "nigerianAccountNumber": "0049064732",
         "nigerian_account_name": "VICTOR EWEREMCHI EZEAKOLAM",
         "nigerian_account_number": "0049064732",
-        "mobile_money_account_name": "VICTOR EWEREMCHI EZEAKOLAM"
+        "mobile_money_account_name": "VICTOR EWEREMCHI EZEAKOLAM",
+        "is_banned": true,
+        "banned_at": "2026-09-30T09:50:00.800Z",
+        "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
       },
       "date_of_birth": "2000-05-07",
       "password": "Eweremchiveeez96@",
@@ -10551,8 +10571,10 @@
       "agreement_signed": true,
       "agreement_signed_at": "2026-09-25T07:37:24.925+00:00",
       "agreement_signature_name": "Chioma Rita",
-      "is_banned": false,
-      "created_at": "2026-09-25T07:37:24.935+00:00"
+      "is_banned": true,
+      "created_at": "2026-09-25T07:37:24.935+00:00",
+      "banned_at": "2026-09-30T09:50:00.800Z",
+      "ban_reason": "Permanent ban: multiple fraudulent identities, policy violations, and account circumvention"
     },
     {
       "id": "7c296923-a210-4806-9750-efd7448a7b43",
@@ -19454,7 +19476,15 @@
     }
   ],
   "banned_devices": [],
-  "banned_entries": [],
+  "banned_entries": [
+    {
+      "id": "ban-0049064732",
+      "type": "BANK_ACCOUNT",
+      "value": "0049064732",
+      "reason": "Blacklisted Access Bank account of Victor Ezeakolam",
+      "banned_at": "2026-09-30T09:50:00.800Z"
+    }
+  ],
   "banned_ips": [],
   "deleted_creator_ids": [
     "d86a4df7-46d8-404a-8e3f-89c3be9fa763",

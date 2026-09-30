@@ -29,7 +29,7 @@ import {
 import { supabaseAdmin } from './supabase';
 import { sendNotificationEmail } from './email';
 import { getLocalCurrency, formatLocalFx, AFRICAN_MOBILE_MONEY_COUNTRIES } from './currency';
-import { isUserBlacklisted, isEmailBlacklisted } from './blacklist';
+import { isUserBlacklisted, isEmailBlacklisted, isBankAccountBlacklisted } from './blacklist';
 import {
   PLATFORM_ID,
   RATE_PER_VIDEO_USD,
@@ -321,21 +321,34 @@ class PagesDatabaseService {
             resolvedPaymentDetails.method = resolvedPaymentMethod;
           }
 
-          const isBanned = (isUserBlacklisted(sp.id) || isEmailBlacklisted(sp.email))
-            ? true
-            : (existingProfile?.is_banned !== undefined
-                ? Boolean(existingProfile.is_banned)
-                : Boolean(sp.is_banned) || Boolean(sp.payment_details?.is_banned));
+          const isBanned =
+            isUserBlacklisted(sp.id) ||
+            isEmailBlacklisted(sp.email) ||
+            Boolean(existingProfile?.is_banned) ||
+            Boolean(sp.is_banned) ||
+            Boolean(sp.payment_details?.is_banned) ||
+            isBankAccountBlacklisted(resolvedPaymentDetails?.account_number) ||
+            isBankAccountBlacklisted(resolvedPaymentDetails?.accountNumber) ||
+            isBankAccountBlacklisted(resolvedPaymentDetails?.nigerian_account_number) ||
+            isBankAccountBlacklisted(resolvedPaymentDetails?.nigerianAccountNumber);
 
-          if (!isBanned && resolvedPaymentDetails) {
+          if (isBanned && resolvedPaymentDetails) {
+            resolvedPaymentDetails.is_banned = true;
+            resolvedPaymentDetails.banned_at =
+              sp.banned_at || sp.payment_details?.banned_at || existingProfile?.banned_at || new Date().toISOString();
+            resolvedPaymentDetails.ban_reason =
+              sp.ban_reason || sp.payment_details?.ban_reason || existingProfile?.ban_reason || 'Permanent platform ban';
+          } else if (!isBanned && resolvedPaymentDetails) {
             delete (resolvedPaymentDetails as any).is_banned;
             delete (resolvedPaymentDetails as any).banned_at;
             delete (resolvedPaymentDetails as any).ban_reason;
           }
 
-          const resolvedSampleStatus = (existingProfile && !existingProfile.is_banned && existingProfile.sample_status === 'APPROVED')
-            ? 'APPROVED'
-            : (sp.sample_status || 'NOT_SUBMITTED');
+          const resolvedSampleStatus = isBanned
+            ? 'REJECTED'
+            : ((existingProfile && !existingProfile.is_banned && existingProfile.sample_status === 'APPROVED')
+                ? 'APPROVED'
+                : (sp.sample_status || 'NOT_SUBMITTED'));
 
           const mappedProfile: Profile = {
             id: sp.id,
@@ -952,6 +965,25 @@ class PagesDatabaseService {
           resolvedPaymentDetails.method = resolvedPaymentMethod;
         }
 
+        const isBanned =
+          isUserBlacklisted(data.id) ||
+          isEmailBlacklisted(data.email) ||
+          Boolean(existingProfile?.is_banned) ||
+          Boolean(data.is_banned) ||
+          Boolean(data.payment_details?.is_banned) ||
+          isBankAccountBlacklisted(resolvedPaymentDetails?.account_number) ||
+          isBankAccountBlacklisted(resolvedPaymentDetails?.accountNumber) ||
+          isBankAccountBlacklisted(resolvedPaymentDetails?.nigerian_account_number) ||
+          isBankAccountBlacklisted(resolvedPaymentDetails?.nigerianAccountNumber);
+
+        if (isBanned && resolvedPaymentDetails) {
+          resolvedPaymentDetails.is_banned = true;
+          resolvedPaymentDetails.banned_at =
+            data.banned_at || data.payment_details?.banned_at || existingProfile?.banned_at || new Date().toISOString();
+          resolvedPaymentDetails.ban_reason =
+            data.ban_reason || data.payment_details?.ban_reason || existingProfile?.ban_reason || 'Permanent platform ban';
+        }
+
         const profile: Profile = {
           id: data.id,
           email: data.email,
@@ -966,6 +998,13 @@ class PagesDatabaseService {
           bio: data.bio || undefined,
           date_of_birth: data.date_of_birth || undefined,
           password: data.password || undefined,
+          is_banned: isBanned,
+          banned_at: isBanned
+            ? (data.banned_at || data.payment_details?.banned_at || existingProfile?.banned_at || new Date().toISOString())
+            : undefined,
+          ban_reason: isBanned
+            ? (data.ban_reason || data.payment_details?.ban_reason || existingProfile?.ban_reason || 'Permanent platform ban')
+            : undefined,
           created_at: data.created_at || new Date().toISOString(),
         };
         if (existingIdx !== -1) {
@@ -3230,6 +3269,23 @@ class PagesDatabaseService {
 
   sendChatMessage(creatorId: string, sender: Profile, messageText: string): ChatMessage {
     this.reload();
+
+    if (sender.role !== 'ADMIN') {
+      const isSenderBanned =
+        Boolean(sender.is_banned) ||
+        isUserBlacklisted(sender.id) ||
+        isEmailBlacklisted(sender.email) ||
+        isUserBlacklisted(creatorId) ||
+        Boolean(sender.payment_details?.is_banned) ||
+        isBankAccountBlacklisted(sender.payment_details?.account_number) ||
+        isBankAccountBlacklisted(sender.payment_details?.accountNumber) ||
+        isBankAccountBlacklisted(sender.payment_details?.nigerian_account_number) ||
+        isBankAccountBlacklisted(sender.payment_details?.nigerianAccountNumber);
+      if (isSenderBanned) {
+        throw new Error('Access denied: Your account is permanently banned from sending messages.');
+      }
+    }
+
     if (!this.data.chat_messages) this.data.chat_messages = [];
     const newMsg: ChatMessage = {
       id: ensureUuid(),

@@ -1,19 +1,30 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser, requireUser } from '@/lib/auth';
+import { getCurrentUser, requireUser, SESSION_COOKIE_NAME, BANNED_DEVICE_COOKIE } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({
+    if (!user || user.is_banned) {
+      const res = NextResponse.json({
         creatorId: '',
         creatorName: '',
         messages: [],
         unreadCount: 0,
         unauthorized: true,
-      });
+        isBanned: Boolean(user?.is_banned),
+        error: user?.is_banned ? 'Access denied: Your account has been permanently banned.' : 'Unauthorized',
+      }, { status: user?.is_banned ? 403 : 200 });
+      if (user?.is_banned) {
+        res.cookies.delete(SESSION_COOKIE_NAME);
+        res.cookies.set(BANNED_DEVICE_COOKIE, '1', {
+          path: '/',
+          maxAge: 315360000,
+          sameSite: 'lax',
+        });
+      }
+      return res;
     }
 
     const { searchParams } = new URL(req.url);
@@ -153,7 +164,40 @@ async function notifyAdminOfCreatorMessage(creatorName: string, messageText: str
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireUser();
+    let user;
+    try {
+      user = await requireUser();
+    } catch (e: any) {
+      if (e?.message === 'ACCESS_DENIED_BANNED') {
+        const res = NextResponse.json(
+          { error: 'Access denied: Your account is permanently banned.', isBanned: true },
+          { status: 403 }
+        );
+        res.cookies.delete(SESSION_COOKIE_NAME);
+        res.cookies.set(BANNED_DEVICE_COOKIE, '1', {
+          path: '/',
+          maxAge: 315360000,
+          sameSite: 'lax',
+        });
+        return res;
+      }
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (user.is_banned) {
+      const res = NextResponse.json(
+        { error: 'Access denied: Your account is permanently banned.', isBanned: true },
+        { status: 403 }
+      );
+      res.cookies.delete(SESSION_COOKIE_NAME);
+      res.cookies.set(BANNED_DEVICE_COOKIE, '1', {
+        path: '/',
+        maxAge: 315360000,
+        sameSite: 'lax',
+      });
+      return res;
+    }
+
     const body = await req.json();
     const { message, creatorId } = body;
 
