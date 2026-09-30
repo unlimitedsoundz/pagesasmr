@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const user = await requireUser();
     await db.syncFromSupabase();
+    const freshProfile = (await db.getProfileByIdAsync(user.id)) || user;
     const stats = db.getCreatorStats(user.id);
     const ledger = db.getEarningsLedger(user.id);
     const settings = db.getSettings();
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
       stats,
       ledger,
       settings,
-      profile: user,
+      profile: freshProfile,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Unauthorized' }, { status: 401 });

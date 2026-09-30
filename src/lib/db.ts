@@ -201,13 +201,32 @@ class PagesDatabaseService {
       return;
     }
     this.data.referrals = diskData.referrals || [];
-    this.data.earnings_ledger = diskData.earnings_ledger || [];
     this.data.notifications = diskData.notifications || [];
     this.data.platform_memberships = diskData.platform_memberships || [];
     this.data.settings = diskData.settings || this.data.settings || DEFAULT_SETTINGS;
-    this.data.payout_requests = diskData.payout_requests || [];
     this.data.testimonials = diskData.testimonials || [];
     this.data.deleted_creator_ids = diskData.deleted_creator_ids || this.data.deleted_creator_ids || [];
+
+    // Refresh and merge payout_requests from disk, preserving any in-memory requests
+    const diskPayoutMap = new Map((diskData.payout_requests || []).map((p) => [p.id, p]));
+    for (const memP of (this.data.payout_requests || [])) {
+      if (!diskPayoutMap.has(memP.id)) {
+        diskPayoutMap.set(memP.id, memP);
+      } else {
+        const dp = diskPayoutMap.get(memP.id)!;
+        diskPayoutMap.set(memP.id, { ...dp, ...memP });
+      }
+    }
+    this.data.payout_requests = Array.from(diskPayoutMap.values());
+
+    // Refresh and merge earnings_ledger from disk, preserving in-memory entries
+    const diskLedgerMap = new Map((diskData.earnings_ledger || []).map((l) => [l.id, l]));
+    for (const memL of (this.data.earnings_ledger || [])) {
+      if (!diskLedgerMap.has(memL.id)) {
+        diskLedgerMap.set(memL.id, memL);
+      }
+    }
+    this.data.earnings_ledger = Array.from(diskLedgerMap.values());
 
     // Refresh and merge chat_messages from disk so concurrent requests/workers immediately see new messages
     if (diskData.chat_messages) {
@@ -228,12 +247,20 @@ class PagesDatabaseService {
 
     const deletedSet = new Set(this.data.deleted_creator_ids || []);
     const memProfilesMap = new Map(this.data.profiles.map((p) => [p.id, p]));
+    const diskProfileIds = new Set<string>();
     this.data.profiles = (diskData.profiles || [])
       .filter((dp) => !deletedSet.has(dp.id) && !deletedSet.has(dp.email.toLowerCase()))
       .map((dp) => {
+        diskProfileIds.add(dp.id);
         const mem = memProfilesMap.get(dp.id);
         return mem ? { ...dp, ...mem } : dp;
       });
+    // Also preserve in-memory profiles that haven't been flushed to disk yet
+    for (const [id, memProf] of memProfilesMap.entries()) {
+      if (!diskProfileIds.has(id) && !deletedSet.has(id) && !deletedSet.has(memProf.email?.toLowerCase())) {
+        this.data.profiles.push(memProf);
+      }
+    }
 
     const existingSubIds = new Set(this.data.submissions.map((s) => s.id));
     for (const sub of diskData.submissions) {
@@ -906,6 +933,25 @@ class PagesDatabaseService {
     try {
       const { data, error } = await supabaseAdmin.from('profiles').select('*').eq('id', id).single();
       if (!error && data) {
+        const existingIdx = this.data.profiles.findIndex((p) => p.id === id);
+        const existingProfile = existingIdx !== -1 ? this.data.profiles[existingIdx] : undefined;
+
+        const resolvedPaymentMethod =
+          (data.payment_method as any) ||
+          (data.payment_details?.payment_method as any) ||
+          (data.payment_details?.method as any) ||
+          (existingProfile?.payment_method as any) ||
+          undefined;
+
+        const resolvedPaymentDetails = data.payment_details && typeof data.payment_details === 'object' && Object.keys(data.payment_details).length > 0
+          ? { ...(existingProfile?.payment_details || {}), ...data.payment_details }
+          : { ...(existingProfile?.payment_details || {}) };
+
+        if (resolvedPaymentMethod && !resolvedPaymentDetails.payment_method) {
+          resolvedPaymentDetails.payment_method = resolvedPaymentMethod;
+          resolvedPaymentDetails.method = resolvedPaymentMethod;
+        }
+
         const profile: Profile = {
           id: data.id,
           email: data.email,
@@ -914,17 +960,21 @@ class PagesDatabaseService {
           country: data.country,
           preferred_category: data.preferred_category || 'PAGE_TURNING',
           is_adult_confirmed: data.is_adult_confirmed,
-          payment_method: data.payment_method as any,
-          payment_details: data.payment_details || {},
+          payment_method: resolvedPaymentMethod,
+          payment_details: resolvedPaymentDetails,
           avatar_url: data.avatar_url || undefined,
           bio: data.bio || undefined,
           date_of_birth: data.date_of_birth || undefined,
           password: data.password || undefined,
           created_at: data.created_at || new Date().toISOString(),
         };
-        this.data.profiles.push(profile);
+        if (existingIdx !== -1) {
+          this.data.profiles[existingIdx] = { ...this.data.profiles[existingIdx], ...profile };
+        } else {
+          this.data.profiles.push(profile);
+        }
         this.save();
-        return profile;
+        return this.data.profiles[existingIdx !== -1 ? existingIdx : this.data.profiles.length - 1];
       }
     } catch { }
     return undefined;
@@ -944,6 +994,25 @@ class PagesDatabaseService {
         .ilike('email', email.trim())
         .single();
       if (!error && data) {
+        const existingIdx = this.data.profiles.findIndex((p) => p.email.toLowerCase() === email.trim().toLowerCase());
+        const existingProfile = existingIdx !== -1 ? this.data.profiles[existingIdx] : undefined;
+
+        const resolvedPaymentMethod =
+          (data.payment_method as any) ||
+          (data.payment_details?.payment_method as any) ||
+          (data.payment_details?.method as any) ||
+          (existingProfile?.payment_method as any) ||
+          undefined;
+
+        const resolvedPaymentDetails = data.payment_details && typeof data.payment_details === 'object' && Object.keys(data.payment_details).length > 0
+          ? { ...(existingProfile?.payment_details || {}), ...data.payment_details }
+          : { ...(existingProfile?.payment_details || {}) };
+
+        if (resolvedPaymentMethod && !resolvedPaymentDetails.payment_method) {
+          resolvedPaymentDetails.payment_method = resolvedPaymentMethod;
+          resolvedPaymentDetails.method = resolvedPaymentMethod;
+        }
+
         const profile: Profile = {
           id: data.id,
           email: data.email,
@@ -952,17 +1021,21 @@ class PagesDatabaseService {
           country: data.country,
           preferred_category: data.preferred_category || 'PAGE_TURNING',
           is_adult_confirmed: data.is_adult_confirmed,
-          payment_method: data.payment_method as any,
-          payment_details: data.payment_details || {},
+          payment_method: resolvedPaymentMethod,
+          payment_details: resolvedPaymentDetails,
           avatar_url: data.avatar_url || undefined,
           bio: data.bio || undefined,
           date_of_birth: data.date_of_birth || undefined,
           password: data.password || undefined,
           created_at: data.created_at || new Date().toISOString(),
         };
-        this.data.profiles.push(profile);
+        if (existingIdx !== -1) {
+          this.data.profiles[existingIdx] = { ...this.data.profiles[existingIdx], ...profile };
+        } else {
+          this.data.profiles.push(profile);
+        }
         this.save();
-        return profile;
+        return this.data.profiles[existingIdx !== -1 ? existingIdx : this.data.profiles.length - 1];
       }
     } catch { }
     return undefined;
@@ -1129,57 +1202,30 @@ class PagesDatabaseService {
     return profile;
   }
 
-  async updateProfileAsync(id: string, updates: Partial<Profile>): Promise<Profile> {
-    const profile = this.getProfileById(id);
-    if (!profile) throw new Error('Profile not found.');
-    Object.assign(profile, updates);
-
-    const isNowBanned = updates.is_banned !== undefined ? updates.is_banned : profile.is_banned;
-    if (!isNowBanned && profile.payment_details) {
-      delete (profile.payment_details as any).is_banned;
-      delete (profile.payment_details as any).banned_at;
-      delete (profile.payment_details as any).ban_reason;
-    }
-
-    this.save();
-
-    try {
-      await supabaseAdmin.from('profiles').upsert(
-        {
-          id: profile.id,
-          email: profile.email,
-          display_name: profile.display_name,
-          role: profile.role,
-          country: profile.country || 'Nigeria',
-          preferred_category: profile.preferred_category || 'PAGE_TURNING',
-          is_adult_confirmed: Boolean(profile.is_adult_confirmed),
-          avatar_url: profile.avatar_url || null,
-          bio: profile.bio || null,
-          date_of_birth: profile.date_of_birth || null,
-          sample_status: profile.sample_status || 'NOT_SUBMITTED',
-          sample_submission_id: profile.sample_submission_id || null,
-          sample_review_notes: profile.sample_review_notes || null,
-          payment_method: profile.payment_method || null,
-          payment_details: profile.payment_details || {},
-          password: profile.password || null,
-          agreement_signed: Boolean(profile.agreement_signed ?? true),
-          agreement_signed_at: profile.agreement_signed_at || profile.created_at,
-          agreement_signature_name: profile.agreement_signature_name || profile.display_name,
-          created_at: profile.created_at,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'email' }
-      );
-    } catch (e) {
-      console.error('[Pages DB] Update profile error:', e);
-    }
-    return profile;
-  }
-
   updateProfile(id: string, updates: Partial<Profile>): Profile {
     const profile = this.getProfileById(id);
     if (!profile) throw new Error('Profile not found.');
+
+    const isNewMethodActive = updates.payment_method && updates.payment_method !== 'PAYPAL' && updates.payment_method !== 'WISE';
+    const mergedDetails = updates.payment_details !== undefined
+      ? { ...(profile.payment_details || {}), ...updates.payment_details }
+      : (profile.payment_details ? { ...profile.payment_details } : undefined);
+
+    if (isNewMethodActive && mergedDetails) {
+      delete (mergedDetails as any).paypal_email;
+      delete (mergedDetails as any).paypalEmail;
+      delete (mergedDetails as any).wise_email;
+      delete (mergedDetails as any).wiseEmail;
+    }
+    if (updates.payment_method && mergedDetails) {
+      mergedDetails.payment_method = updates.payment_method;
+      mergedDetails.method = updates.payment_method;
+    }
+
     Object.assign(profile, updates);
+    if (mergedDetails !== undefined) {
+      profile.payment_details = mergedDetails;
+    }
 
     const isNowBanned = updates.is_banned !== undefined ? updates.is_banned : profile.is_banned;
     if (!isNowBanned && profile.payment_details) {
@@ -1189,13 +1235,14 @@ class PagesDatabaseService {
     }
 
     this.save();
-    (async () => {
-      try {
-        await supabaseAdmin.from('profiles').update(updates).eq('id', id);
-      } catch (e) {
-        console.error('[Pages DB] Update profile error:', e);
-      }
-    })();
+    // Safely sync to Supabase using syncProfileToSupabase (respects check constraint and enhanced payment details)
+    this.syncProfileToSupabase(profile);
+    return profile;
+  }
+
+  async updateProfileAsync(id: string, updates: Partial<Profile>): Promise<Profile> {
+    const profile = this.updateProfile(id, updates);
+    await this.syncProfileToSupabase(profile);
     return profile;
   }
 

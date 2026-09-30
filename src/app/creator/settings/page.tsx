@@ -216,38 +216,38 @@ export default function CreatorSettingsPage() {
       if (storedName) setDisplayName(storedName);
     } catch {}
 
-    fetch('/api/creator/profile', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.profile) {
-          setProfile(data.profile);
-          if (data.profile.display_name && !localStorage.getItem('pinkroom_display_name')) {
-            setDisplayName(data.profile.display_name);
+      fetch('/api/creator/profile', { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.profile) {
+            setProfile(data.profile);
+            if (data.profile.display_name) {
+              setDisplayName(data.profile.display_name);
+            }
+            if (data.profile.email) {
+              setEmail(data.profile.email);
+            }
+            if (data.profile.payment_method) {
+              setPaymentMethod(data.profile.payment_method);
+            }
+            if (data.profile.payment_details) {
+              const d = data.profile.payment_details;
+              // Support both camelCase (legacy) and snake_case (canonical) keys
+              if (d.beneficiaryName || d.beneficiary_name) setBeneficiaryName(d.beneficiaryName || d.beneficiary_name || '');
+              if (d.nigerianBankName || d.nigerian_bank_name) setNigerianBankName(d.nigerianBankName || d.nigerian_bank_name || 'Access Bank');
+              if (d.nigerianAccountNumber || d.nigerian_account_number) setNigerianAccountNumber(d.nigerianAccountNumber || d.nigerian_account_number || '');
+              if (d.mobileNetwork || d.mobile_money_provider) setMobileNetwork(d.mobileNetwork || d.mobile_money_provider || 'M-Pesa');
+              if (d.mobileNumber || d.mobile_money_phone) setMobileNumber(d.mobileNumber || d.mobile_money_phone || '');
+              if (d.wiseEmail || d.wise_email) setWiseEmail(d.wiseEmail || d.wise_email || '');
+              if (d.paypalEmail || d.paypal_email) setPaypalEmail(d.paypalEmail || d.paypal_email || '');
+              if (d.bankName || d.bank_name) setBankName(d.bankName || d.bank_name || '');
+              if (d.routingNumber || d.routing_number) setRoutingNumber(d.routingNumber || d.routing_number || '');
+              if (d.accountNumber || d.account_number) setAccountNumber(d.accountNumber || d.account_number || '');
+            }
           }
-          if (data.profile.email) {
-            setEmail(data.profile.email);
-          }
-          if (data.profile.payment_method && !localStorage.getItem('pinkroom_payment_method')) {
-            setPaymentMethod(data.profile.payment_method);
-          }
-          if (data.profile.payment_details && !localStorage.getItem('pinkroom_payment_details')) {
-            const d = data.profile.payment_details;
-            // Support both camelCase (legacy) and snake_case (canonical) keys
-            if (d.beneficiaryName || d.beneficiary_name) setBeneficiaryName(d.beneficiaryName || d.beneficiary_name || '');
-            if (d.nigerianBankName || d.nigerian_bank_name) setNigerianBankName(d.nigerianBankName || d.nigerian_bank_name || 'Access Bank');
-            if (d.nigerianAccountNumber || d.nigerian_account_number) setNigerianAccountNumber(d.nigerianAccountNumber || d.nigerian_account_number || '');
-            if (d.mobileNetwork || d.mobile_money_provider) setMobileNetwork(d.mobileNetwork || d.mobile_money_provider || 'M-Pesa');
-            if (d.mobileNumber || d.mobile_money_phone) setMobileNumber(d.mobileNumber || d.mobile_money_phone || '');
-            if (d.wiseEmail || d.wise_email) setWiseEmail(d.wiseEmail || d.wise_email || '');
-            if (d.paypalEmail || d.paypal_email) setPaypalEmail(d.paypalEmail || d.paypal_email || '');
-            if (d.bankName || d.bank_name) setBankName(d.bankName || d.bank_name || '');
-            if (d.routingNumber || d.routing_number) setRoutingNumber(d.routingNumber || d.routing_number || '');
-            if (d.accountNumber || d.account_number) setAccountNumber(d.accountNumber || d.account_number || '');
-          }
-        }
-      })
-      .catch((err) => console.error('Failed to load profile', err))
-      .finally(() => setLoading(false));
+        })
+        .catch((err) => console.error('Failed to load profile', err))
+        .finally(() => setLoading(false));
     // Listen to theme-change event from Navbar ThemeToggle
     const handleThemeChange = (e: CustomEvent<{ theme: 'light' | 'dark' }>) => {
       setIsDark(e.detail.theme === 'dark');
@@ -367,38 +367,121 @@ export default function CreatorSettingsPage() {
   };
 
   const handleSavePaymentPreference = async () => {
+    if (!paymentMethod) {
+      toast.error('Please select your preferred payout method from the dropdown before saving.', 'Select Payout Method');
+      return;
+    }
     if (paymentMethod === 'PAYPAL' || paymentMethod === 'WISE') {
       toast.error('Wise and PayPal have been discontinued as payout methods. Please select a supported payout method (Nigerian Local Bank Transfer, African Mobile Money, or US ACH / Wire) and provide your details before saving.', 'Update Required');
       return;
     }
+
+    const cleanBenName = (beneficiaryName || resolvedNubanName).trim();
+
+    if (paymentMethod === 'NIGERIA_BANK') {
+      const cleanAcc = nigerianAccountNumber.replace(/\D/g, '');
+      if (cleanAcc.length !== 10) {
+        toast.error('Please enter a valid 10-digit Nigerian NUBAN account number.', 'Invalid Account Number');
+        return;
+      }
+      if (!cleanBenName) {
+        toast.error('Please provide the verified legal beneficiary full name for this bank account.', 'Beneficiary Name Required');
+        return;
+      }
+    } else if (paymentMethod === 'MOBILE_MONEY') {
+      const cleanPhone = mobileNumber.replace(/\s+/g, '');
+      if (!cleanPhone || cleanPhone.length < 8) {
+        toast.error('Please enter a valid registered mobile number (e.g. +254... or 07...).', 'Mobile Number Required');
+        return;
+      }
+      if (!cleanBenName) {
+        toast.error('Please enter the legal full name matching your mobile wallet recipient registration.', 'Beneficiary Name Required');
+        return;
+      }
+    } else if (paymentMethod === 'ACH') {
+      if (!bankName.trim()) {
+        toast.error('Please enter your US bank name.', 'Bank Name Required');
+        return;
+      }
+      const cleanRouting = routingNumber.replace(/\D/g, '');
+      if (cleanRouting.length !== 9) {
+        toast.error('Please enter a valid 9-digit ABA routing transit number.', 'Invalid Routing Transit Number');
+        return;
+      }
+      if (!accountNumber.trim()) {
+        toast.error('Please enter your checking or savings account number.', 'Account Number Required');
+        return;
+      }
+      if (!cleanBenName) {
+        toast.error('Please enter your legal beneficiary full name.', 'Beneficiary Name Required');
+        return;
+      }
+    } else if (paymentMethod === 'WIRE') {
+      if (!bankName.trim()) {
+        toast.error('Please enter the international bank name.', 'Bank Name Required');
+        return;
+      }
+      if (!routingNumber.trim()) {
+        toast.error('Please enter the SWIFT / BIC code for international wire.', 'SWIFT / BIC Code Required');
+        return;
+      }
+      if (!accountNumber.trim()) {
+        toast.error('Please enter your IBAN or international account number.', 'Account Number Required');
+        return;
+      }
+      if (!cleanBenName) {
+        toast.error('Please enter your legal beneficiary full name.', 'Beneficiary Name Required');
+        return;
+      }
+    }
+
     setSavingPayment(true);
-    // Include both camelCase (for settings restore logic) and snake_case (for db.ts resolver)
-    const details = {
-      // camelCase keys — used by settings page restore
-      beneficiaryName: beneficiaryName.trim(),
-      nigerianBankName,
-      nigerianAccountNumber: nigerianAccountNumber.trim(),
-      mobileNetwork,
-      mobileNumber: mobileNumber.trim(),
-      wiseEmail: wiseEmail.trim(),
-      paypalEmail: paypalEmail.trim(),
-      bankName: bankName.trim(),
-      routingNumber: routingNumber.trim(),
-      accountNumber: accountNumber.trim(),
-      // snake_case keys — used by db.ts requestPayout resolver
-      beneficiary_name: beneficiaryName.trim(),
-      nigerian_bank_name: nigerianBankName,
-      nigerian_account_number: nigerianAccountNumber.trim(),
-      nigerian_account_name: (resolvedNubanName || beneficiaryName).trim(),
-      mobile_money_provider: mobileNetwork,
-      mobile_money_phone: mobileNumber.trim(),
-      mobile_money_account_name: beneficiaryName.trim(),
-      wise_email: wiseEmail.trim(),
-      paypal_email: paypalEmail.trim(),
-      bank_name: bankName.trim(),
-      routing_number: routingNumber.trim(),
-      account_number: accountNumber.trim(),
+
+    const cleanNuban = nigerianAccountNumber.replace(/\D/g, '');
+    const cleanMobile = mobileNumber.replace(/\s+/g, '');
+    const cleanRouting = routingNumber.trim();
+    const cleanAcc = accountNumber.trim();
+
+    const details: any = {
+      // Common identifiers
+      method: paymentMethod,
+      payment_method: paymentMethod,
+      beneficiaryName: cleanBenName,
+      beneficiary_name: cleanBenName,
+      // Discontinued methods explicitly cleared
+      wiseEmail: '',
+      wise_email: '',
+      paypalEmail: '',
+      paypal_email: '',
     };
+
+    if (paymentMethod === 'NIGERIA_BANK') {
+      details.nigerianBankName = nigerianBankName;
+      details.nigerian_bank_name = nigerianBankName;
+      details.nigerianAccountNumber = cleanNuban;
+      details.nigerian_account_number = cleanNuban;
+      details.nigerian_account_name = cleanBenName;
+    } else if (paymentMethod === 'MOBILE_MONEY') {
+      details.mobileNetwork = mobileNetwork;
+      details.mobile_money_provider = mobileNetwork;
+      details.mobileNumber = cleanMobile;
+      details.mobile_money_phone = cleanMobile;
+      details.mobile_money_account_name = cleanBenName;
+    } else if (paymentMethod === 'ACH') {
+      details.bankName = bankName.trim();
+      details.bank_name = bankName.trim();
+      details.routingNumber = cleanRouting;
+      details.routing_number = cleanRouting;
+      details.accountNumber = cleanAcc;
+      details.account_number = cleanAcc;
+    } else if (paymentMethod === 'WIRE') {
+      details.bankName = bankName.trim();
+      details.bank_name = bankName.trim();
+      details.routingNumber = cleanRouting.toUpperCase();
+      details.routing_number = cleanRouting.toUpperCase();
+      details.accountNumber = cleanAcc;
+      details.account_number = cleanAcc;
+    }
 
     try {
       localStorage.setItem('pinkroom_payment_method', paymentMethod);
@@ -928,7 +1011,7 @@ export default function CreatorSettingsPage() {
               </div>
 
               {/* Action Required Alert if user currently has PayPal or Wise configured */}
-              {(paymentMethod === 'PAYPAL' || paymentMethod === 'WISE' || creatorHasDiscontinuedPayPal(profile)) && (
+              {(paymentMethod === 'PAYPAL' || paymentMethod === 'WISE' || (!paymentMethod && creatorHasDiscontinuedPayPal(profile))) && (
                 <div className="w-full bg-[#FCEBF2] dark:bg-[#23151F] border border-[#F3D3E1] dark:border-[#3D2132] rounded-2xl p-6 sm:p-7 transition-all text-left shadow-xs">
                   <div className="flex items-start gap-4 sm:gap-5">
                     <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-[#2F1C2A] shadow-xs flex items-center justify-center shrink-0 mt-0.5">

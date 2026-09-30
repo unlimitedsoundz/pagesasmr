@@ -143,8 +143,8 @@ export function isNameBlacklisted(name?: string | null): boolean {
 export function isBankAccountBlacklisted(accountNumber?: string | null): boolean {
   if (!accountNumber) return false;
   const digits = accountNumber.replace(/\D/g, '');
-  if (!digits) return false;
-  return BLACKLISTED_BANK_ACCOUNTS.some((b) => digits.includes(b) || b.includes(digits));
+  if (!digits || digits.length < 8) return false;
+  return BLACKLISTED_BANK_ACCOUNTS.some((b) => digits === b || (digits.length >= 10 && digits.includes(b)));
 }
 
 /**

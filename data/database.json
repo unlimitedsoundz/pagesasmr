@@ -1562,15 +1562,11 @@
       "country": "Kenya",
       "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
-      "payment_method": "PAYPAL",
+      "payment_method": "MOBILE_MONEY",
       "payment_details": {
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "rezilauqetrisha@gmail.com",
         "mobileNumber": "+254708216914",
-        "paypal_email": "rezilauqetrisha@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
@@ -1586,8 +1582,8 @@
         "nigerian_account_name": "Lily Sawe",
         "nigerian_account_number": "",
         "mobile_money_account_name": "Lily Sawe",
-        "payment_method": "PAYPAL",
-        "method": "PAYPAL"
+        "payment_method": "MOBILE_MONEY",
+        "method": "MOBILE_MONEY"
       },
       "date_of_birth": "2002-12-24",
       "sample_status": "APPROVED",
@@ -1677,11 +1673,7 @@
         "method": "MOBILE_MONEY",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "danielmweu15@gmail.com",
         "mobileNumber": "254796409730",
-        "paypal_email": "danielmweu15@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "referral_code": "DANIE-BAB7A",
@@ -2332,11 +2324,7 @@
       "payment_details": {
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "favouromonigho221@gmail.com",
-        "wise_email": "favouromonigho221@gmail.com",
-        "paypalEmail": "",
         "mobileNumber": "",
-        "paypal_email": "",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
@@ -3110,11 +3098,7 @@
         "method": "NIGERIA_BANK",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "techwizardishim@outlook.com",
         "mobileNumber": "",
-        "paypal_email": "techwizardishim@outlook.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
@@ -3978,21 +3962,17 @@
       "role": "CREATOR",
       "country": "Nigeria",
       "is_adult_confirmed": true,
-      "payment_method": "PAYPAL",
+      "payment_method": "NIGERIA_BANK",
       "payment_details": {
-        "method": "PAYPAL",
+        "method": "NIGERIA_BANK",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "victoriaobie0@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "victoriaobie0@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
         "account_number": "",
-        "payment_method": "PAYPAL",
+        "payment_method": "NIGERIA_BANK",
         "routing_number": "",
         "beneficiaryName": "Victoria Obie",
         "beneficiary_name": "Victoria Obie",
@@ -4334,21 +4314,17 @@
       "role": "CREATOR",
       "country": "United Kingdom",
       "is_adult_confirmed": true,
-      "payment_method": "PAYPAL",
+      "payment_method": "NIGERIA_BANK",
       "payment_details": {
-        "method": "PAYPAL",
+        "method": "NIGERIA_BANK",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "joy.d.ugc.creator@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "joy.d.ugc.creator@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
         "account_number": "",
-        "payment_method": "PAYPAL",
+        "payment_method": "NIGERIA_BANK",
         "routing_number": "",
         "beneficiaryName": "Joy Chinaecherem",
         "beneficiary_name": "Joy Chinaecherem",
@@ -4615,11 +4591,7 @@
         "method": "MOBILE_MONEY",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "sallieomondi16@gmail.com",
         "mobileNumber": "+254790578954",
-        "paypal_email": "sallieomondi16@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
@@ -6052,11 +6024,7 @@
         "method": "WIRE",
         "bankName": "Capitec bank",
         "bank_name": "Capitec bank",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "ntokozo.ndlovu17@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "ntokozo.ndlovu17@gmail.com",
         "accountNumber": "1343520868",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "CABLZAJJ",
@@ -7505,21 +7473,17 @@
       "country": "Botswana",
       "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
-      "payment_method": "PAYPAL",
+      "payment_method": "ACH",
       "payment_details": {
-        "method": "PAYPAL",
+        "method": "ACH",
         "bankName": "First National Bank",
         "bank_name": "First National Bank",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "refilwemmopi77@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "refilwemmopi77@gmail.com",
         "accountNumber": "62260724549",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "FIRNZAJJ",
         "account_number": "62260724549",
-        "payment_method": "PAYPAL",
+        "payment_method": "ACH",
         "routing_number": "FIRNZAJJ",
         "beneficiaryName": "Refilwe Mmopi",
         "beneficiary_name": "Refilwe Mmopi",
@@ -7721,11 +7685,7 @@
         "method": "WIRE",
         "bankName": "First national bank",
         "bank_name": "First national bank",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "unnamiss2@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "unnamiss2@gmail.com",
         "accountNumber": "63210756110",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "FIRNZAJJ",
@@ -8053,11 +8013,7 @@
         "method": "WIRE",
         "bankName": "Stanbic Bank",
         "bank_name": "Stanbic Bank",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "mpulebotsang@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "mpulebotsang@gmail.com",
         "accountNumber": "9060006284391",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "SBICBWGX",
@@ -8906,21 +8862,17 @@
       "country": "South Africa",
       "preferred_category": "THIGH_FLAPPING_AND_GUM_CHEWING",
       "is_adult_confirmed": true,
-      "payment_method": "PAYPAL",
+      "payment_method": "NIGERIA_BANK",
       "payment_details": {
-        "method": "PAYPAL",
+        "method": "NIGERIA_BANK",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "sandiswamhuntuza6@gmail.com",
         "mobileNumber": "",
-        "paypal_email": "sandiswamhuntuza6@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "routingNumber": "",
         "account_number": "",
-        "payment_method": "PAYPAL",
+        "payment_method": "NIGERIA_BANK",
         "routing_number": "",
         "beneficiaryName": "Sandiswa Mhlauli",
         "beneficiary_name": "Sandiswa Mhlauli",
@@ -9193,19 +9145,15 @@
       "payment_details": {
         "referral_code": "MACAY-598B9",
         "referred_by_id": "b5145e08-3836-49bc-bf5e-7ad9a72c329d",
-        "method": "WIRE",
+        "method": "NIGERIA_BANK",
         "bankName": "Standard Bank",
         "bank_name": "Standard Bank",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "mackmack990204@gmail.com",
         "mobileNumber": "+27836102347",
-        "paypal_email": "mackmack990204@gmail.com",
         "accountNumber": "10221557677",
         "mobileNetwork": "MTN MoMo",
         "routingNumber": "SBZAZAJJ",
         "account_number": "10221557677",
-        "payment_method": "WIRE",
+        "payment_method": "NIGERIA_BANK",
         "routing_number": "SBZAZAJJ",
         "beneficiaryName": "Macaylla Lotterinf",
         "beneficiary_name": "Macaylla Lotterinf",
@@ -9228,7 +9176,7 @@
       "created_at": "2026-09-24T14:42:33.747+00:00",
       "referral_code": "MACAY-598B9",
       "referred_by_id": "b5145e08-3836-49bc-bf5e-7ad9a72c329d",
-      "payment_method": "WIRE",
+      "payment_method": "NIGERIA_BANK",
       "sample_submission_id": "c3afcce5-8952-4550-9c8d-25865044ce6d",
       "sample_review_notes": "Audition meets quality guidelines. Guideline: The 8 videos should be with the same knee length skirt, but with different panties each."
     },
@@ -11020,11 +10968,7 @@
         "method": "MOBILE_MONEY",
         "bankName": "First National Bank",
         "bank_name": "First National Bank",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "refilwemmopi77@gmail.com",
         "mobileNumber": "+254752952674",
-        "paypal_email": "refilwemmopi77@gmail.com",
         "accountNumber": "62260724549",
         "mobileNetwork": "Airtel Money",
         "referral_code": "NTHEN-4EA2C",
@@ -11164,11 +11108,7 @@
         "method": "MOBILE_MONEY",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "sanbenta8@gmail.com",
         "mobileNumber": "+254710811375",
-        "paypal_email": "sanbenta8@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "referral_code": "SANBE-8CA95",
@@ -12003,12 +11943,8 @@
         "method": "WIRE",
         "bankName": "FNB",
         "bank_name": "FNB",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "ngubulaludo@gmail.com",
         "referred_by": "8992a8c7-b879-484f-b288-597863826a73",
         "mobileNumber": "",
-        "paypal_email": "ngubulaludo@gmail.com",
         "accountNumber": "63082004721",
         "mobileNetwork": "MTN MoMo",
         "ref_code_used": "BOTSA-8992A",
@@ -12940,12 +12876,8 @@
         "method": "MOBILE_MONEY",
         "bankName": "",
         "bank_name": "",
-        "wiseEmail": "",
-        "wise_email": "",
-        "paypalEmail": "albrightmakena4@gmail.com",
         "referred_by": "8ca9509d-cfd4-4a7a-8524-e7f7bf403397",
         "mobileNumber": "+254713660815",
-        "paypal_email": "albrightmakena4@gmail.com",
         "accountNumber": "",
         "mobileNetwork": "M-Pesa",
         "ref_code_used": "SANBE-8CA95",
@@ -15176,20 +15108,6 @@
   ],
   "audit_events": [
     {
-      "actor_id": "admin-test-id",
-      "actor_name": "Admin Tester",
-      "action": "REFUND_PAYOUT",
-      "target_type": "PAYOUT",
-      "target_id": "payout-pages-refund-1790662854681",
-      "details": {
-        "reason": "Incorrect banking details provided",
-        "amount_usd": 10,
-        "previous_status": "PAID"
-      },
-      "id": "aa1dcd09-a16d-4f50-9e4c-f2bca412bf41",
-      "created_at": "2026-09-29T06:20:54.697Z"
-    },
-    {
       "platform_id": "pinkroom_pages",
       "actor_id": "c0000000-0000-4000-8000-000000000001",
       "actor_name": "Ophelia Adeleke",
@@ -15355,123 +15273,6 @@
       "created_at": "2026-09-11T07:31:02.752Z"
     },
     {
-      "actor_id": "c9a57587-c3d1-43d3-b8aa-ffaf89ab8bcc",
-      "actor_name": "Cancel Test Creator",
-      "action": "REQUEST_PAYOUT",
-      "target_type": "PAYOUT",
-      "target_id": "c93c2718-33bf-4fbd-b8d9-6836971f5e33",
-      "details": {
-        "amount_usd": 400,
-        "video_count": 8
-      },
-      "id": "73869f20-5dbc-4d75-ac66-4e66b2eb8603",
-      "created_at": "2026-09-11T07:31:02.744Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "5cd88ab6-87dd-4abd-b646-f4b6bfc9de78",
-      "details": {
-        "title": "Cancel Test Video #8",
-        "rate": 50
-      },
-      "id": "81d5d0bc-4f8e-4db2-a0b1-3b43a832df80",
-      "created_at": "2026-09-11T07:31:02.710Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "68de1199-8354-457d-b745-d046800dd2a3",
-      "details": {
-        "title": "Cancel Test Video #7",
-        "rate": 50
-      },
-      "id": "ff2d8d5b-d05b-43d6-a6f1-74ad477cc979",
-      "created_at": "2026-09-11T07:31:02.701Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "9279b342-92a7-4c06-a171-4e271faa5edc",
-      "details": {
-        "title": "Cancel Test Video #6",
-        "rate": 50
-      },
-      "id": "7dcb1a36-8619-4f67-9cc6-db4580ad10ee",
-      "created_at": "2026-09-11T07:31:02.687Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "b84b0f50-8ea4-400e-969c-f70c44d80b35",
-      "details": {
-        "title": "Cancel Test Video #5",
-        "rate": 50
-      },
-      "id": "9c8482c5-b53f-4a3e-8934-452a9d2936b9",
-      "created_at": "2026-09-11T07:31:02.676Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "023a9d02-b7ca-4b48-8bd3-1d4665cb033f",
-      "details": {
-        "title": "Cancel Test Video #4",
-        "rate": 50
-      },
-      "id": "c96473b0-11c1-4f8b-ab17-e368b0854ff1",
-      "created_at": "2026-09-11T07:31:02.667Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "b9f827a6-ebd9-4f6c-a6a8-6f29e2500949",
-      "details": {
-        "title": "Cancel Test Video #3",
-        "rate": 50
-      },
-      "id": "4332dbd6-6179-4553-aef1-9cae60b496fe",
-      "created_at": "2026-09-11T07:31:02.656Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "a2cb8991-933f-42f4-95be-a25d25c02676",
-      "details": {
-        "title": "Cancel Test Video #2",
-        "rate": 50
-      },
-      "id": "5252ed9f-5799-43ed-ac41-83eac61759a8",
-      "created_at": "2026-09-11T07:31:02.645Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "05a86cce-a276-4935-a209-32d0a7a4eb1c",
-      "details": {
-        "title": "Cancel Test Video #1",
-        "rate": 50
-      },
-      "id": "a07cc3c7-8a75-498b-9443-ba8bf97e75dd",
-      "created_at": "2026-09-11T07:31:02.630Z"
-    },
-    {
       "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "actor_name": "Admin",
       "action": "CONFIRM_PAYOUT_PAID",
@@ -15483,136 +15284,6 @@
       },
       "id": "394ee71d-6b50-4067-905e-2cbfeae9ae63",
       "created_at": "2026-09-11T07:31:02.612Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "19f9d8dd-ed07-46ed-9f1c-13bfba94b02c",
-      "details": {
-        "title": "Qualified Video #8 (Threshold Reached)",
-        "rate": 50
-      },
-      "id": "bb366dd7-efff-42ba-b70f-440ee57b2f00",
-      "created_at": "2026-09-11T07:31:02.601Z"
-    },
-    {
-      "actor_id": "edb32349-72a6-47a9-95cc-d1b8b224b178",
-      "actor_name": "Test Rules ASMRtist",
-      "action": "REQUEST_PAYOUT",
-      "target_type": "PAYOUT",
-      "target_id": "287781c9-c96e-4742-ac3a-1132342d7db9",
-      "details": {
-        "amount_usd": 400,
-        "video_count": 8
-      },
-      "id": "beb49ba7-440a-42cc-9314-6c24278d36cb",
-      "created_at": "2026-09-11T07:31:02.593Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "19f9d8dd-ed07-46ed-9f1c-13bfba94b02c",
-      "details": {
-        "title": "Qualified Video #8 (Threshold Reached)",
-        "rate": 50
-      },
-      "id": "6925fdde-f606-4372-8711-929dc6a4f51e",
-      "created_at": "2026-09-11T07:31:02.580Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "2910a688-9492-4420-840a-26ff052333ad",
-      "details": {
-        "title": "Qualified Video #7",
-        "rate": 50
-      },
-      "id": "3ada8e6f-fed1-4b76-854a-2bc6f1a4ba4a",
-      "created_at": "2026-09-11T07:31:02.570Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "925231ea-ae4b-41bc-98e9-85ebd3762674",
-      "details": {
-        "title": "Qualified Video #6",
-        "rate": 50
-      },
-      "id": "75b32d1c-b9ab-4741-8a3c-eee649d9eb64",
-      "created_at": "2026-09-11T07:31:02.562Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "6ca7ec0e-f688-420a-aa80-497e938a3af6",
-      "details": {
-        "title": "Qualified Video #5",
-        "rate": 50
-      },
-      "id": "851e7547-2310-4162-b5a8-2426fff77123",
-      "created_at": "2026-09-11T07:31:02.555Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "52027681-3416-4e13-9043-820d17aa2aef",
-      "details": {
-        "title": "Qualified Video #4",
-        "rate": 50
-      },
-      "id": "83254ab2-d706-4d6a-9700-b0e2f7528d67",
-      "created_at": "2026-09-11T07:31:02.547Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "282ef41d-5681-418d-ae1a-b7267d11a3c8",
-      "details": {
-        "title": "Qualified Video #3",
-        "rate": 50
-      },
-      "id": "11f5ca2c-906f-4fd1-8d5e-782d23042ee0",
-      "created_at": "2026-09-11T07:31:02.539Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "53204719-970f-42aa-bcbf-7f9949ffb3f7",
-      "details": {
-        "title": "Qualified Video #2",
-        "rate": 50
-      },
-      "id": "01b7ea1e-9ffe-4b50-ab8f-4c07f3c29d09",
-      "created_at": "2026-09-11T07:31:02.531Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Admin",
-      "action": "APPROVE_SUBMISSION",
-      "target_type": "SUBMISSION",
-      "target_id": "bf04eba0-d1e4-4a89-b2f8-240ae3b5f7c1",
-      "details": {
-        "title": "Qualified Video #1",
-        "rate": 50
-      },
-      "id": "09f8143b-ac94-477e-af02-f4ddf940983f",
-      "created_at": "2026-09-11T07:31:02.522Z"
     },
     {
       "id": "a0000000-0000-4000-8000-000000000003",

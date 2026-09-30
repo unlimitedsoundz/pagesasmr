@@ -54,6 +54,8 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
     creator?.payment_method ||
     creator?.creator_payment_method ||
     payout?.payment_method ||
+    d.payment_method ||
+    d.method ||
     ''
   ).toUpperCase();
 
@@ -122,21 +124,33 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
 
   // Determine actual configured payment method
   let method = rawMethod;
-  if (!method) {
-    if (accountNumber && (bankName.toLowerCase().includes('opay') || bankName.toLowerCase().includes('bank') || creator?.country === 'Nigeria')) {
+  if (!method || method === 'PAYPAL' || method === 'WISE') {
+    // If rawMethod is empty or legacy PayPal/Wise, check if creator has configured an active method
+    if (momoPhone) {
+      method = 'MOBILE_MONEY';
+    } else if (accountNumber && (bankName.toLowerCase().includes('opay') || bankName.toLowerCase().includes('bank') || creator?.country === 'Nigeria')) {
       method = 'NIGERIA_BANK';
     } else if (routingNumber || (accountNumber && bankName)) {
       method = 'ACH';
-    } else if (paypalEmail) {
-      method = 'PAYPAL';
-    } else if (wiseEmail) {
-      method = 'WISE';
-    } else if (momoPhone) {
-      method = 'MOBILE_MONEY';
+    } else if (accountNumber) {
+      method = 'WIRE';
+    } else if (!rawMethod) {
+      if (paypalEmail) {
+        method = 'PAYPAL';
+      } else if (wiseEmail) {
+        method = 'WISE';
+      }
     }
   }
 
-  const isConfigured = Boolean(accountNumber || paypalEmail || wiseEmail || momoPhone || bankName || destinationStr);
+  const isConfigured = Boolean(
+    (method === 'MOBILE_MONEY' && momoPhone) ||
+    (method === 'NIGERIA_BANK' && accountNumber) ||
+    (method === 'ACH' && accountNumber) ||
+    (method === 'WIRE' && accountNumber) ||
+    (!['MOBILE_MONEY', 'NIGERIA_BANK', 'ACH', 'WIRE', 'PAYPAL', 'WISE'].includes(method) &&
+      (accountNumber || momoPhone || bankName || destinationStr))
+  );
 
   if (!isConfigured) {
     return {
@@ -373,10 +387,12 @@ export function creatorHasDiscontinuedPayPal(creatorOrDetails: any): boolean {
   const hasValidOther = Boolean(
     d.nigerian_account_number || d.nigerianAccountNumber ||
     d.mobile_money_phone || d.mobileNumber ||
-    d.wise_email || d.wiseEmail ||
     d.routing_number || d.routingNumber ||
     d.account_number || d.accountNumber
   );
+
+  // If creator has configured an active method (bank, mobile money, ach, wire), they do NOT have discontinued PayPal
+  if (hasValidOther && method !== 'PAYPAL' && method !== 'WISE') return false;
 
   if (method === 'PAYPAL') return true;
   if (!hasValidOther && (d.paypal_email || d.paypalEmail)) return true;
