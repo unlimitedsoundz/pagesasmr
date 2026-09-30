@@ -15158,19 +15158,6 @@
     {
       "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
       "actor_name": "Unlymited Soundz",
-      "action": "ADMIN_MANUAL_REMOVE_CREATOR",
-      "target_type": "CREATOR",
-      "target_id": "4de95f79-efd8-4785-a424-a8b910f53607",
-      "details": {
-        "email": "chat_1789031988267@creator.io",
-        "display_name": "Chat Support Creator"
-      },
-      "id": "7dcb13d8-36ba-4c29-b086-919205b0f5d2",
-      "created_at": "2026-09-13T06:26:15.257Z"
-    },
-    {
-      "actor_id": "694d15ea-ff2c-43ff-967d-80b7817534a8",
-      "actor_name": "Unlymited Soundz",
       "action": "ADMIN_CLEANUP_STALE_CREATORS",
       "target_type": "CREATOR",
       "target_id": "batch",
