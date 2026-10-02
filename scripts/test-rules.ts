@@ -340,8 +340,42 @@ async function runTests() {
 
   // Automated Cleanup: Delete transient test profiles from database
   try {
-    const { supabaseAdmin } = await import('../src/lib/supabase');
     const testIds = [testCreator.id, testCreator2.id, auditionCreator.id, chatCreator.id];
+
+    // 1. Remove from local in-memory DB so tests never persist test creators to disk
+    const removedSubIds = new Set(
+      ((db as any).data.submissions || [])
+        .filter((s: any) => testIds.includes(s.creator_id))
+        .map((s: any) => s.id)
+    );
+
+    (db as any).data.profiles = ((db as any).data.profiles || []).filter((p: any) => !testIds.includes(p.id));
+    (db as any).data.submissions = ((db as any).data.submissions || []).filter((s: any) => !testIds.includes(s.creator_id));
+    (db as any).data.payout_requests = ((db as any).data.payout_requests || []).filter(
+      (p: any) =>
+        !testIds.includes(p.creator_id) &&
+        p.payment_reference !== 'WIRE-US-9823411' &&
+        !p.creator_name?.includes('Test Rules ASMRtist') &&
+        !p.creator_name?.includes('Cancel Test Creator') &&
+        !p.creator_name?.includes('Audition New Creator') &&
+        !p.creator_name?.includes('Chat Support Creator') &&
+        !p.creator_email?.includes('creator.io') &&
+        !p.creator_email?.includes('test_')
+    );
+    (db as any).data.earnings_ledger = ((db as any).data.earnings_ledger || []).filter((l: any) => !testIds.includes(l.creator_id));
+    (db as any).data.notifications = ((db as any).data.notifications || []).filter((n: any) => 
+      !testIds.includes(n.user_id) && !testIds.some((id) => (n.link || '').includes(id))
+    );
+    (db as any).data.chat_messages = ((db as any).data.chat_messages || []).filter((m: any) => !testIds.includes(m.creator_id) && !testIds.includes(m.sender_id));
+    (db as any).data.audit_events = ((db as any).data.audit_events || []).filter((a: any) => !testIds.includes(a.actor_id) && !testIds.includes(a.target_id));
+    (db as any).save();
+
+    // 2. Remove from Supabase
+    const { supabaseAdmin } = await import('../src/lib/supabase');
+    await supabaseAdmin.from('payout_requests').delete().eq('payment_reference', 'WIRE-US-9823411');
+    await supabaseAdmin.from('payout_requests').delete().ilike('creator_name', '%Test Rules ASMRtist%');
+    await supabaseAdmin.from('payout_requests').delete().ilike('creator_name', '%Cancel Test Creator%');
+
     for (const id of testIds) {
       await supabaseAdmin.from('notifications').delete().eq('user_id', id);
       await supabaseAdmin.from('chat_messages').delete().eq('creator_id', id);

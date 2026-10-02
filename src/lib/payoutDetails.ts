@@ -59,32 +59,30 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
     ''
   ).toUpperCase();
 
+  const country = creator?.country || payout?.creator_country;
+  const isNonNigerian = Boolean(country && country !== 'Nigeria');
+
   const destinationStr = (payout?.payment_destination || creator?.payment_destination || '').trim();
 
-  // Extract bank name
+  // Extract bank name (for non-Nigerians, prioritize generic bank_name over legacy nigerian_bank_name)
   let bankName = (
-    d.nigerian_bank_name ||
-    d.nigerianBankName ||
-    d.bank_name ||
-    d.bankName ||
-    ''
+    isNonNigerian
+      ? (d.bank_name || d.bankName || d.nigerian_bank_name || d.nigerianBankName || '')
+      : (d.nigerian_bank_name || d.nigerianBankName || d.bank_name || d.bankName || '')
   ).trim();
 
-  // Extract account number
+  // Extract account number (for non-Nigerians, prioritize generic account_number)
   let accountNumber = (
-    d.nigerian_account_number ||
-    d.nigerianAccountNumber ||
-    d.account_number ||
-    d.accountNumber ||
-    ''
+    isNonNigerian
+      ? (d.account_number || d.accountNumber || d.nigerian_account_number || d.nigerianAccountNumber || '')
+      : (d.nigerian_account_number || d.nigerianAccountNumber || d.account_number || d.accountNumber || '')
   ).trim();
 
   // Extract account/beneficiary name
   let accountName = (
-    d.nigerian_account_name ||
-    d.beneficiary_name ||
-    d.beneficiaryName ||
-    ''
+    isNonNigerian
+      ? (d.beneficiary_name || d.beneficiaryName || d.account_name || d.accountName || d.nigerian_account_name || '')
+      : (d.nigerian_account_name || d.beneficiary_name || d.beneficiaryName || d.account_name || d.accountName || '')
   ).trim();
 
   // Extract routing / sort code
@@ -102,38 +100,58 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
 
   // Parse destinationStr if details were empty but destination string is present
   if (!accountNumber && !paypalEmail && !wiseEmail && !momoPhone && destinationStr) {
-    if (destinationStr.includes('NUBAN:')) {
+    if (destinationStr.includes('Routing:') || destinationStr.includes('Acc:') || destinationStr.includes('SWIFT:')) {
+      const accMatch = destinationStr.match(/Acc(?:ount)?:\s*([^\s,]+)/i);
+      const rMatch = destinationStr.match(/(?:Routing|SWIFT):\s*([^\s,]+)/i);
+      const benMatch = destinationStr.match(/Beneficiary:\s*([^,]+)/i);
+      const bMatch = destinationStr.match(/^([^,]+),/);
+      if (accMatch) accountNumber = accMatch[1];
+      if (rMatch) routingNumber = rMatch[1];
+      if (benMatch) accountName = benMatch[1].trim();
+      if (bMatch && !bankName) bankName = bMatch[1].trim();
+    } else if (destinationStr.includes('NUBAN:')) {
       const match = destinationStr.match(/^(.*?)\s*-\s*NUBAN:\s*(\d+)(?:\s*\((.*?)\))?/);
       if (match) {
-        if (!bankName) bankName = match[1]?.trim() || '';
+        const rawB = match[1]?.trim() || '';
+        if (!bankName) bankName = (isNonNigerian && rawB === 'Access Bank') ? (d.bank_name || d.bankName || '') : rawB;
         accountNumber = match[2]?.trim() || '';
         if (match[3] && !accountName) accountName = match[3]?.trim() || '';
       }
     } else if (destinationStr.includes('@')) {
       if (rawMethod === 'WISE') wiseEmail = destinationStr;
       else paypalEmail = destinationStr;
-    } else if (destinationStr.includes('Routing:')) {
-      const accMatch = destinationStr.match(/Acc(?:ount)?:\s*([^\s,]+)/i);
-      const rMatch = destinationStr.match(/Routing:\s*([^\s,]+)/i);
-      const benMatch = destinationStr.match(/Beneficiary:\s*([^,]+)/i);
-      if (accMatch) accountNumber = accMatch[1];
-      if (rMatch) routingNumber = rMatch[1];
-      if (benMatch) accountName = benMatch[1].trim();
     }
+  }
+
+  // If non-Nigerian creator has "Access Bank" erroneously set from legacy migration defaults, clean it
+  if (isNonNigerian && bankName === 'Access Bank' && !d.bank_name && !d.bankName && !destinationStr.startsWith('Access Bank')) {
+    bankName = '';
   }
 
   // Determine actual configured payment method
   let method = rawMethod;
+
+  // Non-Nigerian creators should NEVER be assigned NIGERIA_BANK
+  if (isNonNigerian && method === 'NIGERIA_BANK') {
+    method = '';
+  }
+
   if (!method || method === 'PAYPAL' || method === 'WISE') {
     // If rawMethod is empty or legacy PayPal/Wise, check if creator has configured an active method
-    if (momoPhone) {
+    if (momoPhone || (isNonNigerian && (d.mobileNetwork || d.mobile_money_provider))) {
       method = 'MOBILE_MONEY';
-    } else if (accountNumber && (bankName.toLowerCase().includes('opay') || bankName.toLowerCase().includes('bank') || creator?.country === 'Nigeria')) {
+    } else if (!isNonNigerian && accountNumber && (
+      bankName.toLowerCase().includes('opay') ||
+      bankName.toLowerCase().includes('palmpay') ||
+      bankName.toLowerCase().includes('kuda') ||
+      bankName.toLowerCase().includes('moniepoint') ||
+      country === 'Nigeria'
+    )) {
       method = 'NIGERIA_BANK';
     } else if (routingNumber || (accountNumber && bankName)) {
-      method = 'ACH';
+      method = (routingNumber && routingNumber.length === 9) ? 'ACH' : (country === 'United States' ? 'ACH' : 'WIRE');
     } else if (accountNumber) {
-      method = 'WIRE';
+      method = isNonNigerian ? (country === 'United States' ? 'ACH' : 'WIRE') : 'NIGERIA_BANK';
     } else if (!rawMethod) {
       if (paypalEmail) {
         method = 'PAYPAL';
@@ -141,6 +159,11 @@ export function formatCreatorPayoutInfo(creatorOrPayout: any, fallbackPayout?: a
         method = 'WISE';
       }
     }
+  }
+
+  // Ultimate guard: non-Nigerian creators must NEVER be formatted as NIGERIA_BANK
+  if (isNonNigerian && method === 'NIGERIA_BANK') {
+    method = country === 'United States' ? 'ACH' : (routingNumber ? 'WIRE' : (momoPhone ? 'MOBILE_MONEY' : 'WIRE'));
   }
 
   const isConfigured = Boolean(

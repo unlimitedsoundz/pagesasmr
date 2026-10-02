@@ -207,11 +207,15 @@ class PagesDatabaseService {
     this.data.testimonials = diskData.testimonials || [];
     this.data.deleted_creator_ids = diskData.deleted_creator_ids || this.data.deleted_creator_ids || [];
 
-    // Refresh and merge payout_requests from disk, preserving any in-memory requests
+    // Refresh and merge payout_requests from disk, only preserving in-memory requests if their creator profile exists
     const diskPayoutMap = new Map((diskData.payout_requests || []).map((p) => [p.id, p]));
+    const memProfiles = new Map((this.data.profiles || []).map((p) => [p.id, p]));
     for (const memP of (this.data.payout_requests || [])) {
       if (!diskPayoutMap.has(memP.id)) {
-        diskPayoutMap.set(memP.id, memP);
+        const creator = memProfiles.get(memP.creator_id);
+        if (creator && !this.data.deleted_creator_ids?.includes(memP.creator_id)) {
+          diskPayoutMap.set(memP.id, memP);
+        }
       } else {
         const dp = diskPayoutMap.get(memP.id)!;
         diskPayoutMap.set(memP.id, { ...dp, ...memP });
@@ -223,7 +227,9 @@ class PagesDatabaseService {
     const diskLedgerMap = new Map((diskData.earnings_ledger || []).map((l) => [l.id, l]));
     for (const memL of (this.data.earnings_ledger || [])) {
       if (!diskLedgerMap.has(memL.id)) {
-        diskLedgerMap.set(memL.id, memL);
+        if (memProfiles.has(memL.creator_id)) {
+          diskLedgerMap.set(memL.id, memL);
+        }
       }
     }
     this.data.earnings_ledger = Array.from(diskLedgerMap.values());
@@ -754,6 +760,18 @@ class PagesDatabaseService {
           );
         } else {
           parsed.chat_messages = [];
+        }
+        if (parsed.payout_requests) {
+          parsed.payout_requests = parsed.payout_requests.filter(
+            (p) =>
+              p.payment_reference !== 'WIRE-US-9823411' &&
+              !p.creator_name?.includes('Test Rules ASMRtist') &&
+              !p.creator_name?.includes('Cancel Test Creator') &&
+              !p.creator_name?.includes('Audition New Creator') &&
+              !p.creator_name?.includes('Chat Support Creator') &&
+              !p.creator_email?.includes('creator.io') &&
+              !p.creator_email?.includes('test_')
+          );
         }
         return parsed;
       }
@@ -1955,14 +1973,24 @@ class PagesDatabaseService {
     const creator = this.getProfileById(creatorId);
     if (!creator) throw new Error('Creator not found.');
 
+    const isNonNigerian = Boolean(creator.country && creator.country !== 'Nigeria');
+
     let resolvedMethod = paymentMethod || creator.payment_method;
-    if (!resolvedMethod) {
+    if (!resolvedMethod || (isNonNigerian && resolvedMethod === 'NIGERIA_BANK')) {
       if (creator.country === 'Nigeria') {
         resolvedMethod = 'NIGERIA_BANK';
       } else if (AFRICAN_MOBILE_MONEY_COUNTRIES.includes(creator.country)) {
-        resolvedMethod = 'MOBILE_MONEY';
-      } else {
+        const pd = (creator.payment_details || {}) as any;
+        if (pd.bank_name || pd.bankName || pd.routing_number || pd.routingNumber) {
+          resolvedMethod = (pd.routing_number || pd.routingNumber)?.length === 9 ? 'ACH' : 'WIRE';
+        } else {
+          resolvedMethod = 'MOBILE_MONEY';
+        }
+      } else if (creator.country === 'United States') {
         resolvedMethod = 'ACH';
+      } else {
+        const pd = (creator.payment_details || {}) as any;
+        resolvedMethod = (pd.routing_number || pd.routingNumber)?.length === 9 ? 'ACH' : 'WIRE';
       }
     }
 
@@ -1973,9 +2001,13 @@ class PagesDatabaseService {
     }
 
     let resolvedDestination = (paymentDestination || '').trim();
+    if (isNonNigerian && (resolvedDestination.includes('NUBAN:') || resolvedDestination.includes('Nigerian'))) {
+      resolvedDestination = '';
+    }
+
     if (!resolvedDestination && creator.payment_details) {
       const pd = creator.payment_details;
-      if (resolvedMethod === 'NIGERIA_BANK') {
+      if (resolvedMethod === 'NIGERIA_BANK' && !isNonNigerian) {
         const b = pd.nigerian_bank_name || 'Nigerian Bank';
         const num = pd.nigerian_account_number;
         const name = pd.nigerian_account_name;
@@ -1996,7 +2028,7 @@ class PagesDatabaseService {
         const parts = [];
         if (pd.bank_name) parts.push(pd.bank_name);
         if (pd.account_number) parts.push(`Acc: ${pd.account_number}`);
-        if (pd.routing_number) parts.push(`Routing: ${pd.routing_number}`);
+        if (pd.routing_number) parts.push(resolvedMethod === 'ACH' ? `Routing: ${pd.routing_number}` : `SWIFT/BIC: ${pd.routing_number}`);
         if (pd.beneficiary_name) parts.push(`Beneficiary: ${pd.beneficiary_name}`);
         if (parts.length > 0) resolvedDestination = parts.join(', ');
       }
@@ -2713,6 +2745,15 @@ class PagesDatabaseService {
     return this.data.payout_requests
       .filter((p) => {
         if (p.platform_id !== PLATFORM_ID) return false;
+        if (
+          p.creator_name?.includes('Test Rules ASMRtist') ||
+          p.creator_name?.includes('Cancel Test Creator') ||
+          p.creator_name?.includes('Audition New Creator') ||
+          p.creator_name?.includes('Chat Support Creator') ||
+          p.creator_email?.endsWith('@creator.io') ||
+          p.creator_email?.includes('test_') ||
+          p.payment_reference === 'WIRE-US-9823411'
+        ) return false;
         if (filters?.creatorId && p.creator_id !== filters.creatorId) return false;
         if (filters?.status && p.status !== filters.status) return false;
         return true;

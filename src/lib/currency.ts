@@ -73,7 +73,15 @@ export const MOBILE_MONEY_PROVIDERS: Record<string, string[]> = {
 };
 
 export function getLocalCurrency(country?: string, method?: string): CurrencyInfo {
-  if (method === 'NIGERIA_BANK') {
+  // If creator is explicitly from a country other than Nigeria, NEVER return Nigerian Naira (NGN)
+  if (country && country !== 'Nigeria') {
+    if (COUNTRY_CURRENCY_MAP[country]) {
+      return COUNTRY_CURRENCY_MAP[country];
+    }
+    return { code: 'USD', symbol: '$', name: 'US Dollar', ratePerUsd: 1.00 };
+  }
+  // For Nigerian creators or explicit Nigerian bank payout when country is not explicitly foreign
+  if (country === 'Nigeria' || method === 'NIGERIA_BANK') {
     return COUNTRY_CURRENCY_MAP['Nigeria'];
   }
   if (country && COUNTRY_CURRENCY_MAP[country]) {
