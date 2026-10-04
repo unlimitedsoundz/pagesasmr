@@ -454,7 +454,8 @@ class PagesDatabaseService {
             failure_reason: ss.failure_reason || undefined,
             upload_completed_at: ss.upload_completed_at || ss.created_at,
             processing_completed_at: ss.processing_completed_at || ss.created_at,
-            agreed_rate_usd: isSample ? (ss.status === 'APPROVED' ? Number(ss.agreed_rate_usd || 1.0) : 0) : Number(ss.agreed_rate_usd ?? RATE_PER_VIDEO_USD),
+            agreed_rate_usd: isSample ? (ss.status === 'APPROVED' ? Number(ss.agreed_rate_usd || 1.0) : 0) : Number(ss.agreed_rate_usd ?? (ss.is_not_faceless ? 50 : RATE_PER_VIDEO_USD)),
+            is_not_faceless: Boolean(ss.is_not_faceless),
             payout_status: (ss.payout_status as PayoutItemStatus) || 'UNPAID',
             payout_id: ss.payout_id || undefined,
             notes: ss.notes || undefined,
@@ -1480,6 +1481,10 @@ class PagesDatabaseService {
     file_size_bytes?: number;
     notes?: string;
     is_sample?: boolean;
+    is_not_faceless?: boolean;
+    is_office_bonus?: boolean;
+    bonus_amount_usd?: number;
+    agreed_rate_usd?: number;
     storage_provider?: StorageProvider;
     storage_key?: string;
     upload_id?: string;
@@ -1547,6 +1552,9 @@ class PagesDatabaseService {
       ? (submission.rejection_reason || `Duplicate video file submission: Matches earlier recording #${duplicateOfId} ("${duplicateCheck.duplicateOf?.title || 'Existing submission'}"). Duplicate submissions are rejected.`)
       : submission.rejection_reason;
 
+    const isNotFaceless = Boolean(submission.is_not_faceless);
+    const agreedRate = isDuplicate ? 0 : (isSample ? 1.0 : (isNotFaceless ? 50.0 : (submission.agreed_rate_usd ?? (submission.is_office_bonus ? 15.0 : RATE_PER_VIDEO_USD))));
+
     const newSub: Submission = {
       storage_provider: submission.storage_provider || (process.env.STORAGE_PROVIDER === 'supabase' ? 'supabase' : 'hostinger'),
       upload_status: submission.upload_status || 'COMPLETED',
@@ -1571,7 +1579,8 @@ class PagesDatabaseService {
       duplicate_of_id: duplicateOfId,
       rejection_reason: rejectionReason,
       is_sample: isSample,
-      agreed_rate_usd: isDuplicate ? 0 : (isSample ? 1.0 : RATE_PER_VIDEO_USD),
+      is_not_faceless: isNotFaceless,
+      agreed_rate_usd: agreedRate,
       payout_status: 'UNPAID',
       notes: submission.notes,
       version_number: 1,
@@ -2472,7 +2481,7 @@ class PagesDatabaseService {
         file_name: sub.file_name || 'page_turning.mp4',
         file_size_bytes: sub.file_size_bytes || 0,
         status: sub.status,
-        agreed_rate_usd: sub.agreed_rate_usd !== undefined ? Number(sub.agreed_rate_usd) : 50.0,
+        agreed_rate_usd: sub.agreed_rate_usd !== undefined ? Number(sub.agreed_rate_usd) : (sub.is_not_faceless ? 50.0 : RATE_PER_VIDEO_USD),
         payout_status: sub.payout_status || 'UNPAID',
         payout_id: sub.payout_id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sub.payout_id) ? sub.payout_id : null,
         notes: sub.notes || null,
@@ -2481,8 +2490,9 @@ class PagesDatabaseService {
         version_number: sub.version_number || 1,
         is_sample: Boolean(sub.is_sample),
         parent_submission_id: sub.parent_submission_id || null,
+        is_not_faceless: Boolean((sub as any).is_not_faceless),
         is_office_bonus: Boolean((sub as any).is_office_bonus),
-        bonus_amount_usd: (sub as any).bonus_amount_usd || 0,
+        bonus_amount_usd: (sub as any).bonus_amount_usd || ((sub as any).is_not_faceless ? 40.0 : 0),
         created_at: sub.created_at || new Date().toISOString(),
         updated_at: sub.updated_at || new Date().toISOString(),
       };

@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { title, durationSeconds, fileUrl, fileName, fileSizeBytes, notes, consentConfirmed, width, height } = body;
+    const { title, durationSeconds, fileUrl, fileName, fileSizeBytes, notes, consentConfirmed, is_not_faceless, width, height } = body;
 
     if (!title || !durationSeconds || !fileUrl) {
       return NextResponse.json({ error: 'Missing required submission fields.' }, { status: 400 });
@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
       file_size_bytes: fileSizeBytes || 0,
       notes: notes?.trim() || undefined,
       is_sample: false,
+      is_not_faceless: Boolean(is_not_faceless),
     });
 
     if (submission.is_duplicate) {

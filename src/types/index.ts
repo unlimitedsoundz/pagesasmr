@@ -151,6 +151,9 @@ export interface Submission {
   version_number: number;
   parent_submission_id?: string;
   is_sample?: boolean;
+  is_office_bonus?: boolean;
+  is_not_faceless?: boolean;
+  bonus_amount_usd?: number;
   agreed_rate_usd: number;
   payout_status: PayoutItemStatus;
   payout_id?: string;

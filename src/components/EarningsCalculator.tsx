@@ -14,6 +14,7 @@ export default function EarningsCalculator({ initialCount = 8, showCta = true }:
   const [videoCount, setVideoCount] = useState<number>(initialCount);
   const [ratePerVideo, setRatePerVideo] = useState<number>(RATE_PER_VIDEO_USD || 10);
   const [minVideosForPayout, setMinVideosForPayout] = useState<number>(MIN_PAYOUT_VIDEOS || 8);
+  const [isNotFaceless, setIsNotFaceless] = useState<boolean>(false);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -31,10 +32,11 @@ export default function EarningsCalculator({ initialCount = 8, showCta = true }:
       .catch(() => {});
   }, []);
 
-  const totalEarnings = videoCount * ratePerVideo;
+  const effectiveRate = isNotFaceless ? 50 : ratePerVideo;
+  const totalEarnings = videoCount * effectiveRate;
   const isEligibleForPayout = videoCount >= minVideosForPayout;
   const remainingForPayout = Math.max(0, minVideosForPayout - videoCount);
-  const minPayoutAmount = minVideosForPayout * ratePerVideo;
+  const minPayoutAmount = minVideosForPayout * effectiveRate;
 
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-6 sm:p-8 shadow-sm">
@@ -89,6 +91,39 @@ export default function EarningsCalculator({ initialCount = 8, showCta = true }:
             <span className="text-black font-bold">{minVideosForPayout} videos (Minimum Payout)</span>
             <span>30 videos</span>
           </div>
+
+          {/* Not Faceless / Face Showing Video Toggle ($50/video) */}
+          <div className="pt-2 border-t border-neutral-200">
+            <label
+              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isNotFaceless
+                  ? 'bg-emerald-50 border-emerald-400 ring-1 ring-emerald-400'
+                  : 'bg-white border-neutral-200 hover:border-neutral-300'
+                }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">✨</span>
+                <div className="text-left">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-xs text-neutral-900">
+                      Not Faceless / Face Showing Option
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white">
+                      $50.00 / VIDEO
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500 font-medium">
+                    Face visible on camera ($400 payout for 8 videos)
+                  </p>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                checked={isNotFaceless}
+                onChange={(e) => setIsNotFaceless(e.target.checked)}
+                className="w-4 h-4 rounded accent-emerald-600 cursor-pointer"
+              />
+            </label>
+          </div>
         </div>
 
         {/* Computed Earnings Display */}
@@ -101,7 +136,7 @@ export default function EarningsCalculator({ initialCount = 8, showCta = true }:
             <span className="text-xl sm:text-2xl font-normal text-black ml-1">USD</span>
           </div>
           <div className="text-xs text-black font-medium">
-            {videoCount} approved video{videoCount > 1 ? 's' : ''} × ${ratePerVideo.toFixed(2)} guaranteed locked rate
+            {videoCount} approved video{videoCount > 1 ? 's' : ''} × ${effectiveRate.toFixed(2)} {isNotFaceless ? '($50 face-showing rate)' : 'guaranteed locked rate'}
           </div>
         </div>
 

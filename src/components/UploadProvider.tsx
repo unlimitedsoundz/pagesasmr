@@ -23,6 +23,8 @@ export interface UploadMetadata {
   notes?: string;
   durationSeconds: number;
   isSample?: boolean;
+  isOfficeBonus?: boolean;
+  isNotFaceless?: boolean;
   consentConfirmed?: boolean;
   category?: string;
 }
@@ -255,7 +257,8 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
                 fileSizeBytes,
                 notes: meta.notes,
                 consentConfirmed: meta.consentConfirmed ?? true,
-                is_office_bonus: Boolean((meta as any).isOfficeBonus),
+                is_not_faceless: Boolean(meta.isNotFaceless),
+                is_office_bonus: Boolean(meta.isOfficeBonus),
                 isSample,
                 width: resp.width,
                 height: resp.height,
@@ -653,6 +656,8 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
                       fileSizeBytes: file.size,
                       notes: meta.notes,
                       consentConfirmed: meta.consentConfirmed ?? true,
+                      is_not_faceless: Boolean(meta.isNotFaceless),
+                      is_office_bonus: Boolean(meta.isOfficeBonus),
                       isSample,
                       storageProvider: 'hostinger',
                     }),

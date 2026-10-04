@@ -48,6 +48,7 @@ interface UploadQueueItem {
   uploadedKey?: string;
   compressingMsg?: string;
   isOfficeBonus?: boolean;
+  isNotFaceless?: boolean;
   compressionStats?: {
     originalSize: number;
     compressedSize: number;
@@ -65,6 +66,7 @@ export default function CreatorUploadPage() {
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
   const [batchTitle, setBatchTitle] = useState('');
   const [batchNotes, setBatchNotes] = useState('');
+  const [isNotFacelessBatch, setIsNotFacelessBatch] = useState(false);
   const [consentConfirmed, setConsentConfirmed] = useState(false);
   const [isAdultConfirmed, setIsAdultConfirmed] = useState(false);
   const [activePreviewUrl, setActivePreviewUrl] = useState<string | null>(null);
@@ -391,6 +393,7 @@ export default function CreatorUploadPage() {
         progress: 0,
         previewUrl: previewBlob,
         durationSeconds: clientDuration,
+        isNotFaceless: isNotFacelessBatch,
       });
     }
 
@@ -433,6 +436,7 @@ export default function CreatorUploadPage() {
         notes: itemNotesCombined,
         consentConfirmed: true,
         isSample: false,
+        isNotFaceless: Boolean(item.isNotFaceless),
       });
 
       updateItem(item.id, { status: 'SUCCESS', progress: 100 });
@@ -467,7 +471,12 @@ export default function CreatorUploadPage() {
 
   const validQueueItems = queue.filter((i) => !i.durationSeconds || i.durationSeconds >= 180);
   const totalReadyCount = Math.min(minRequired, eligibleCount + validQueueItems.length);
-  const totalPotentialEarnings = (totalReadyCount * ratePerVideo).toFixed(2);
+  const queuePotentialEarnings = validQueueItems.reduce((acc, item) => {
+    const rate = item.isNotFaceless ? 50 : ratePerVideo;
+    return acc + rate;
+  }, 0);
+  const currentEligibleEarnings = (stats?.available_payout_balance !== undefined ? Number(stats.available_payout_balance) : (eligibleCount * ratePerVideo));
+  const totalPotentialEarnings = (currentEligibleEarnings + queuePotentialEarnings).toFixed(2);
 
   return (
     <div className="w-full min-h-screen bg-[#FDFBFD] dark:bg-[#120F15] text-neutral-900 dark:text-neutral-100 transition-colors">
@@ -545,6 +554,46 @@ export default function CreatorUploadPage() {
                   <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-white text-white" />
                   <span>Play Sample Now</span>
                 </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Not Faceless / Face Showing Video Premium Banner */}
+        <div className="bg-gradient-to-r from-[#0E1F16] via-[#142D20] to-[#0E1F16] text-white rounded-2xl p-4 sm:p-6 border-2 border-emerald-500/50 shadow-md">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1.5 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-serif font-bold text-base sm:text-lg text-white">
+                  Not Faceless / Face Showing Video
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black bg-emerald-500 text-black">
+                  +$40.00 PREMIUM
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black bg-emerald-400 text-black">
+                  $50.00 Total Payout / Video
+                </span>
+              </div>
+                <label className="flex items-start gap-2.5 cursor-pointer pt-1 group">
+                  <input
+                    type="checkbox"
+                    checked={isNotFacelessBatch}
+                    onChange={(e) => {
+                      const val = e.target.checked;
+                      setIsNotFacelessBatch(val);
+                      setQueue((prev) =>
+                        prev.map((item) => ({
+                          ...item,
+                          isNotFaceless: val,
+                        }))
+                      );
+                    }}
+                    className="mt-0.5 w-4 h-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500 accent-emerald-500 cursor-pointer shrink-0"
+                  />
+                  <span className="text-xs text-emerald-100/90 leading-relaxed font-normal group-hover:text-white transition-colors">
+                    Check this box if your face is visible on-camera during the ASMR recording. Approved face-showing videos earn a premium rate of $50.00 USD each upon approval.
+                  </span>
+                </label>
               </div>
             </div>
           </div>
@@ -797,7 +846,7 @@ export default function CreatorUploadPage() {
                               <div className="font-bold text-neutral-900 dark:text-white truncate text-[11px] sm:text-xs">
                                 {item.file.name}
                               </div>
-                              <div className="text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 mt-0.5">
+                              <div className="text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 flex-wrap mt-0.5">
                                 <span>{formatBytes(item.file.size)}</span>
                                 {item.durationSeconds ? (
                                   <span>
@@ -805,6 +854,15 @@ export default function CreatorUploadPage() {
                                     {String(Math.round(item.durationSeconds % 60)).padStart(2, '0')}
                                   </span>
                                 ) : null}
+                                {item.isNotFaceless ? (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                    Face Showing ($50)
+                                  </span>
+                                ) : (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-medium bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+                                    Faceless ($10)
+                                  </span>
+                                )}
                               </div>
                               {isTooShort && (
                                 <div className="text-[10px] text-[#BE185D] dark:text-[#F472B6] font-semibold mt-0.5 flex items-center gap-1">
@@ -943,6 +1001,42 @@ export default function CreatorUploadPage() {
                   <div className="text-right text-[10px] text-neutral-400">
                     {batchNotes.length}/1,000
                   </div>
+                </div>
+
+                {/* Not Faceless / Face Showing Video Option ($50.00 / Video) */}
+                <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                  <label className="flex items-start gap-3 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-950/80 bg-emerald-50/50 dark:bg-[#111c15] cursor-pointer transition-all hover:border-emerald-500">
+                    <input
+                      type="checkbox"
+                      checked={isNotFacelessBatch}
+                      onChange={(e) => {
+                        const val = e.target.checked;
+                        setIsNotFacelessBatch(val);
+                        setQueue((prev) =>
+                          prev.map((item) => ({
+                            ...item,
+                            isNotFaceless: val,
+                          }))
+                        );
+                      }}
+                      className="mt-0.5 w-4 h-4 rounded border-neutral-300 text-emerald-600 focus:ring-emerald-600 accent-emerald-600"
+                    />
+                    <div className="text-xs space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap font-bold text-neutral-900 dark:text-white">
+                        <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>Not Faceless / Face Showing Video</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-700 text-white">
+                          +$40.00 PREMIUM
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-700 text-white">
+                          $50.00 Total Payout / Video
+                        </span>
+                      </div>
+                      <p className="text-neutral-600 dark:text-neutral-400 font-medium leading-relaxed text-[11px]">
+                        Check this box if your face is visible on-camera during the page-turning ASMR recording. Approved face-showing videos earn a premium rate of $50.00 USD each upon approval.
+                      </p>
+                    </div>
+                  </label>
                 </div>
               </div>
             </div>
