@@ -28,6 +28,7 @@ import {
 import { useToast } from '@/components/ToastProvider';
 import { NIGERIAN_BANKS, getBankCodeByName } from '@/lib/nigerian-banks';
 import { creatorHasDiscontinuedPayPal } from '@/lib/payoutDetails';
+import { AFRICAN_MOBILE_MONEY_COUNTRIES } from '@/lib/currency';
 
 export default function CreatorSettingsPage() {
   const { toast } = useToast();
@@ -1040,10 +1041,22 @@ export default function CreatorSettingsPage() {
                   className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-[#FDFBFD] dark:bg-[#141217] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#7B1E4B] transition-all"
                 >
                   <option value="">No preference selected</option>
-                  <option value="NIGERIA_BANK">Nigerian Local Bank Transfer (NGN Direct Deposit / NUBAN)</option>
-                  <option value="MOBILE_MONEY">African Mobile Money (M-Pesa, MTN MoMo, Airtel)</option>
-                  <option value="ACH">US ACH / Direct Deposit</option>
-                  <option value="WIRE">International Wire Transfer</option>
+                  {(!profile?.country || profile?.country === 'Nigeria') && (
+                    <option value="NIGERIA_BANK">Nigerian Local Bank Transfer (NGN Direct Deposit / NUBAN)</option>
+                  )}
+                  {(!profile?.country || profile?.country === 'United States') && (
+                    <option value="ACH">US Direct Deposit (ACH)</option>
+                  )}
+                  {(!profile?.country || AFRICAN_MOBILE_MONEY_COUNTRIES.includes(profile.country)) && (
+                    <option value="MOBILE_MONEY">African Mobile Money (M-Pesa, MTN MoMo, Airtel)</option>
+                  )}
+                  <option value="WIRE">International Wire Transfer (SWIFT / BIC)</option>
+                  {profile?.country && profile.country !== 'United States' && profile.country !== 'Nigeria' && (
+                    <option value="ACH">US Direct Deposit (ACH)</option>
+                  )}
+                  {profile?.country && !AFRICAN_MOBILE_MONEY_COUNTRIES.includes(profile.country) && profile.country !== 'Nigeria' && (
+                    <option value="MOBILE_MONEY">African Mobile Money (M-Pesa, MTN MoMo, Airtel)</option>
+                  )}
                   {paymentMethod === 'WISE' && (
                     <option value="WISE" disabled>Wise (Discontinued — Please select another)</option>
                   )}

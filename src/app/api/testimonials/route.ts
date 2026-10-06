@@ -24,6 +24,37 @@ function ensureProofsDir() {
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
 const MAX_PROOF_SIZE_BYTES = 12 * 1024 * 1024; // 12MB
 
+// Privacy: keep first name visible, asterisk only last name(s) for public display, e.g. "Jane Doe" -> "Jane D***"
+function maskCreatorName(name?: string | null): string {
+  let base = (name || '').trim();
+  // Never expose an email used as a display name — keep only the local part
+  if (base.includes('@')) {
+    base = base.split('@')[0].replace(/[._-]+/g, ' ').trim();
+  }
+  if (!base) return 'Creator';
+
+  const words = base.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return 'Creator';
+
+  if (words.length === 1) {
+    // Only a first name or username provided (e.g. "Olivia", "Joseph")
+    const single = words[0];
+    return single.charAt(0).toUpperCase() + single.slice(1);
+  }
+
+  // Multiple words: keep first name(s) as-is, asterisk only the last name
+  const firstNames = words
+    .slice(0, -1)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1));
+  const rawLast = words[words.length - 1];
+  const cleanLast = rawLast.replace(/[^a-zA-Z0-9]/g, '');
+  const initial = (cleanLast.charAt(0) || rawLast.charAt(0)).toUpperCase();
+  const starsCount = Math.min(Math.max(cleanLast.length - 1, 3), 6);
+  const maskedLast = `${initial}${'*'.repeat(starsCount)}`;
+
+  return [...firstNames, maskedLast].join(' ');
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -55,8 +86,14 @@ export async function GET(req: NextRequest) {
       totalPaidUsd += t.amount_usd || 0;
     }
 
+    // Strip emails and mask names before sending to the public
+    const publicTestimonials = testimonials.map(({ creator_email, ...rest }) => ({
+      ...rest,
+      creator_name: maskCreatorName(rest.creator_name),
+    }));
+
     return NextResponse.json({
-      testimonials,
+      testimonials: publicTestimonials,
       stats: {
         totalReviews,
         averageRating,

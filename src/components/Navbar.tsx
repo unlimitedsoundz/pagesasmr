@@ -830,8 +830,8 @@ export default function Navbar() {
                   </button>
 
                   {notifDropdownOpen && (
-                    <div className="fixed left-3 right-3 top-[68px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 md:w-96 sm:max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-50 overflow-hidden text-black dark:text-[#F0F0F6]">
-                      <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
+                    <div data-notification-drawer="true" className="notification-drawer notification-bar fixed left-3 right-3 top-[68px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 md:w-96 sm:max-w-sm !rounded-none rounded-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-50 overflow-hidden text-black dark:text-[#F0F0F6]" style={{ backdropFilter: 'none', borderRadius: 0 }}>
+                      <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800 !rounded-none" style={{ borderRadius: 0 }}>
                         <div className="flex items-center gap-2">
                           <span className="font-serif font-bold text-sm">Notifications</span>
                           {unreadNotifs > 0 && (
@@ -844,14 +844,15 @@ export default function Navbar() {
                           <button
                             type="button"
                             onClick={handleMarkAllRead}
-                            className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
+                            className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors !rounded-none"
+                            style={{ borderRadius: 0 }}
                           >
                             Mark all read
                           </button>
                         )}
                       </div>
 
-                      <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 bg-white dark:bg-neutral-900">
+                      <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 bg-white dark:bg-neutral-900 !rounded-none" style={{ borderRadius: 0 }}>
                         {notifications.length === 0 ? (
                           <div className="p-6 text-center text-xs text-neutral-500 font-medium">
                             No notifications yet
@@ -862,7 +863,9 @@ export default function Navbar() {
                               key={n.id}
                               href={n.link || (user.role === 'ADMIN' ? '/admin/submissions' : '/creator/notifications')}
                               onClick={() => setNotifDropdownOpen(false)}
-                              className={`p-3 block hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs space-y-1 ${!n.is_read ? 'bg-neutral-100 dark:bg-neutral-800 border-l-2 border-l-black dark:border-l-white' : 'bg-white dark:bg-neutral-900'
+                              data-notification-card="true"
+                              style={{ borderRadius: 0 }}
+                              className={`notification-card p-3 block hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs space-y-1 !rounded-none rounded-none ${!n.is_read ? 'bg-neutral-100 dark:bg-neutral-800 border-l-2 border-l-black dark:border-l-white' : 'bg-white dark:bg-neutral-900'
                                 }`}
                             >
                               <div className="font-bold text-black dark:text-white flex items-center justify-between">
@@ -906,7 +909,7 @@ export default function Navbar() {
                       className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 transition-all group"
                       title="Admin Settings & Avatar"
                     >
-                      <div className="w-6 h-6 rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center text-white ring-1 ring-neutral-300 group-hover:ring-black transition-all shrink-0">
+                      <div data-avatar="true" className="w-6 h-6 rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center text-white ring-1 ring-neutral-300 group-hover:ring-black transition-all shrink-0">
                         {user.avatar_url ? (
                           <img
                             src={user.avatar_url}
@@ -941,7 +944,7 @@ export default function Navbar() {
                       className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 transition-all group"
                       title="Edit Profile & Avatar"
                     >
-                      <div className="w-6 h-6 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center text-white ring-1 ring-neutral-300 group-hover:ring-black transition-all shrink-0">
+                      <div data-avatar="true" className="w-6 h-6 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center text-white ring-1 ring-neutral-300 group-hover:ring-black transition-all shrink-0">
                         {user.avatar_url ? (
                           <img
                             src={user.avatar_url}
@@ -1023,8 +1026,8 @@ export default function Navbar() {
                   </button>
 
                   {notifDropdownOpen && (
-                    <div className="fixed left-4 right-4 top-[65px] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-50 overflow-hidden text-black dark:text-[#F0F0F6]">
-                      <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
+                    <div data-notification-drawer="true" className="notification-drawer notification-bar fixed left-4 right-4 top-[65px] !rounded-none rounded-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-50 overflow-hidden text-black dark:text-[#F0F0F6]" style={{ backdropFilter: 'none', borderRadius: 0 }}>
+                      <div className="p-3 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800 !rounded-none" style={{ borderRadius: 0 }}>
                         <div className="flex items-center gap-2">
                           <span className="font-serif font-bold text-sm">Notifications</span>
                           {unreadNotifs > 0 && (
@@ -1037,14 +1040,15 @@ export default function Navbar() {
                           <button
                             type="button"
                             onClick={handleMarkAllRead}
-                            className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
+                            className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors !rounded-none"
+                            style={{ borderRadius: 0 }}
                           >
                             Mark all read
                           </button>
                         )}
                       </div>
 
-                      <div className="max-h-64 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 bg-white dark:bg-neutral-900">
+                      <div className="max-h-64 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 bg-white dark:bg-neutral-900 !rounded-none" style={{ borderRadius: 0 }}>
                         {notifications.length === 0 ? (
                           <div className="p-6 text-center text-xs text-neutral-500 font-medium">
                             No notifications yet
@@ -1055,7 +1059,9 @@ export default function Navbar() {
                               key={n.id}
                               href={n.link || (user.role === 'ADMIN' ? '/admin/submissions' : '/creator/notifications')}
                               onClick={() => { setNotifDropdownOpen(false); setMobileMenuOpen(false); }}
-                              className={`p-3 block hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs space-y-1 ${!n.is_read ? 'bg-neutral-100 dark:bg-neutral-800 border-l-2 border-l-black dark:border-l-white' : 'bg-white dark:bg-neutral-900'
+                              data-notification-card="true"
+                              style={{ borderRadius: 0 }}
+                              className={`notification-card p-3 block !rounded-none rounded-none hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs space-y-1 ${!n.is_read ? 'bg-neutral-100 dark:bg-neutral-800 border-l-2 border-l-black dark:border-l-white' : 'bg-white dark:bg-neutral-900'
                                 }`}
                             >
                               <div className="font-bold text-black dark:text-white flex items-center justify-between">
@@ -1086,10 +1092,11 @@ export default function Navbar() {
 
                 <NextLink
                   href={user.role === 'ADMIN' ? '/admin' : '/creator/settings'}
+                  data-avatar="true"
                   className="p-0.5 rounded-full ring-1 ring-neutral-300 dark:ring-neutral-700 hover:ring-neutral-900 transition-all shrink-0"
                   title="Edit Profile & Avatar"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center text-white">
+                  <div data-avatar="true" className="w-8 h-8 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center text-white">
                     {user.avatar_url ? (
                       <img
                         src={user.avatar_url}
@@ -1128,7 +1135,7 @@ export default function Navbar() {
                   className="shrink-0 group"
                   title="Manage Avatar & Settings"
                 >
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-black flex items-center justify-center text-white ring-1 ring-neutral-300 group-hover:ring-black transition-all">
+                  <div data-avatar="true" className="w-10 h-10 rounded-full overflow-hidden bg-black flex items-center justify-center text-white ring-1 ring-neutral-300 group-hover:ring-black transition-all">
                     {user.avatar_url ? (
                       <img
                         src={user.avatar_url}

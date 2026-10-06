@@ -23,6 +23,9 @@ import {
   FolderOpen,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
   History,
 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
@@ -397,6 +400,16 @@ export default function AdminSubmissionsPage() {
   }, [filtered]);
 
   const [expandedCreators, setExpandedCreators] = useState<Record<string, boolean>>({});
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, filterType, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(creatorGroups.length / (pageSize === -1 ? creatorGroups.length || 1 : pageSize)));
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedCreatorGroups = creatorGroups.slice(startIndex, startIndex + pageSize);
 
   const toggleCreator = (creatorId: string) => {
     setExpandedCreators((prev) => {
@@ -641,200 +654,310 @@ export default function AdminSubmissionsPage() {
             </div>
           </div>
 
-          {/* Collapsible Creator Accordion Folders */}
-          {creatorGroups.map((group) => {
-            const isExpanded = expandedCreators[group.creatorId] ?? true;
+          {/* Creator Submissions Table (matches Pink Room Main) */}
+          <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-2xs">
+            {/* Table Header */}
+            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 border-b border-neutral-200 text-xs font-medium text-neutral-500 bg-white select-none">
+              <div className="col-span-4">Creator</div>
+              <div className="col-span-2">Videos</div>
+              <div className="col-span-3">Submissions</div>
+              <div className="col-span-1">Date</div>
+              <div className="col-span-2 text-right pr-6">Status</div>
+            </div>
 
-            return (
-              <div
-                key={group.creatorId}
-                className="border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm transition-all"
-              >
-                {/* Folder Header */}
+            {/* Table Accordion Rows */}
+            <div className="divide-y divide-neutral-100">
+              {paginatedCreatorGroups.map((group) => {
+                const isExpanded = expandedCreators[group.creatorId] ?? true;
+
+                return (
+                  <div key={group.creatorId} className="transition-colors">
+                    {/* Row Trigger */}
+                    <button
+                      type="button"
+                      onClick={() => toggleCreator(group.creatorId)}
+                      className="w-full text-left px-4 sm:px-6 py-3.5 hover:bg-neutral-50/70 transition-colors flex items-center justify-between group"
+                    >
+                      {/* Desktop Columns */}
+                      <div className="hidden md:grid grid-cols-12 gap-4 items-center w-full">
+                        {/* Creator */}
+                        <div className="col-span-4 min-w-0 pr-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-sm text-neutral-900 truncate">{group.creatorName}</span>
+                            {(group.submissions.some((s) => s.creator_sample_status === 'APPROVED' || (s.is_sample && s.status === 'APPROVED')) || group.approvedCount > 0) && (
+                              <VerifiedBadge size={14} />
+                            )}
+                          </div>
+                          <p className="text-xs text-neutral-500 font-normal truncate">{group.creatorEmail || 'No email'}</p>
+                        </div>
+
+                        {/* Videos */}
+                        <div className="col-span-2 min-w-0">
+                          <span className="text-xs font-mono text-neutral-700 truncate block">
+                            {group.submissions.length} video{group.submissions.length === 1 ? '' : 's'}
+                          </span>
+                        </div>
+
+                        {/* Submissions */}
+                        <div className="col-span-3 min-w-0">
+                          <p className="text-xs text-neutral-800 font-medium truncate">
+                            {group.approvedCount} approved • {group.pendingCount} pending
+                          </p>
+                          {group.auditionCount > 0 && (
+                            <p className="text-[11px] text-neutral-500 truncate">
+                              Includes Audition Sample
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Date */}
+                        <div className="col-span-1 text-xs text-neutral-500 font-normal truncate">
+                          {group.latestDate ? new Date(group.latestDate).toISOString().split('T')[0] : '—'}
+                        </div>
+
+                        {/* Status & Purple Chevron */}
+                        <div className="col-span-2 flex items-center justify-end gap-3">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            {group.pendingCount > 0 ? (
+                              <>
+                                <Clock className="w-4 h-4 text-amber-500 fill-amber-50 shrink-0" />
+                                <span className="text-xs font-medium text-neutral-800">Pending Review</span>
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 fill-emerald-50 shrink-0" />
+                                <span className="text-xs font-medium text-neutral-800">All Reviewed</span>
+                              </>
+                            )}
+                          </div>
+
+                          <ChevronRight
+                            className={`w-4 h-4 text-purple-600 transition-transform duration-200 shrink-0 ${
+                              isExpanded ? 'rotate-90' : ''
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Mobile Row */}
+                      <div className="flex md:hidden items-center justify-between w-full gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-sm text-neutral-900 truncate">{group.creatorName}</span>
+                            {group.approvedCount > 0 && <VerifiedBadge size={14} />}
+                          </div>
+                          <p className="text-xs text-neutral-500 truncate">{group.submissions.length} videos • {group.pendingCount} pending</p>
+                        </div>
+
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          {group.pendingCount > 0 ? (
+                            <Clock className="w-4 h-4 text-amber-500 fill-amber-50" />
+                          ) : (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 fill-emerald-50" />
+                          )}
+                          <ChevronRight
+                            className={`w-4 h-4 text-purple-600 transition-transform duration-200 shrink-0 ${
+                              isExpanded ? 'rotate-90' : ''
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Submissions inside this Creator's Folder */}
+                    {isExpanded && (
+                      <div className="bg-neutral-50/40 p-4 sm:p-5 space-y-3">
+                        {group.submissions.map((sub) => {
+                          const minutes = Math.floor(sub.duration_seconds / 60);
+                          const seconds = Math.round(sub.duration_seconds % 60);
+
+                          return (
+                            <div
+                              key={sub.id}
+                              className="bg-white p-4 sm:p-5 rounded-lg transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
+                            >
+                              <div className="space-y-2 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <StatusBadge status={sub.status} size="sm" />
+                                  {sub.is_sample && (
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-black bg-neutral-100 border border-neutral-300 px-2 py-0.5 rounded">
+                                      30s Audition Sample
+                                    </span>
+                                  )}
+                                  <span className="text-xs font-bold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200">
+                                    Page Turning
+                                  </span>
+                                  <span className="text-xs text-black flex items-center gap-1 font-bold">
+                                    <Clock className="w-3.5 h-3.5 text-black" />
+                                    {minutes}:{seconds.toString().padStart(2, '0')} ({Math.round(sub.duration_seconds)}s)
+                                  </span>
+                                  {sub.file_size_bytes ? (
+                                    <span className="text-xs font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
+                                      {(sub.file_size_bytes / (1024 * 1024)).toFixed(1)} MB
+                                    </span>
+                                  ) : null}
+                                  {sub.created_at && (
+                                    <span className="text-xs font-semibold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200 flex items-center gap-1">
+                                      <Calendar className="w-3.5 h-3.5 text-neutral-600" />
+                                      {new Date(sub.created_at).toLocaleString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                        hour12: true,
+                                      })}
+                                    </span>
+                                  )}
+                                  {sub.version_number && sub.version_number > 1 && (
+                                    <span className="text-[10px] font-bold text-black bg-neutral-100 px-1.5 py-0.5 rounded border border-neutral-300">
+                                      v{sub.version_number}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <h3 className="font-serif text-lg font-bold text-black">{sub.title}</h3>
+
+                                {sub.notes && (
+                                  <p className="text-xs text-black italic">Notes: “{sub.notes}”</p>
+                                )}
+
+                                {sub.revision_notes && (
+                                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
+                                    <strong>Current Revision Guidance:</strong> {sub.revision_notes}
+                                  </div>
+                                )}
+
+                                {sub.rejection_reason && (
+                                  <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-900">
+                                    <strong>Rejection Reason:</strong> {sub.rejection_reason}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between md:flex-col md:items-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-neutral-200">
+                                <div className="text-left md:text-right">
+                                  <div className="font-serif text-lg font-bold text-black">
+                                    {sub.is_sample ? (
+                                      <span className="text-xs font-sans font-bold text-neutral-500">$0.00 (Unpaid Sample)</span>
+                                    ) : (
+                                      `$${sub.agreed_rate_usd.toFixed(2)} USD`
+                                    )}
+                                  </div>
+                                  <div className="text-[10px] uppercase font-bold text-neutral-500">
+                                    Payout State: {sub.payout_status}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 flex-wrap justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => openReviewModal(sub)}
+                                    className="px-3.5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors flex items-center gap-1.5 shadow-sm"
+                                  >
+                                    {sub.status === 'APPROVED' ? (
+                                      <>
+                                        <Eye className="w-3.5 h-3.5" />
+                                        <span>Re-inspect</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Film className="w-3.5 h-3.5" />
+                                        <span>{sub.is_sample ? 'Review Audition' : 'Review Video'}</span>
+                                      </>
+                                    )}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownload(sub)}
+                                    disabled={downloadingId === sub.id}
+                                    title="Download Normal Original Video directly to device storage"
+                                    className="px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors bg-neutral-100 hover:bg-neutral-200 text-black border border-neutral-300 disabled:opacity-50"
+                                  >
+                                    <Download className={`w-3.5 h-3.5 ${downloadingId === sub.id ? 'animate-bounce' : ''}`} />
+                                    <span className="font-bold">{downloadingId === sub.id ? 'Saving...' : 'Normal'}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination Footer (matches screenshot) */}
+            <div className="px-5 py-3.5 border-t border-neutral-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500 font-medium select-none">
+              <div className="flex items-center gap-2">
+                <span>Page size:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="border border-neutral-200 rounded px-2 py-1 bg-white text-xs text-neutral-800 focus:outline-none cursor-pointer"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+
+              <div>
+                {creatorGroups.length === 0
+                  ? '0 of 0'
+                  : `${startIndex + 1} to ${Math.min(startIndex + pageSize, creatorGroups.length)} of ${creatorGroups.length}`}
+              </div>
+
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => toggleCreator(group.creatorId)}
-                  className={`w-full p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-50 hover:bg-neutral-100 transition-colors text-left ${
-                    isExpanded ? 'border-b border-neutral-200' : ''
-                  }`}
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(1)}
+                  className="p-1 rounded hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  title="First page"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-md bg-black text-white flex items-center justify-center shrink-0 shadow-sm">
-                      {isExpanded ? (
-                        <FolderOpen className="w-5 h-5 text-amber-400" />
-                      ) : (
-                        <Folder className="w-5 h-5 text-neutral-200" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-serif text-lg font-bold text-black">{group.creatorName}</span>
-                        {(group.submissions.some((s) => s.creator_sample_status === 'APPROVED' || (s.is_sample && s.status === 'APPROVED')) || group.approvedCount > 0) && (
-                          <VerifiedBadge size={18} />
-                        )}
-                        {group.creatorEmail && (
-                          <span className="text-xs text-neutral-600 font-medium">({group.creatorEmail})</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-neutral-600 mt-1 flex-wrap">
-                        <span className="font-bold text-black bg-white px-2 py-0.5 rounded border border-neutral-200">
-                          {group.submissions.length} video{group.submissions.length === 1 ? '' : 's'}
-                        </span>
-                        {group.pendingCount > 0 && (
-                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                            {group.pendingCount} Pending Review
-                          </span>
-                        )}
-                        {group.approvedCount > 0 && (
-                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
-                            {group.approvedCount} Approved
-                          </span>
-                        )}
-                        {group.auditionCount > 0 && (
-                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-neutral-100 text-black border border-neutral-300">
-                            Audition Sample
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto pt-2 sm:pt-0">
-                    <span className="text-xs font-bold text-neutral-500">
-                      {isExpanded ? 'Collapse Folder' : 'Open Folder'}
-                    </span>
-                    <ChevronDown
-                      className={`w-5 h-5 text-black transition-transform duration-200 ${
-                        isExpanded ? 'rotate-0' : '-rotate-90'
-                      }`}
-                    />
-                  </div>
+                  <ChevronsLeft className="w-3.5 h-3.5" />
                 </button>
-
-                {/* Submissions Inside Creator Folder — Rich Card Layout */}
-                {isExpanded && (
-                  <div className="p-3 sm:p-4 space-y-3 bg-neutral-50/60">
-                    {group.submissions.map((sub) => {
-                      const minutes = Math.floor(sub.duration_seconds / 60);
-                      const seconds = Math.round(sub.duration_seconds % 60);
-
-                      return (
-                        <div
-                          key={sub.id}
-                          className="bg-white p-4 sm:p-5 rounded-lg transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
-                        >
-                          <div className="space-y-2 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <StatusBadge status={sub.status} size="sm" />
-                              {sub.is_sample && (
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-black bg-neutral-100 border border-neutral-300 px-2 py-0.5 rounded">
-                                  30s Audition Sample
-                                </span>
-                              )}
-                              <span className="text-xs font-bold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200">
-                                Page Turning
-                              </span>
-                              <span className="text-xs text-black flex items-center gap-1 font-bold">
-                                <Clock className="w-3.5 h-3.5 text-black" />
-                                {minutes}:{seconds.toString().padStart(2, '0')} ({Math.round(sub.duration_seconds)}s)
-                              </span>
-                              {sub.file_size_bytes ? (
-                                <span className="text-xs font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
-                                  {(sub.file_size_bytes / (1024 * 1024)).toFixed(1)} MB
-                                </span>
-                              ) : null}
-                              {sub.created_at && (
-                                <span className="text-xs font-semibold text-black bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200 flex items-center gap-1">
-                                  <Calendar className="w-3.5 h-3.5 text-neutral-600" />
-                                  {new Date(sub.created_at).toLocaleString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true,
-                                  })}
-                                </span>
-                              )}
-                              {sub.version_number && sub.version_number > 1 && (
-                                <span className="text-[10px] font-bold text-black bg-neutral-100 px-1.5 py-0.5 rounded border border-neutral-300">
-                                  v{sub.version_number}
-                                </span>
-                              )}
-                            </div>
-
-                            <h3 className="font-serif text-lg font-bold text-black">{sub.title}</h3>
-
-                            {sub.notes && (
-                              <p className="text-xs text-black italic">Notes: “{sub.notes}”</p>
-                            )}
-
-                            {sub.revision_notes && (
-                              <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
-                                <strong>Current Revision Guidance:</strong> {sub.revision_notes}
-                              </div>
-                            )}
-
-                            {sub.rejection_reason && (
-                              <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-900">
-                                <strong>Rejection Reason:</strong> {sub.rejection_reason}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between md:flex-col md:items-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-neutral-200">
-                            <div className="text-left md:text-right">
-                              <div className="font-serif text-lg font-bold text-black">
-                                {sub.is_sample ? (
-                                  <span className="text-xs font-sans font-bold text-neutral-500">$0.00 (Unpaid Sample)</span>
-                                ) : (
-                                  `$${sub.agreed_rate_usd.toFixed(2)} USD`
-                                )}
-                              </div>
-                              <div className="text-[10px] uppercase font-bold text-neutral-500">
-                                Payout State: {sub.payout_status}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 flex-wrap justify-end">
-                              <button
-                                type="button"
-                                onClick={() => openReviewModal(sub)}
-                                className="px-3.5 py-2 rounded-lg bg-black text-white text-xs font-bold hover:bg-neutral-800 transition-colors flex items-center gap-1.5 shadow-sm"
-                              >
-                                {sub.status === 'APPROVED' ? (
-                                  <>
-                                    <Eye className="w-3.5 h-3.5" />
-                                    <span>Re-inspect</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Film className="w-3.5 h-3.5" />
-                                    <span>{sub.is_sample ? 'Review Audition' : 'Review Video'}</span>
-                                  </>
-                                )}
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleDownload(sub)}
-                                disabled={downloadingId === sub.id}
-                                title="Download Normal Original Video directly to device storage"
-                                className="px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors bg-neutral-100 hover:bg-neutral-200 text-black border border-neutral-300 disabled:opacity-50"
-                              >
-                                <Download className={`w-3.5 h-3.5 ${downloadingId === sub.id ? 'animate-bounce' : ''}`} />
-                                <span className="font-bold">{downloadingId === sub.id ? 'Saving...' : 'Normal'}</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="p-1 rounded hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  title="Previous page"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <span className="px-2">
+                  Page <strong className="text-neutral-800">{currentPage}</strong> of <strong className="text-neutral-800">{totalPages}</strong>
+                </span>
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="p-1 rounded hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  title="Next page"
+                >
+                  <ChevronRight className="w-3.5 h-3.5 text-neutral-600" />
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(totalPages)}
+                  className="p-1 rounded hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  title="Last page"
+                >
+                  <ChevronsRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-            );
-          })}
+            </div>
+          </div>
         </div>
       )}
 

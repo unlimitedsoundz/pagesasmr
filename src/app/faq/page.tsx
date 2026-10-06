@@ -140,7 +140,7 @@ export default function FaqPage() {
                 key={idx}
                 className="border-b border-neutral-200/80 dark:border-neutral-800/80 last:border-b-0 pb-5 pt-3 reveal-on-scroll"
               >
-                <div className="w-full text-left flex items-start justify-between gap-4 py-2">
+                <div className="w-full text-left flex items-start justify-between gap-4 py-2 group">
                   <span className="font-serif text-xl sm:text-2xl font-medium text-[#1C1520] dark:text-white group-hover:text-[#9D174D] dark:group-hover:text-pink-300 transition-colors leading-snug">
                     {faq.q}
                   </span>

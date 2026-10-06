@@ -597,7 +597,6 @@ export default function CreatorUploadPage() {
               </div>
             </div>
           </div>
-        </div>
 
         {/* 30s Audition Sample Gate Card (When sampleStatus !== 'APPROVED') */}
         {sampleStatus !== 'APPROVED' && (

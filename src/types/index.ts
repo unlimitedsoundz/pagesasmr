@@ -207,6 +207,7 @@ export interface PayoutRequest {
   payment_method: PaymentMethodType;
   payment_destination: string;
   submission_ids: string[];
+  payout_type?: 'VIDEOS' | 'REFERRAL';
   failure_reason?: string;
   payment_reference?: string;
   bank_payment_reference?: string;
