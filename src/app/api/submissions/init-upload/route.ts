@@ -47,7 +47,10 @@ export async function POST(req: NextRequest) {
     }
 
     const submissionId = crypto.randomUUID();
-    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || process.env.MEDIA_SERVICE_URL || '';
+    let mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || process.env.MEDIA_SERVICE_URL || '';
+    if (mediaUrl.includes('media.pinkroom.online')) {
+      mediaUrl = '';
+    }
     const tusEndpoint = mediaUrl ? `${mediaUrl.replace(/\/+$/, '')}/files/` : '/api/upload';
 
     return NextResponse.json({

@@ -29,5 +29,6 @@ export function createMediaAccessToken(fileKey: string, ttlSeconds = TOKEN_TTL_S
 
 export function getMediaServiceUrl(): string | null {
   const value = process.env.MEDIA_SERVICE_URL || process.env.NEXT_PUBLIC_MEDIA_URL;
+  if (!value || value.includes('media.pinkroom.online')) return null;
   return value?.startsWith('http') ? value.replace(/\/+$/, '') : null;
 }

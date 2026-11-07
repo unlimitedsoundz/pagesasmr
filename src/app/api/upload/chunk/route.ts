@@ -177,9 +177,16 @@ export async function POST(req: NextRequest) {
     const diskFileName = `${uniqueFileId}${ext}`;
 
     // Resolve persistent local storage directory
-    const uploadsDir = path.resolve(process.env.LOCAL_MEDIA_DIR || path.join(process.cwd(), 'uploads'));
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+    let uploadsDir = process.env.LOCAL_MEDIA_DIR ? path.resolve(process.env.LOCAL_MEDIA_DIR) : path.join(process.cwd(), 'uploads');
+    try {
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+    } catch {
+      uploadsDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
     }
     const diskPath = path.join(uploadsDir, diskFileName);
 

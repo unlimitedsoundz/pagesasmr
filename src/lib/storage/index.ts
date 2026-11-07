@@ -86,7 +86,7 @@ export class HostingerStorageProvider implements IStorageProvider {
 
   private getMediaBaseUrl(): string | null {
     const mediaUrl = process.env.MEDIA_SERVICE_URL || process.env.NEXT_PUBLIC_MEDIA_URL;
-    if (mediaUrl && mediaUrl.startsWith('http')) {
+    if (mediaUrl && mediaUrl.startsWith('http') && !mediaUrl.includes('media.pinkroom.online')) {
       return mediaUrl.replace(/\/+$/, '');
     }
     return null;

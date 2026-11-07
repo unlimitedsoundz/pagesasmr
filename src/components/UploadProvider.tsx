@@ -541,6 +541,9 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
       const initData = await initRes.json();
       submissionId = submissionId || initData.submissionId || (initData.submission && initData.submission.id);
       tusEndpoint = initData.tusEndpoint || process.env.NEXT_PUBLIC_MEDIA_URL || '';
+      if (!tusEndpoint || tusEndpoint.includes('media.pinkroom.online')) {
+        tusEndpoint = '/api/upload';
+      }
       storageProvider = initData.storageProvider || 'hostinger';
 
       try {
@@ -573,10 +576,34 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
       throw initErr;
     }
 
-    const useTus = tusEndpoint.startsWith('http');
+    const startChunkedFallback = (resolve: (val: any) => void, reject: (err: any) => void) => {
+      const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks
+      const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
+
+      chunkUploadRef.current = {
+        file,
+        meta,
+        submissionId: submissionId || crypto.randomUUID(),
+        isSample,
+        title,
+        chunkSize: CHUNK_SIZE,
+        totalChunks,
+        currentChunkIndex: 0,
+        isPaused: false,
+        storageProvider,
+        isRevision,
+        resolve,
+        reject,
+      };
+
+      uploadNextChunk();
+    };
+
+    const useTus = tusEndpoint.startsWith('http') && !tusEndpoint.includes('media.pinkroom.online');
 
     if (useTus) {
       return new Promise(async (resolve, reject) => {
+        let hasFallenBack = false;
         try {
           let authToken = '';
           try {
@@ -600,16 +627,12 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
             },
             headers: authToken ? { Authorization: authToken } : {},
             onError: (error) => {
-              console.error('[Pages TUS] Upload error:', error);
-              const errText = error?.message || 'Network error during resumable video transfer.';
-              setUploadState((prev) => ({
-                ...prev,
-                isUploading: false,
-                status: 'ERROR',
-                error: errText,
-              }));
-              toast.error(errText);
-              reject(error);
+              console.warn('[Pages TUS] Remote media server unreachable or failed, falling back to chunked upload:', error);
+              if (!hasFallenBack) {
+                hasFallenBack = true;
+                tusUploadRef.current = null;
+                startChunkedFallback(resolve, reject);
+              }
             },
             onProgress: (bytesUploaded, bytesTotal) => {
               const pct = Math.min(99, Math.round((bytesUploaded / bytesTotal) * 100));
@@ -719,39 +742,26 @@ export function UploadProvider({ children }: { children: React.ReactNode }) {
           tusUploadRef.current = upload;
           upload.start();
         } catch (err: any) {
-          setUploadState((prev) => ({
-            ...prev,
-            isUploading: false,
-            status: 'ERROR',
-            error: err.message || 'Failed to start upload',
-          }));
-          reject(err);
+          if (!hasFallenBack) {
+            hasFallenBack = true;
+            tusUploadRef.current = null;
+            startChunkedFallback(resolve, reject);
+          } else {
+            setUploadState((prev) => ({
+              ...prev,
+              isUploading: false,
+              status: 'ERROR',
+              error: err.message || 'Failed to start upload',
+            }));
+            reject(err);
+          }
         }
       });
     }
 
-    // Step 2b: Fallback to resilient chunked slice upload with full Pause / Resume support
+    // Step 2b: Direct resilient chunked slice upload with full Pause / Resume support
     return new Promise((resolve, reject) => {
-      const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks
-      const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
-
-      chunkUploadRef.current = {
-        file,
-        meta,
-        submissionId: submissionId || crypto.randomUUID(),
-        isSample,
-        title,
-        chunkSize: CHUNK_SIZE,
-        totalChunks,
-        currentChunkIndex: 0,
-        isPaused: false,
-        storageProvider,
-        isRevision,
-        resolve,
-        reject,
-      };
-
-      uploadNextChunk();
+      startChunkedFallback(resolve, reject);
     });
   };
 
