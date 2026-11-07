@@ -104,7 +104,7 @@ async function notifyAdminOfCreatorMessage(creatorName: string, messageText: str
     <body style="margin:0;padding:36px 16px;background-color:#FDF0F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1C1520;">
       <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:24px;padding:36px 32px;">
         <div style="padding-bottom:20px;margin-bottom:20px;">
-          <img src="https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/brand/logo.png" alt="The Pink Room" width="130" style="display:block;max-width:130px;height:auto;" />
+          <img src="https://wworklrchluhmppksine.supabase.co/storage/v1/object/public/avatars/brand/logo.png" alt="The Pink Room" width="130" style="display:block;max-width:130px;height:auto;" />
         </div>
         <h3 style="margin-top:0;font-size:18px;color:#1C1520;">💬 New message from ${creatorName}</h3>
         <p style="font-size:14px;line-height:1.6;color:#2E2533;background:#F5F5F5;padding:14px 18px;border-radius:12px;border-left:4px solid #1C1520;">

@@ -22,4 +22,4 @@ export const ADMIN_NOTIFICATION_EMAILS: string[] = ADMIN_NOTIFICATION_EMAIL.spli
 export const ADMIN_EMAIL = ADMIN_NOTIFICATION_EMAILS[0] || 'opheliaadeleke@gmail.com';
 
 export const PLATFORM_LOGO_URL =
-  'https://ydymhzdoptmpblmejcjs.supabase.co/storage/v1/object/public/avatars/brand/logo.png';
+  'https://wworklrchluhmppksine.supabase.co/storage/v1/object/public/avatars/brand/logo.png';

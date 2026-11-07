@@ -160,7 +160,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<EmailDeliver
 
   // 2. Fallback: Invoke Supabase Edge Function `send-email`
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ydymhzdoptmpblmejcjs.supabase.co';
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wworklrchluhmppksine.supabase.co';
     const supabaseKey =
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
