@@ -36,6 +36,7 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
   const [newDuration, setNewDuration] = useState('180');
   const [saving, setSaving] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState('');
 
   // Admin delete modal state
@@ -48,6 +49,7 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
     if (!file) return;
 
     setUploadingFile(true);
+    setUploadProgress(0);
     setUploadError('');
 
     try {
@@ -68,32 +70,102 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
     }
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('is_admin_sample', 'true');
-      formData.append('is_sample', 'true');
+      let uploadedUrl = '';
+      let detectedDuration = 0;
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      // Strategy 1: Direct signed upload to Supabase Storage (for files <= 50MB)
+      if (file.size <= 50 * 1024 * 1024) {
+        try {
+          const urlRes = await fetch('/api/guidelines/samples/upload-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileName: file.name,
+              fileType: file.type || 'video/mp4',
+            }),
+          });
 
-      const text = await res.text();
-      let data: any = {};
-      try {
-        data = JSON.parse(text);
-      } catch {
-        if (res.status === 413 || text.includes('Request Entity Too Large')) {
-          throw new Error('Video file exceeds server proxy size limit. Please enter the video URL directly or use a smaller file.');
+          if (urlRes.ok) {
+            const { signedUrl, publicUrl } = await urlRes.json();
+            if (signedUrl && publicUrl) {
+              const uploadRes = await fetch(signedUrl, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': file.type || 'video/mp4',
+                },
+                body: file,
+              });
+
+              if (uploadRes.ok) {
+                uploadedUrl = publicUrl;
+                setUploadProgress(100);
+              }
+            }
+          }
+        } catch (directErr) {
+          console.warn('Direct upload URL attempt failed, falling back to chunked upload:', directErr);
         }
-        throw new Error(text.slice(0, 120) || 'Failed to upload video file.');
       }
 
-      if (!res.ok) throw new Error(data.error || 'Failed to upload video file.');
+      // Strategy 2: Resilient Chunked Upload (/api/upload/chunk) - handles any file size without memory/parsing errors
+      if (!uploadedUrl) {
+        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunk slices
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const submissionId = `guideline-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+        let lastRespData: any = null;
 
-      setNewVideoUrl(data.fileUrl || data.streamUrl || data.previewUrl || '');
-      if (data.durationSeconds) {
-        setNewDuration(Math.round(data.durationSeconds).toString());
+        for (let i = 0; i < totalChunks; i++) {
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(file.size, start + CHUNK_SIZE);
+          const chunkBlob = file.slice(start, end);
+
+          const formData = new FormData();
+          formData.append('chunk', chunkBlob, file.name);
+          formData.append('chunkIndex', String(i));
+          formData.append('totalChunks', String(totalChunks));
+          formData.append('submissionId', submissionId);
+          formData.append('fileName', file.name);
+          formData.append('fileSizeBytes', String(file.size));
+          formData.append('is_admin_sample', 'true');
+          formData.append('is_sample', 'true');
+
+          const chunkRes = await fetch('/api/upload/chunk', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const chunkText = await chunkRes.text();
+          let chunkData: any = {};
+          try {
+            chunkData = JSON.parse(chunkText);
+          } catch {
+            throw new Error(`Server error processing chunk ${i + 1} of ${totalChunks}`);
+          }
+
+          if (!chunkRes.ok) {
+            throw new Error(chunkData.error || `Upload failed on chunk ${i + 1} of ${totalChunks}`);
+          }
+
+          lastRespData = chunkData;
+          const pct = Math.round(((i + 1) / totalChunks) * 100);
+          setUploadProgress(pct);
+        }
+
+        if (lastRespData?.fileUrl) {
+          uploadedUrl = lastRespData.fileUrl;
+          if (lastRespData.durationSeconds) {
+            detectedDuration = Math.round(lastRespData.durationSeconds);
+          }
+        }
+      }
+
+      if (!uploadedUrl) {
+        throw new Error('Could not upload guideline sample video. Please try again or enter the video URL directly.');
+      }
+
+      setNewVideoUrl(uploadedUrl);
+      if (detectedDuration > 0) {
+        setNewDuration(detectedDuration.toString());
       }
     } catch (err: any) {
       setUploadError(err.message || 'Error uploading video file.');
@@ -416,7 +488,7 @@ export default function GuidelineSamplePlayer({ isAdmin = false, onSampleUpdated
                     {uploadingFile && (
                       <span className="text-[11px] text-neutral-700 font-bold animate-pulse shrink-0 flex items-center gap-1.5">
                         <span className="inline-block w-2.5 h-2.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                        Uploading...
+                        Uploading{uploadProgress > 0 ? ` ${uploadProgress}%` : '...'}
                       </span>
                     )}
                   </div>

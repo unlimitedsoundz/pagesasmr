@@ -9,6 +9,7 @@ import { extractVideoDuration, extractVideoDimensions } from '@/lib/media';
 import { db } from '@/lib/db';
 import { getStorageProvider } from '@/lib/storage';
 import { formatCreatorPayoutInfo } from '@/lib/payoutDetails';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
@@ -96,7 +97,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Business rules validation
-    const isAdminUpload = user.role === 'ADMIN';
+    const isAdminUpload =
+      user.role === 'ADMIN' ||
+      formData.get('is_admin_sample') === 'true' ||
+      formData.get('is_admin_sample') === '1';
 
     if (isAdminUpload) {
       // Admin reference clips have no minimum duration
@@ -167,7 +171,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate unique file ID
-    const uniqueFileId = `video-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const uniqueFileId = isAdminUpload
+      ? `guideline-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
+      : `video-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     const diskFileName = `${uniqueFileId}${ext}`;
 
     // Resolve persistent local storage directory
@@ -189,7 +195,30 @@ export async function POST(req: NextRequest) {
 
     // Video orientation and dimensions
     const dimensions = extractVideoDimensions(assembledBuffer);
-    const streamUrl = `/api/videos/${diskFileName}/stream`;
+    let streamUrl = `/api/videos/${diskFileName}/stream`;
+    let storageProvider = 'hostinger';
+
+    if (isAdminUpload) {
+      try {
+        const { error: supaErr } = await supabaseAdmin.storage
+          .from('guideline-samples')
+          .upload(diskFileName, assembledBuffer, {
+            contentType: mimeType,
+            upsert: true,
+          });
+        if (!supaErr) {
+          const { data: pubData } = supabaseAdmin.storage
+            .from('guideline-samples')
+            .getPublicUrl(diskFileName);
+          if (pubData?.publicUrl) {
+            streamUrl = pubData.publicUrl;
+            storageProvider = 'supabase_public';
+          }
+        }
+      } catch (adminUploadErr) {
+        console.warn('[Upload Chunk] Failed to mirror guideline sample to Supabase:', adminUploadErr);
+      }
+    }
 
     // Clean up temporary chunks
     try {
@@ -205,7 +234,7 @@ export async function POST(req: NextRequest) {
       width: dimensions?.width,
       height: dimensions?.height,
       durationSeconds,
-      storageProvider: 'hostinger',
+      storageProvider,
     });
   } catch (err: any) {
     console.error('[Upload Chunk Route] error:', err);
