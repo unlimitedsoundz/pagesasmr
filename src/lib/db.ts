@@ -3682,7 +3682,7 @@ class PagesDatabaseService {
     return newReferral;
   }
 
-  checkAndUpdateReferralMilestone(referredUserId: string): any {
+  checkAndUpdateReferralMilestone(referredUserId: string, shouldPersist: boolean = true): any {
     if (!this.data.referrals) {
       this.data.referrals = [];
     }
@@ -3707,7 +3707,7 @@ class PagesDatabaseService {
       referral.reward_status = 'REWARDED';
       referral.milestone_reached = true;
       referral.rewarded_at = referral.rewarded_at || existingRewardLedger.created_at;
-      this.save();
+      if (shouldPersist) this.save();
       return referral;
     }
 
@@ -3742,8 +3742,10 @@ class PagesDatabaseService {
           created_at: new Date().toISOString(),
         };
         this.data.earnings_ledger.push(creditEntry);
-        this.save();
-        this.syncLedgerToSupabase(creditEntry);
+        if (shouldPersist) {
+          this.save();
+          this.syncLedgerToSupabase(creditEntry);
+        }
 
         // Check if unlock notification was already sent to avoid duplicate emails
         const alreadyNotified = (this.data.notifications || []).some(
@@ -3776,11 +3778,13 @@ class PagesDatabaseService {
           }
         }
       }
-      this.save();
-      this.syncReferralsToSupabase();
+      if (shouldPersist) {
+        this.save();
+        this.syncReferralsToSupabase();
+      }
     }
 
-    this.save();
+    if (shouldPersist) this.save();
     return referral;
   }
 

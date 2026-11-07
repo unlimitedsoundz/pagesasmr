@@ -139,11 +139,35 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const chunksize = end - start + 1;
       const fileStream = fs.createReadStream(actualFilePath, { start, end });
 
+      let isClosed = false;
       const readable = new ReadableStream({
         start(controller) {
-          fileStream.on('data', (chunk) => controller.enqueue(chunk));
-          fileStream.on('end', () => controller.close());
-          fileStream.on('error', (err) => controller.error(err));
+          fileStream.on('data', (chunk) => {
+            if (!isClosed) {
+              try {
+                controller.enqueue(chunk);
+              } catch {
+                isClosed = true;
+                fileStream.destroy();
+              }
+            }
+          });
+          fileStream.on('end', () => {
+            if (!isClosed) {
+              isClosed = true;
+              try { controller.close(); } catch {}
+            }
+          });
+          fileStream.on('error', (err) => {
+            if (!isClosed) {
+              isClosed = true;
+              try { controller.error(err); } catch {}
+            }
+          });
+        },
+        cancel() {
+          isClosed = true;
+          fileStream.destroy();
         },
       });
 
@@ -159,11 +183,35 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       });
     } else {
       const fileStream = fs.createReadStream(actualFilePath);
+      let isClosed = false;
       const readable = new ReadableStream({
         start(controller) {
-          fileStream.on('data', (chunk) => controller.enqueue(chunk));
-          fileStream.on('end', () => controller.close());
-          fileStream.on('error', (err) => controller.error(err));
+          fileStream.on('data', (chunk) => {
+            if (!isClosed) {
+              try {
+                controller.enqueue(chunk);
+              } catch {
+                isClosed = true;
+                fileStream.destroy();
+              }
+            }
+          });
+          fileStream.on('end', () => {
+            if (!isClosed) {
+              isClosed = true;
+              try { controller.close(); } catch {}
+            }
+          });
+          fileStream.on('error', (err) => {
+            if (!isClosed) {
+              isClosed = true;
+              try { controller.error(err); } catch {}
+            }
+          });
+        },
+        cancel() {
+          isClosed = true;
+          fileStream.destroy();
         },
       });
 
