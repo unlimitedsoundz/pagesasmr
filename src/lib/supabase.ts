@@ -2,9 +2,9 @@ import { createClient } from '@supabase/supabase-js';
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ydymhzdoptmpblmejcjs.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkeW1oemRvcHRtcGJsbWVqY2pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3Nzg4NTksImV4cCI6MjEwNDM1NDg1OX0.ebN7kACUEpY5uUFXUa8PPTZXnl9IhxxQryUyyMhBzI4';
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkeW1oemRvcHRtcGJsbWVqY2pzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODc3ODg1OSwiZXhwIjoyMTA0MzU0ODU5fQ.3PftOAibqREafTOqQqXLuF510J04DW4Sip1wjy8bJyQ';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wworklrchluhmppksine.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_g3fxFfiucvQPTQF5u4-X5w_ouHIeW5H';
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3b3JrbHJjaGx1aG1wcGtzaW5lIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5NDAyNTgyOSwiZXhwIjoyMTA5NjAxODI5fQ.WTq1jE384MGVhn7H-nI9pKsTBoqddILR8ZKamCyAgco';
 
 // Browser/public Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
