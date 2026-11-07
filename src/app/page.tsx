@@ -11,7 +11,7 @@ import HomeTestimonialsSection from '@/components/HomeTestimonialsSection';
 export const metadata: Metadata = {
   title: 'Turn Pages. Create Calming ASMR. Earn Beautifully. | The Pink Room',
   description:
-    'Join The Pink Room. Record authentic faceless page-turning ASMR. Earn $10 USD per approved video with reliable direct bank, Mobile Money & Direct Deposit payouts.',
+    'Join The Pink Room. Record authentic faceless page-turning ASMR. Earn $40 USD per approved video with reliable direct bank, Mobile Money & Direct Deposit payouts.',
   alternates: {
     canonical: '/',
   },
@@ -81,7 +81,7 @@ export default function HomePage() {
             </div>
             <div className="md:max-w-md">
               <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                We pay $10 for every accepted faceless video. Direct bank deposits via Mobile Money, Nigerian bank transfer, or Direct Deposit (ACH). Payout threshold is 8 approved videos ($80).
+                We pay $40 for every accepted faceless video. Direct bank deposits via Mobile Money, Nigerian bank transfer, or Direct Deposit (ACH). Payout threshold is 8 approved videos ($320).
               </p>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function HomePage() {
                   STARTER BATCH
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium !text-white tracking-tight my-4">
-                  $80
+                  $320
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-300 font-medium">
@@ -110,7 +110,7 @@ export default function HomePage() {
                   10 VIDEOS
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $100
+                  $400
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
@@ -125,7 +125,7 @@ export default function HomePage() {
                   STEADY CREATOR
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $160
+                  $640
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">

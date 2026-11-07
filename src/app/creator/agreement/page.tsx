@@ -69,7 +69,7 @@ export default function CreatorAgreementPage() {
     (typeof window !== 'undefined' ? localStorage.getItem('pinkroom_display_name') : null) ||
     'Creator';
 
-  const rate = profile?.rate_per_video_usd || 10;
+  const rate = profile?.rate_per_video_usd || 40;
   const minVideos = 8;
   const minPayout = rate * minVideos;
 

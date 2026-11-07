@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: '%s | The Pink Room',
   },
   description:
-    'Turn pages. Create calming ASMR. Earn $10 per approved video. Record original, faceless page-turning ASMR videos lasting at least 3 minutes. Request a payout once 8 videos are approved ($80).',
+    'Turn pages. Create calming ASMR. Earn $40 per approved video. Record original, faceless page-turning ASMR videos lasting at least 3 minutes. Request a payout once 8 videos are approved ($320).',
   keywords: [
     'The Pink Room',
     'Faceless ASMR',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     url: BASE_URL,
     title: 'The Pink Room — Page Turning ASMR Studio',
     description:
-      'Record faceless page-turning ASMR and earn $10 per approved video. Reliable direct payouts upon 8 approved videos ($80).',
+      'Record faceless page-turning ASMR and earn $40 per approved video. Reliable direct payouts upon 8 approved videos ($320).',
     siteName: 'The Pink Room',
     images: [
       {
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'The Pink Room — Page Turning ASMR Studio',
     description:
-      'Record faceless page-turning ASMR and earn $10 per approved video with reliable direct payouts.',
+      'Record faceless page-turning ASMR and earn $40 per approved video with reliable direct payouts.',
     images: ['/the-pink-room-logo.png'],
   },
   icons: {

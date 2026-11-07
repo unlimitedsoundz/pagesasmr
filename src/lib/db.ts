@@ -1789,7 +1789,7 @@ class PagesDatabaseService {
         creator_id: sub.creator_id,
         submission_id: sub.id,
         type: 'CREDIT',
-        amount_usd: sub.agreed_rate_usd, // exactly $10.00
+        amount_usd: sub.agreed_rate_usd,
         description: `Approval credit: ${sub.title}`,
         created_at: new Date().toISOString(),
       };
@@ -1813,7 +1813,7 @@ class PagesDatabaseService {
       user_id: sub.creator_id,
       title: sub.is_sample ? '30s Audition Approved! 🎉' : `Page-Turning Video Approved! (+$${sub.agreed_rate_usd.toFixed(2)})`,
       message: sub.is_sample
-        ? 'Your 30-second audition was approved! Full production unlocked: you may now upload your 8 full videos ($10 each).'
+        ? 'Your 30-second audition was approved! Full production unlocked: you may now upload your 8 full videos ($40 each).'
         : `Your page-turning video "${sub.title}" was approved. $${sub.agreed_rate_usd.toFixed(2)} USD has been added to your page-turning balance.`,
       type: 'REVIEW',
       link: sub.is_sample ? '/creator/upload' : '/creator/videos',
@@ -2957,7 +2957,7 @@ class PagesDatabaseService {
 
     creator.sample_status = 'APPROVED';
     creator.sample_review_notes =
-      notes || 'Audition meets quality guidelines. You may now produce and upload the 8 full paid videos ($10 each).';
+      notes || 'Audition meets quality guidelines. You may now produce and upload the 8 full paid videos ($40 each).';
 
     // Update all sample submissions for this creator to APPROVED with $1.00 reward
     const sampleSubs = this.data.submissions.filter(

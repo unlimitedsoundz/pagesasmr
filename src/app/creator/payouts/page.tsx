@@ -69,7 +69,7 @@ export default function CreatorPayoutsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const rate = profile?.rate_per_video_usd || 10;
+  const rate = profile?.rate_per_video_usd || 40;
   const threshold = profile?.payout_min_videos || 8;
   const minPayout = threshold * rate;
 

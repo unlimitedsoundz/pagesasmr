@@ -12,9 +12,9 @@ import {
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Earnings & Payments | Guaranteed $10/Video Payouts | The Pink Room — Page Turning',
+  title: 'Earnings & Payments | Guaranteed $40/Video Payouts | The Pink Room — Page Turning',
   description:
-    'Transparent compensation model: Earn flat $10 USD per approved page-turning video. Minimum 8-video ($80) payout threshold via Mobile Money, Local Bank Transfer, or Direct Deposit (ACH).',
+    'Transparent compensation model: Earn flat $40 USD per approved page-turning video. Minimum 8-video ($320) payout threshold via Mobile Money, Local Bank Transfer, or Direct Deposit (ACH).',
   alternates: {
     canonical: '/earnings-and-payments',
   },
@@ -24,15 +24,15 @@ export default function EarningsAndPaymentsPage() {
   const pillars = [
     {
       num: '01',
-      title: '$10.00 Rate Locked Per Submission',
-      desc: 'When you upload a video, the agreed platform rate ($10.00 USD) is permanently recorded with that submission. Even if platform rates fluctuate in the future, existing submissions are guaranteed their locked rate.',
+      title: '$40.00 Rate Locked Per Submission',
+      desc: 'When you upload a video, the agreed platform rate ($40.00 USD) is permanently recorded with that submission. Even if platform rates fluctuate in the future, existing submissions are guaranteed their locked rate.',
       meta: ['Immutable rate ledger', 'Never affected by market rate updates', 'Zero platform fees deducted'],
     },
     {
       num: '02',
-      title: '8 Approved Videos Minimum Payout ($80)',
-      desc: 'To ensure sustainable banking batch transfers, creators accumulate at least 8 approved, unpaid videos before submitting a withdrawal request. 8 approved videos = $80.00; 10 = $100.00; 16 = $160.00.',
-      meta: ['8 videos = $80 minimum', '10 videos = $100 payout', '16 videos = $800 payout'],
+      title: '8 Approved Videos Minimum Payout ($320)',
+      desc: 'To ensure sustainable banking batch transfers, creators accumulate at least 8 approved, unpaid videos before submitting a withdrawal request. 8 approved videos = $320.00; 10 = $400.00; 16 = $640.00.',
+      meta: ['8 videos = $320 minimum', '10 videos = $400 payout', '16 videos = $640 payout'],
     },
     {
       num: '03',
@@ -85,7 +85,7 @@ export default function EarningsAndPaymentsPage() {
             Direct payouts.
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            We pay $10 for every accepted faceless video. Direct bank deposits via Mobile Money, Nigerian bank transfer, or Direct Deposit (ACH). Payout threshold is 8 approved videos ($80).
+            We pay $40 for every accepted faceless video. Direct bank deposits via Mobile Money, Nigerian bank transfer, or Direct Deposit (ACH). Payout threshold is 8 approved videos ($320).
           </p>
         </div>
       </section>
@@ -115,7 +115,7 @@ export default function EarningsAndPaymentsPage() {
                   STARTER BATCH
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium !text-white tracking-tight my-4">
-                  $80
+                  $320
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-300 font-medium">
@@ -129,7 +129,7 @@ export default function EarningsAndPaymentsPage() {
                   10 VIDEOS
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $100
+                  $400
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
@@ -143,7 +143,7 @@ export default function EarningsAndPaymentsPage() {
                   STEADY CREATOR
                 </span>
                 <div className="font-serif text-5xl sm:text-6xl font-medium text-[#1C1520] dark:text-white tracking-tight my-4">
-                  $160
+                  $640
                 </div>
               </div>
               <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">

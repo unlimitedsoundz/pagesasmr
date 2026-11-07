@@ -32,7 +32,7 @@ export default function TermsPage() {
     {
       num: '04',
       title: 'Guaranteed Compensation & Minimum Threshold',
-      desc: 'Every accepted video earns a guaranteed, flat rate of $10.00 USD, permanently stored with your submission record. First withdrawal unlocks upon accumulating at least 8 approved, unpaid videos ($80.00 USD). Subsequent payouts also require 8 approved videos.',
+      desc: 'Every accepted video earns a guaranteed, flat rate of $40.00 USD, permanently stored with your submission record. First withdrawal unlocks upon accumulating at least 8 approved, unpaid videos ($320.00 USD). Subsequent payouts also require 8 approved videos.',
     },
     {
       num: '05',

@@ -44,8 +44,8 @@ export default function FaqPage() {
       a: 'You can use classic hardcover books, vintage paperbacks, art journals, notebooks, or sketchbooks. Ensure pages are clean, non-confidential, and non-explicit.',
     },
     {
-      q: 'How does the agreed $10 rate work if platform rates change?',
-      a: 'Every submission permanently stores the agreed rate ($10.00 USD) at the moment of upload. If the platform ever adjusts rates in the future, existing submissions are immutable and will still be paid out at the rate agreed upon when uploaded.',
+      q: 'How does the agreed $40 rate work if platform rates change?',
+      a: 'Every submission permanently stores the agreed rate ($40.00 USD) at the moment of upload. If the platform ever adjusts rates in the future, existing submissions are immutable and will still be paid out at the rate agreed upon when uploaded.',
     },
     {
       q: 'How are payouts sent to creators?',
@@ -85,11 +85,11 @@ export default function FaqPage() {
     },
     {
       q: 'How are earnings calculated?',
-      a: 'Each approved full video earns the agreed $10 USD rate recorded with that submission. Pending, rejected, duplicate, and revision-requested videos do not count toward the payout balance.',
+      a: 'Each approved full video earns the agreed $40 USD rate recorded with that submission. Pending, rejected, duplicate, and revision-requested videos do not count toward the payout balance.',
     },
     {
       q: 'When can I withdraw?',
-      a: 'You can request a payout once you have at least 8 approved, unpaid full videos, equal to the $80 minimum threshold. The payout page shows your eligible balance and whether the request button is available.',
+      a: 'You can request a payout once you have at least 8 approved, unpaid full videos, equal to the $320 minimum threshold. The payout page shows your eligible balance and whether the request button is available.',
     },
     {
       q: 'How long do payouts take?',
