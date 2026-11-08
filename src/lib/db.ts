@@ -1213,6 +1213,16 @@ class PagesDatabaseService {
 
     // Supabase sync
     try {
+      try {
+        await supabaseAdmin.auth.admin.createUser({
+          id: profile.id,
+          email: profile.email,
+          password: profile.password || 'Pink@2026',
+          email_confirm: true,
+          user_metadata: { display_name: profile.display_name, role: profile.role },
+        });
+      } catch {}
+
       await supabaseAdmin.from('profiles').upsert(
         {
           id: profile.id,

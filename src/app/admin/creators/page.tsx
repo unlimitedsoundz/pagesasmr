@@ -329,18 +329,18 @@ export default function AdminCreatorsPage() {
     .sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return (new Date(b.created_at || 0).getTime() || 0) - (new Date(a.created_at || 0).getTime() || 0);
         case 'oldest':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return (new Date(a.created_at || 0).getTime() || 0) - (new Date(b.created_at || 0).getTime() || 0);
         case 'pending': {
           const aPend = a.sample_status === 'PENDING_REVIEW' ? 0 : 1;
           const bPend = b.sample_status === 'PENDING_REVIEW' ? 0 : 1;
-          return aPend - bPend || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return aPend - bPend || (new Date(b.created_at || 0).getTime() || 0) - (new Date(a.created_at || 0).getTime() || 0);
         }
         case 'approved': {
           const aAppr = a.sample_status === 'APPROVED' ? 0 : 1;
           const bAppr = b.sample_status === 'APPROVED' ? 0 : 1;
-          return aAppr - bAppr || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return aAppr - bAppr || (new Date(b.created_at || 0).getTime() || 0) - (new Date(a.created_at || 0).getTime() || 0);
         }
         case 'balance':
           return (b.stats?.availablePayoutBalance || 0) - (a.stats?.availablePayoutBalance || 0);
