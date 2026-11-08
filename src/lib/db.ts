@@ -276,6 +276,30 @@ class PagesDatabaseService {
     }
   }
 
+  private async fetchAllSupabaseRows(
+    table: string,
+    configureQuery?: (q: any) => any
+  ): Promise<{ data: any[] | null; error: any }> {
+    const pageSize = 1000;
+    let from = 0;
+    const all: any[] = [];
+    while (true) {
+      let query = supabaseAdmin.from(table).select('*');
+      if (configureQuery) {
+        query = configureQuery(query);
+      }
+      const { data, error } = await query.range(from, from + pageSize - 1);
+      if (error) {
+        return { data: all.length > 0 ? all : null, error };
+      }
+      if (!data || data.length === 0) break;
+      all.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return { data: all, error: null };
+  }
+
   public async syncFromSupabase(): Promise<void> {
     try {
       try {
@@ -293,7 +317,7 @@ class PagesDatabaseService {
       const deletedIds = new Set(this.data.deleted_creator_ids || []);
 
       // 1. Sync Profiles (shared across platforms)
-      const { data: profiles, error: pErr } = await supabaseAdmin.from('profiles').select('*');
+      const { data: profiles, error: pErr } = await this.fetchAllSupabaseRows('profiles');
       if (!pErr && profiles) {
         for (const sp of profiles) {
           if (deletedIds.has(sp.id) || deletedIds.has(sp.email?.toLowerCase())) {
@@ -837,7 +861,8 @@ class PagesDatabaseService {
 
   getProfileById(id: string): Profile | undefined {
     this.reload();
-    return this.data.profiles.find((p) => p.id === id);
+    const targetId = id === '0e96974f-e960-4222-89b7-cd7b4635b619' ? '6fa5553a-6f4e-4097-83e2-480e55a69eb8' : id;
+    return this.data.profiles.find((p) => p.id === targetId || p.id === id);
   }
 
   /**

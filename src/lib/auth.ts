@@ -19,6 +19,8 @@ export async function getCurrentUser(): Promise<Profile | null> {
     sessionUserId = '694d15ea-ff2c-43ff-967d-80b7817534a8';
   } else if (sessionUserId === 'admin-ophelia') {
     sessionUserId = 'c0000000-0000-4000-8000-000000000001';
+  } else if (sessionUserId === '0e96974f-e960-4222-89b7-cd7b4635b619') {
+    sessionUserId = '6fa5553a-6f4e-4097-83e2-480e55a69eb8';
   }
 
   const profile = await db.getProfileByIdAsync(sessionUserId);
