@@ -841,7 +841,7 @@ export default function AdminSubmissionsPage() {
                                     {sub.is_sample ? (
                                       <span className="text-xs font-sans font-bold text-neutral-500">$0.00 (Unpaid Sample)</span>
                                     ) : (
-                                      `$${sub.agreed_rate_usd.toFixed(2)} USD`
+                                      `$${(sub.agreed_rate_usd && sub.agreed_rate_usd > 1 ? sub.agreed_rate_usd : 40).toFixed(2)} USD`
                                     )}
                                   </div>
                                   <div className="text-[10px] uppercase font-bold text-neutral-500">
@@ -1016,7 +1016,7 @@ export default function AdminSubmissionsPage() {
 
             {reviewingSub.is_sample && (
               <div className="p-3.5 rounded-xl bg-[#f8e2ec] border-0 text-xs font-medium text-black">
-                <strong className="font-bold">Quality Audition Rule:</strong> Approving this sample unlocks the creator's portal to record and upload their <strong>8 full paid videos ($10.00 each)</strong> toward their $80 milestone payout. Note: audition samples earn an immediate <strong>$1.00 reward</strong> disbursed to their local bank.
+                <strong className="font-bold">Quality Audition Rule:</strong> Approving this sample unlocks the creator's portal to record and upload their <strong>8 full paid videos ($40.00 each)</strong> toward their $320 milestone payout. Note: audition samples earn an immediate <strong>$1.00 reward</strong> disbursed to their local bank.
               </div>
             )}
 
@@ -1120,7 +1120,7 @@ export default function AdminSubmissionsPage() {
                 <p className="text-xs text-neutral-600">
                   {reviewingSub.is_sample
                     ? 'This 30s audition sample was approved and unlocked full production access. A $1.00 bonus was credited to their account.'
-                    : `This submission was approved ($${reviewingSub.agreed_rate_usd.toFixed(2)} USD credited). It is resolved and removed from the active queue.`}
+                    : `This submission was approved ($${(reviewingSub.agreed_rate_usd && reviewingSub.agreed_rate_usd > 1 ? reviewingSub.agreed_rate_usd : 40).toFixed(2)} USD credited). It is resolved and removed from the active queue.`}
                 </p>
                 {reviewingSub.is_sample && (
                   <div className="pt-2 border-t border-neutral-200 flex items-center justify-between">
@@ -1167,7 +1167,9 @@ export default function AdminSubmissionsPage() {
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span className="leading-tight">
                     Approve
-                    <span className="hidden sm:inline">{reviewingSub.is_sample ? ' Audition' : ' ($10)'}</span>
+                    <span className="hidden sm:inline">
+                      {reviewingSub.is_sample ? ' Audition' : ` (+$${(reviewingSub.agreed_rate_usd && reviewingSub.agreed_rate_usd > 1 ? reviewingSub.agreed_rate_usd : 40).toFixed(0)})`}
+                    </span>
                   </span>
                 </button>
 

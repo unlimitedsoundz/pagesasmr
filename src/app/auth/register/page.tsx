@@ -321,7 +321,7 @@ function RegisterForm() {
               <span>Page-Turning Creator Agreement</span>
             </div>
             <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-              I agree to record original, faceless page-turning ASMR videos lasting at least 180 seconds in a quiet acoustic setting with long press nails and clear paper sounds. I understand that each approved video earns $10.00 USD, and payouts unlock upon accumulating at least 8 approved page-turning videos ($80).
+              I agree to record original, faceless page-turning ASMR videos lasting at least 180 seconds in a quiet acoustic setting with long press nails and clear paper sounds. I understand that each approved video earns $40.00 USD, and payouts unlock upon accumulating at least 8 approved page-turning videos ($320).
             </p>
 
             <div className="space-y-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
